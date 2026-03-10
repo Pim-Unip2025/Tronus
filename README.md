@@ -33,7 +33,6 @@
 | 🎖️ **Cavaleiro** | Conquistado ao atingir 15 estrelas |
 | 🦅 **Duque** | Conquistado ao atingir 30 estrelas |
 | 👑 **Rei** | Conquistado ao atingir 50 estrelas — todos os reinos dominados |
-| 🏛️ **Imperador** | Papel do veterano que orienta e apoia o calouro |
 
 ### ✨ Funcionalidades
 
@@ -83,7 +82,6 @@ git clone https://github.com/Pim-Unip2025/Tronus.git
 | 🎖️ **Knight** | Achieved at 15 stars |
 | 🦅 **Duke** | Achieved at 30 stars |
 | 👑 **King** | Achieved at 50 stars — all kingdoms conquered |
-| 🏛️ **Emperor** | Role of the veteran who guides and supports the freshman |
 
 ### ✨ Features
 
@@ -122,9 +120,9 @@ git clone https://github.com/Pim-Unip2025/Tronus.git
 
 | Nome | GitHub |
 |---|---|
+| Jhonatan Oliveira | [@ojjhonatan](https://github.com/ojjhonatan) |
 | Enzo Oliveira | [@EnzoOliveir19](https://github.com/EnzoOliveir19) |
 | Renata Faria | [@renatafaria001](https://github.com/renatafaria001) |
-| Jhonatan Oliveira | [@ojjhonatan](https://github.com/ojjhonatan) |
 | Nickolas | [@NckGoulart](https://github.com/NckGoulart) |
 | Luiz | [@Luizzregis](https://github.com/Luizzregis) |
 | Pedro Bueno | — |
