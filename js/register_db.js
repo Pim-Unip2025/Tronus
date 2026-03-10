@@ -40,6 +40,7 @@ initDatabase().then(() => {
     if (resultado.sucesso) {
       const usuario = loginUsuario(name.value, password.value);
       sessionStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+      localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
       window.location.href = "character.html";
     } else {
       alert(resultado.erro);
