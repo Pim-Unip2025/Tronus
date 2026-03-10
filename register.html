@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+
+<title>Cadastro - TRONUS</title>
+
+</head>
+
+<body>
+
+<div id="sky"></div>
+
+<main class="container">
+
+<form id="registerForm">
+
+<img src="img/logo.png" class="logo">
+
+<div class="input-box">
+<input id="name" placeholder="Nome completo" type="text">
+<i class='bx bx-user'></i>
+</div>
+
+<div class="input-box">
+  <input id="celular" placeholder="Celular (ex: 11999999999)" type="tel">
+  <i class='bx bx-phone'></i>
+</div>
+
+<div class="input-box">
+<input id="email" placeholder="Email" type="email">
+<i class='bx bx-envelope'></i>
+</div>
+
+<div class="input-box">
+<input id="password" placeholder="Senha" type="password">
+<i class='bx bx-lock-alt'></i>
+</div>
+
+<div class="input-box">
+<input id="confirmPassword" placeholder="Confirmar senha" type="password">
+<i class='bx bx-lock-alt'></i>
+</div>
+
+<button type="submit" class="login">Criar conta</button>
+
+<div class="register-link">
+<p>Já tem conta? <a href="index.html">Entrar</a></p>
+</div>
+
+</form>
+
+</main>
+
+<script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+<script src="database.js"></script>
+<script src="register_db.js"></script>
+
+</body>
+</html>
