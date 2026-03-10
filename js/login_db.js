@@ -20,7 +20,14 @@ initDatabase().then(() => {
     }
 
     sessionStorage.setItem("usuarioLogado", JSON.stringify(usuario));
-    window.location.href = "character.html";
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+
+    const personagem = buscarPersonagem(usuario.id);
+    if (personagem) {
+      window.location.href = "reinos.html";
+    } else {
+      window.location.href = "character.html";
+    }
   });
 
 });
