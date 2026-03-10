@@ -69,7 +69,8 @@ function selectCharacter(card, src) {
 // PASSO 4 — Ficha do personagem + salva no banco
 function showSummary() {
 
-  const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado"));
+  const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado")) 
+             || JSON.parse(localStorage.getItem("usuarioLogado"));
 
   if (!usuario) {
     alert("Sessão expirada. Faça login novamente.");
