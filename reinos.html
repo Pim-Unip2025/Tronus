@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <link rel="stylesheet" href="sidebar.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <title>Reinos - TRONUS</title>
+
+  <style>
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: url('img/fundo_reinos.jpg') center center / cover no-repeat fixed;
+      font-family: 'Crimson Text', serif;
+      color: #f0e6c8;
+    }
+
+    /* OVERLAY escuro sobre o fundo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 5, 0, 0.55);
+      z-index: 0;
+    }
+
+    /* ============================================================
+       TOPO — perfil do jogador
+    ============================================================ */
+    .topbar {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(20, 10, 0, 0.75);
+      border-bottom: 2px solid rgba(212, 175, 55, 0.4);
+      backdrop-filter: blur(6px);
+    }
+
+    .player-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .player-avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid #d4af37;
+      object-fit: cover;
+    }
+
+    .player-details {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .player-name {
+      font-family: 'Cinzel', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: #f0e6c8;
+    }
+
+    .player-title {
+      font-size: 13px;
+      color: #d4af37;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* ESTRELAS E PROGRESSO */
+    .player-stats {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+    }
+
+    .stars-count {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      color: #f0e6c8;
+    }
+
+    .stars-count i {
+      color: #d4af37;
+      font-size: 20px;
+    }
+
+    .progress-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+
+    .progress-label {
+      font-size: 12px;
+      color: #a89060;
+      letter-spacing: 1px;
+    }
+
+    .progress-bar-bg {
+      width: 200px;
+      height: 10px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(212,175,55,0.3);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #d4af37, #f5d020);
+      border-radius: 10px;
+      transition: width 0.6s ease;
+    }
+
+    /* ============================================================
+       TÍTULO DA PÁGINA
+    ============================================================ */
+    .page-title {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      padding: 40px 20px 20px;
+    }
+
+    .page-title h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #f0e6c8;
+      text-shadow: 0 0 30px rgba(212,175,55,0.5);
+      letter-spacing: 4px;
+    }
+
+    .page-title p {
+      font-size: 16px;
+      color: #a89060;
+      margin-top: 8px;
+      font-style: italic;
+    }
+
+    /* ============================================================
+       GRADE DE REINOS
+    ============================================================ */
+    .reinos-grid {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 30px;
+      padding: 30px 40px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* CARD DE REINO */
+    .reino-card {
+      width: 180px;
+      background: rgba(20, 10, 0, 0.8);
+      border: 2px solid rgba(212, 175, 55, 0.35);
+      border-radius: 12px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+      backdrop-filter: blur(4px);
+    }
+
+    .reino-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      border-color: #d4af37;
+      box-shadow: 0 8px 30px rgba(212,175,55,0.3);
+    }
+
+    .reino-card.bloqueado {
+      opacity: 0.45;
+      cursor: not-allowed;
+      filter: grayscale(0.6);
+    }
+
+    .reino-card.bloqueado:hover {
+      transform: none;
+      box-shadow: none;
+      border-color: rgba(212, 175, 55, 0.35);
+    }
+
+    .reino-icone {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+      margin: 0 auto 12px;
+      display: block;
+    }
+
+    .reino-icone-placeholder {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 12px;
+      background: rgba(212,175,55,0.1);
+      border: 2px dashed rgba(212,175,55,0.3);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+
+    .reino-nome {
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: #f0e6c8;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    /* ESTRELINHAS DO REINO */
+    .reino-estrelas {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+
+    .reino-estrelas i {
+      font-size: 16px;
+      color: rgba(212,175,55,0.3);
+    }
+
+    .reino-estrelas i.ativa {
+      color: #d4af37;
+    }
+
+    .reino-progresso {
+      font-size: 12px;
+      color: #a89060;
+    }
+
+    .reino-lock {
+      font-size: 22px;
+      color: rgba(212,175,55,0.4);
+      margin-top: 6px;
+    }
+
+    #sky {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+}
+  </style>
+</head>
+
+<body>
+<div id="sky"></div>
+
+  <!-- TOPO -->
+  <div class="topbar">
+    <div class="player-info">
+      <img class="player-avatar" id="avatarImg" src="" alt="Avatar">
+      <div class="player-details">
+        <span class="player-name" id="playerName">—</span>
+        <span class="player-title" id="playerTitle">Plebeu</span>
+      </div>
+    </div>
+
+    <div class="player-stats">
+      <div class="stars-count">
+        <i class='bx bxs-star'></i>
+        <span id="totalEstrelas">0</span> estrelas
+      </div>
+      <div class="progress-wrap">
+        <span class="progress-label" id="progressLabel">0 / 50 para Rei</span>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TÍTULO -->
+  <div class="page-title">
+    <h1>⚔️ REINOS</h1>
+    <p>Conquiste os reinos e avance em sua jornada</p>
+  </div>
+
+  <!-- REINOS -->
+  <div class="reinos-grid" id="reinosGrid"></div>
+
+  <script src="js/script.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="js/database.js"></script>
+
+
+  <script>
+
+    // Ícones de cada reino (adicione os arquivos em img/ conforme for gerando)
+    const reinoIcones = {
+      "Python":                "img/reino_python.png",
+      "C++":                   null,
+      "Engenharia de Software": null,
+      "Banco de Dados":        null,
+      "Redes":                 null,
+    };
+
+    // Emojis de fallback caso não tenha imagem
+    const reinoEmojis = {
+      "Python":                "🐍",
+      "C++":                   "⚙️",
+      "Engenharia de Software": "📐",
+      "Banco de Dados":        "🗄️",
+      "Redes":                 "🌐",
+    };
+
+    initDatabase().then(() => {
+
+      const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado")) 
+             || JSON.parse(localStorage.getItem("usuarioLogado"));
+
+      if (!usuario) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const personagem = buscarPersonagem(usuario.id);
+
+      if (!personagem) {
+        window.location.href = "character.html";
+        return;
+      }
+
+      // Preenche o topo
+      document.getElementById("avatarImg").src      = personagem.avatar;
+      document.getElementById("playerName").innerText  = personagem.nome;
+      document.getElementById("playerTitle").innerText = personagem.titulo_atual;
+      document.getElementById("totalEstrelas").innerText = personagem.total_estrelas;
+
+      // Barra de progresso (meta: 50 estrelas = Rei)
+      const pct = Math.min((personagem.total_estrelas / 50) * 100, 100);
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressLabel").innerText =
+        personagem.total_estrelas + " / 50 para Rei";
+
+      // Busca progresso
+      const progresso = buscarProgresso(personagem.id);
+
+      // Agrupa por reino
+      const reinos = {};
+      progresso.forEach(row => {
+        if (!reinos[row.reino_id]) {
+          reinos[row.reino_id] = {
+            id: row.reino_id,
+            nome: row.reino_nome,
+            fases: []
+          };
+        }
+        reinos[row.reino_id].fases.push({
+          id: row.fase_id,
+          nome: row.fase_nome,
+          estrelas: row.estrelas
+        });
+      });
+
+      const grid = document.getElementById("reinosGrid");
+      const reinosList = Object.values(reinos);
+
+      reinosList.forEach((reino, index) => {
+
+        const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
+        const maxEstrelas   = reino.fases.length * 3; // 9 estrelas por reino
+        const conquistado   = totalEstrelas === maxEstrelas;
+
+        // Primeiro reino sempre desbloqueado, os outros precisam do anterior completo
+        const desbloqueado = index === 0 || reinosList[index - 1].fases.reduce((s,f) => s + f.estrelas, 0) === reinosList[index-1].fases.length * 3;
+
+        const card = document.createElement("div");
+        card.classList.add("reino-card");
+        if (!desbloqueado) card.classList.add("bloqueado");
+
+        // Ícone ou emoji
+        const icone = reinoIcones[reino.nome];
+        let iconeHtml = "";
+        if (icone) {
+          iconeHtml = `<img class="reino-icone" src="${icone}" alt="${reino.nome}">`;
+        } else {
+          iconeHtml = `<div class="reino-icone-placeholder">${reinoEmojis[reino.nome] || "⚔️"}</div>`;
+        }
+
+        // Estrelinhas (máximo 9 por reino)
+        let estrelasHtml = '<div class="reino-estrelas">';
+        for (let i = 0; i < maxEstrelas; i++) {
+          estrelasHtml += `<i class='bx bxs-star ${i < totalEstrelas ? "ativa" : ""}'></i>`;
+        }
+        estrelasHtml += '</div>';
+
+        card.innerHTML = `
+          ${iconeHtml}
+          <div class="reino-nome">${reino.nome}</div>
+          ${estrelasHtml}
+          <div class="reino-progresso">${totalEstrelas} / ${maxEstrelas} ⭐</div>
+          ${!desbloqueado ? '<div class="reino-lock"><i class="bx bxs-lock"></i></div>' : ''}
+        `;
+
+        if (desbloqueado) {
+          card.onclick = () => {
+            sessionStorage.setItem("reinoSelecionado", JSON.stringify(reino));
+            sessionStorage.setItem("personagemId", personagem.id);
+            localStorage.setItem("reinoSelecionado", JSON.stringify(reino));
+            localStorage.setItem("personagemId", personagem.id);
+            window.location.href = "trilha.html";
+          };
+        }
+
+        grid.appendChild(card);
+      });
+
+    });
+
+  </script>
+  <script src="js/sidebar.js"></script>
+
+</body>
+
+</html>
