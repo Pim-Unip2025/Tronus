@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <title>TRONUS — O Caminho do Herói Acadêmico</title>
+
+  <style>
+
+    :root {
+      --gold: #d4af37;
+      --gold-light: #f5d020;
+      --gold-dim: rgba(212,175,55,0.3);
+      --text: #f0e6c8;
+      --text-dim: #a89060;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #1a1a1a;
+      color: var(--text);
+      font-family: 'Crimson Text', serif;
+      overflow-x: hidden;
+    }
+
+    /* ============================================================
+       NAVBAR
+    ============================================================ */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 60px;
+      height: 70px;
+      background: transparent;
+      border-bottom: 1px solid rgba(212,175,55,0.12);
+      backdrop-filter: blur(4px);
+      transition: background 0.4s;
+    }
+
+    .navbar.scrolled {
+      background: rgba(10,5,0,0.88);
+      border-bottom-color: var(--gold-dim);
+    }
+
+    .navbar-logo img { height: 44px; object-fit: contain; }
+
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      list-style: none;
+    }
+
+    .navbar-links a {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      transition: color 0.3s;
+      position: relative;
+    }
+
+    .navbar-links a::after {
+      content: "";
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--gold);
+      transition: width 0.3s;
+    }
+
+    .navbar-links a:hover { color: var(--gold); }
+    .navbar-links a:hover::after { width: 100%; }
+
+    /* ============================================================
+       HERO
+    ============================================================ */
+    .hero {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background: url('img/hero.jpg') center center / cover no-repeat;
+      z-index: 0;
+    }
+
+    .hero-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(10,5,0,0.88) 0%,
+        rgba(10,5,0,0.55) 55%,
+        rgba(10,5,0,0.1) 100%
+      );
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      padding: 0 80px;
+      max-width: 620px;
+      animation: heroEntrada 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+
+    @keyframes heroEntrada {
+      0%   { opacity: 0; transform: translateX(-40px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      border: 1px solid var(--gold-dim);
+      padding: 6px 16px;
+      border-radius: 2px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+
+    .hero-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(60px, 9vw, 104px);
+      font-weight: 900;
+      line-height: 1.0;
+      color: #fff;
+      text-shadow: 0 0 60px rgba(212,175,55,0.4), 0 4px 24px rgba(0,0,0,0.9);
+      margin-bottom: 14px;
+      letter-spacing: 4px;
+    }
+
+    .hero-subtitle {
+      font-family: 'Cinzel', serif;
+      font-size: 15px;
+      color: var(--gold);
+      letter-spacing: 5px;
+      margin-bottom: 28px;
+      text-transform: uppercase;
+    }
+
+    .hero-desc {
+      font-size: 19px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.7;
+      margin-bottom: 44px;
+      max-width: 480px;
+    }
+
+    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+
+    .hero-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      padding: 16px 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.3s;
+      border: none;
+      background: linear-gradient(135deg, #1a6b4a, #1a4a6b);
+      color: #fff;
+      text-transform: uppercase;
+      box-shadow: 0 4px 20px rgba(26,107,74,0.45);
+    }
+
+    .hero-btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 30px rgba(26,107,74,0.65);
+      background: linear-gradient(135deg, #22885e, #1e5c85);
+    }
+
+    .hero-btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Cinzel', serif;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      padding: 16px 36px;
+      border-radius: 6px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: 0.3s;
+      background: transparent;
+      border: 2px solid rgba(26,107,74,0.6);
+      color: #7ecfaa;
+      text-transform: uppercase;
+    }
+
+    .hero-btn-secondary:hover {
+      border-color: #22885e;
+      color: #fff;
+      background: rgba(26,107,74,0.2);
+      transform: translateY(-3px);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 40px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,0.5);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(8px); }
+    }
+
+    /* ============================================================
+       SEÇÕES GERAIS
+    ============================================================ */
+    .section { padding: 100px 80px; position: relative; }
+
+    .section-tag {
+      font-family: 'Cinzel', serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+
+    .section-desc {
+      font-size: 18px;
+      color: rgba(255,255,255,0.65);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 60px;
+    }
+
+    .divider {
+      width: 60px; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 20px 0 40px;
+    }
+
+    /* ============================================================
+       COMO FUNCIONA — cards estilo Riot
+    ============================================================ */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 24px;
+    }
+
+    .how-card {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 32px 28px;
+      transition: 0.3s;
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+    }
+
+    .how-card:hover {
+      background: rgba(0, 0, 0, 0.65);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .how-icon { font-size: 36px; margin-bottom: 16px; }
+
+    .how-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+
+    .how-card p {
+      font-size: 16px;
+      color: rgba(255, 255, 255, 0.65);
+      line-height: 1.6;
+    }
+
+    /* ============================================================
+       REINOS
+    ============================================================ */
+    .reinos-section {
+      padding: 100px 80px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(4px);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      user-select: none;
+    }
+
+    .reinos-scroll {
+      cursor: grab;
+    }
+
+    .reinos-scroll.dragging {
+      cursor: grabbing;
+    }
+
+    .reinos-scroll {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding-bottom: 20px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold-dim) transparent;
+    }
+
+    .reinos-scroll::-webkit-scrollbar { height: 4px; }
+    .reinos-scroll::-webkit-scrollbar-track { background: transparent; }
+    .reinos-scroll::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 4px; }
+
+    .reino-banner {
+      flex: 0 0 calc(20% - 16px);
+      height: 480px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.1);
+      overflow: hidden;
+      position: relative;
+      cursor: pointer;
+      transition: 0.4s;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(6px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 20px;
+    }
+
+    .reino-banner:hover {
+      flex: 0 0 260px;
+      border-color: rgba(255,255,255,0.3);
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    .reino-banner-icon { font-size: 60px; margin-bottom: 12px; transition: transform 0.3s; }
+    .reino-banner:hover .reino-banner-icon { transform: scale(1.1); }
+
+    .reino-banner-img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      opacity: 0.7; transition: opacity 0.3s;
+    }
+
+    .reino-banner:hover .reino-banner-img { opacity: 1; }
+
+    .reino-banner-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 40%, rgba(0,0,0,0.85) 100%);
+    }
+
+    .reino-banner-content { position: relative; z-index: 2; text-align: center; }
+
+    .reino-banner-nome {
+      font-family: 'Cinzel', serif;
+      font-size: 15px; font-weight: 700;
+      color: #fff; letter-spacing: 2px; text-transform: uppercase;
+    }
+
+    .reino-banner-desc {
+      font-size: 13px; color: rgba(255,255,255,0.65);
+      margin-top: 6px; opacity: 0;
+      transform: translateY(10px); transition: 0.3s;
+    }
+
+    .reino-banner:hover .reino-banner-desc { opacity: 1; transform: translateY(0); }
+
+    /* ============================================================
+       EQUIPE — cards estilo Riot
+    ============================================================ */
+    .team-section { padding: 100px 80px; }
+
+    .team-grid { display: flex; flex-wrap: wrap; gap: 24px; margin-top: 60px; }
+
+    .team-card {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 28px 24px;
+      text-align: center;
+      transition: 0.3s;
+      flex: 1 1 160px;
+      max-width: 200px;
+      backdrop-filter: blur(8px);
+    }
+
+    .team-card:hover {
+      background: rgba(0, 0, 0, 0.65);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-4px);
+    }
+
+    .team-avatar {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.06);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; margin: 0 auto 16px;
+    }
+
+    .team-nome {
+      font-family: 'Cinzel', serif;
+      font-size: 14px; font-weight: 600;
+      color: #fff; margin-bottom: 6px; letter-spacing: 1px;
+    }
+
+    .team-github { font-size: 13px; color: var(--gold); text-decoration: none; transition: 0.2s; }
+    .team-github:hover { color: var(--gold-light); }
+
+    /* ============================================================
+       FOOTER
+    ============================================================ */
+    .footer {
+      padding: 40px 80px;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(8px);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex; align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    .footer-logo img { height: 32px; opacity: 0.7; }
+    .footer-text { font-size: 14px; color: rgba(255,255,255,0.5); }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- ============================================================
+       NAVBAR
+  ============================================================ -->
+  <nav class="navbar" id="navbar">
+
+    <a href="landing.html" class="navbar-logo">
+      <img src="img/logo.png" alt="TRONUS">
+    </a>
+
+    <ul class="navbar-links">
+      <li><a href="#como-funciona">Como Funciona</a></li>
+      <li><a href="#reinos">Reinos</a></li>
+      <li><a href="#equipe">Equipe</a></li>
+    </ul>
+
+    <div style="width: 44px;"></div>
+
+  </nav>
+
+  <!-- ============================================================
+       HERO
+  ============================================================ -->
+  <section class="hero">
+
+    <div class="hero-bg"></div>
+
+    <div class="hero-content">
+      <span class="hero-tag">⚔ UNIP — 2025</span>
+      <h1 class="hero-title">T.R.O.N.U.S.</h1>
+      <p class="hero-subtitle">O Caminho do Herói Acadêmico</p>
+      <p class="hero-desc">
+        Sua jornada rumo ao título de <strong style="color:var(--gold)">REI</strong> começa aqui.
+        Enfrente os desafios das matérias-reinos e forje seu futuro.
+      </p>
+      <div class="hero-btns">
+        <a href="register.html" class="hero-btn-primary">Cadastre-se agora →</a>
+        <a href="index.html"    class="hero-btn-secondary">Já tenho conta</a>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <span style="font-family:'Cinzel',serif; font-size:11px; letter-spacing:3px;">EXPLORAR</span>
+      <i class='bx bx-chevron-down' style="font-size:24px;"></i>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       COMO FUNCIONA
+  ============================================================ -->
+  <section class="section" id="como-funciona">
+
+    <p class="section-tag">⚔ A Jornada</p>
+    <h2 class="section-title">Como Funciona</h2>
+    <div class="divider"></div>
+    <p class="section-desc">
+      O TRONUS transforma sua vida acadêmica em uma aventura épica.
+      Cada matéria é um reino a ser conquistado, cada conquista te aproxima do trono.
+    </p>
+
+    <div class="how-grid">
+
+      <div class="how-card">
+        <div class="how-icon">👑</div>
+        <h3>Comece como Plebeu</h3>
+        <p>Todo herói começa do zero. Crie seu personagem e inicie sua jornada rumo ao trono.</p>
+      </div>
+
+      <div class="how-card">
+        <div class="how-icon">🏰</div>
+        <h3>Conquiste os Reinos</h3>
+        <p>Cada matéria é um reino com 3 fases. Complete as fases e ganhe estrelas.</p>
+      </div>
+
+      <div class="how-card">
+        <div class="how-icon">⭐</div>
+        <h3>Evolua seu Título</h3>
+        <p>15 estrelas → Cavaleiro. 30 → Duque. 50 estrelas → você se torna Rei!</p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       REINOS
+  ============================================================ -->
+  <section class="reinos-section" id="reinos">
+
+    <p class="section-tag">🗺 Territórios</p>
+    <h2 class="section-title">Os Reinos</h2>
+    <div class="divider"></div>
+    <p class="section-desc">Cinco reinos aguardam sua conquista. Cada um com seus próprios desafios e glórias.</p>
+
+    <div class="reinos-scroll">
+
+      <div class="reino-banner">
+        <img class="reino-banner-img" src="img/python.jpg" alt="Python">
+        <div class="reino-banner-overlay"></div>
+        <div class="reino-banner-content">
+          <div class="reino-banner-nome">Python</div>
+          <div class="reino-banner-desc">Linguagem de programação moderna</div>
+        </div>
+      </div>
+
+      <div class="reino-banner">
+        <img class="reino-banner-img" src="img/c++.jpg" alt="C++">
+        <div class="reino-banner-overlay"></div>
+        <div class="reino-banner-content">
+          <<div class="reino-banner-nome">C++</div>
+          <div class="reino-banner-desc">Poder e performance</div>
+        </div>
+      </div>
+
+      <div class="reino-banner">
+        <img class="reino-banner-img" src="img/soft.jpg" alt="Eng. Software">
+        <div class="reino-banner-overlay"></div>
+        <div class="reino-banner-content">
+          <div class="reino-banner-nome">Eng. Software</div>
+          <div class="reino-banner-desc">Metodologias ágeis</div>
+        </div>
+      </div>
+
+      <div class="reino-banner">
+        <img class="reino-banner-img" src="img/bd.jpg" alt="Banco de Dados">
+        <div class="reino-banner-overlay"></div>
+        <div class="reino-banner-content">
+          <div class="reino-banner-nome">Banco de Dados</div>
+          <div class="reino-banner-desc">SQL e modelagem</div>
+        </div>
+      </div>
+
+      <div class="reino-banner">
+        <img class="reino-banner-img" src="img/redes.jpg" alt="Redes">
+        <div class="reino-banner-overlay"></div>
+        <div class="reino-banner-content">
+          <div class="reino-banner-nome">Redes</div>
+          <div class="reino-banner-desc">Fundamentos de redes</div>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       EQUIPE
+  ============================================================ -->
+  <section class="team-section" id="equipe">
+
+    <p class="section-tag">🛡 Os Forjadores</p>
+    <h2 class="section-title">Nossa Equipe</h2>
+    <div class="divider"></div>
+
+    <div class="team-grid">
+
+      <div class="team-card">
+        <div class="team-avatar">⚔️</div>
+        <div class="team-nome">Enzo Oliveira</div>
+        <a href="https://github.com/EnzoOliveir19" target="_blank" class="team-github">@EnzoOliveir19</a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-avatar">🏹</div>
+        <div class="team-nome">Renata Faria</div>
+        <a href="https://github.com/renatafaria001" target="_blank" class="team-github">@renatafaria001</a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-avatar">🗡️</div>
+        <div class="team-nome">Jhonatan Oliveira</div>
+        <a href="https://github.com/ojjhonatan" target="_blank" class="team-github">@ojjhonatan</a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-avatar">🔮</div>
+        <div class="team-nome">Nickolas</div>
+        <a href="https://github.com/NckGoulart" target="_blank" class="team-github">@NckGoulart</a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-avatar">🛡️</div>
+        <div class="team-nome">Luiz</div>
+        <a href="https://github.com/Luizzregis" target="_blank" class="team-github">@Luizzregis</a>
+      </div>
+
+      <div class="team-card">
+        <div class="team-avatar">👑</div>
+        <div class="team-nome">Pedro Bueno</div>
+        <span class="team-github">Em breve</span>
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+  ============================================================ -->
+  <footer class="footer">
+    <div class="footer-logo">
+      <img src="img/logo.png" alt="TRONUS">
+    </div>
+    <p class="footer-text">TRONUS © 2025 — UNIP. Todos os direitos reservados.</p>
+    <p class="footer-text" style="font-family:'Cinzel',serif; color:var(--gold); font-size:12px; letter-spacing:2px;">
+      FORJE SEU FUTURO ⚔
+    </p>
+  </footer>
+
+  <script>
+  const scroll = document.querySelector('.reinos-scroll');
+  let isDown = false, startX, scrollLeft;
+
+  scroll.addEventListener('mousedown', e => {
+    isDown = true;
+    scroll.classList.add('dragging');
+    startX = e.pageX - scroll.offsetLeft;
+    scrollLeft = scroll.scrollLeft;
+  });
+
+  scroll.addEventListener('mouseleave', () => { isDown = false; scroll.classList.remove('dragging'); });
+  scroll.addEventListener('mouseup',    () => { isDown = false; scroll.classList.remove('dragging'); });
+  scroll.addEventListener('mousemove',  e => {
+    if (!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - scroll.offsetLeft;
+    scroll.scrollLeft = scrollLeft - (x - startX) * 1.5;
+  });
+  
+  
+    window.addEventListener('scroll', () => {
+      document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
+    });
+  </script>
+
+</body>
+</html>
