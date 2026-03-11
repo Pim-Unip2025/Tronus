@@ -80,4 +80,4 @@ function logout() {
   window.location.href = "landing.html";
 }
 
-document.addEventListener("DOMContentLoaded", criarSidebar);
+criarSidebar();
