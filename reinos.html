@@ -205,9 +205,10 @@
     }
 
     .reino-icone {
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
+      width: 120px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
       margin: 0 auto 12px;
       display: block;
     }
@@ -238,17 +239,18 @@
     .reino-estrelas {
       display: flex;
       justify-content: center;
-      gap: 4px;
+      gap: 3px;
       margin-bottom: 10px;
     }
 
     .reino-estrelas i {
-      font-size: 16px;
-      color: rgba(212,175,55,0.3);
+      font-size: 12px;
+      color: rgba(212,175,55,0.2);
     }
 
     .reino-estrelas i.ativa {
-      color: #d4af37;
+      color: #f5d020;
+      filter: drop-shadow(0 0 4px rgba(245,208,32,0.6));
     }
 
     .reino-progresso {
@@ -320,11 +322,11 @@
 
     // Ícones de cada reino (adicione os arquivos em img/ conforme for gerando)
     const reinoIcones = {
-      "Python":                "img/reino_python.png",
-      "C++":                   null,
-      "Engenharia de Software": null,
-      "Banco de Dados":        null,
-      "Redes":                 null,
+      "Python":                "img/python.jpg",
+      "C++":                   "img/c++.jpg",
+      "Engenharia de Software": "img/soft.jpg",
+      "Banco de Dados":        "img/bd.jpg",
+      "Redes":                 "img/redes.jpg",
     };
 
     // Emojis de fallback caso não tenha imagem
@@ -394,8 +396,7 @@
         const maxEstrelas   = reino.fases.length * 3; // 9 estrelas por reino
         const conquistado   = totalEstrelas === maxEstrelas;
 
-        // Primeiro reino sempre desbloqueado, os outros precisam do anterior completo
-        const desbloqueado = index === 0 || reinosList[index - 1].fases.reduce((s,f) => s + f.estrelas, 0) === reinosList[index-1].fases.length * 3;
+        const desbloqueado = true;
 
         const card = document.createElement("div");
         card.classList.add("reino-card");
@@ -410,19 +411,11 @@
           iconeHtml = `<div class="reino-icone-placeholder">${reinoEmojis[reino.nome] || "⚔️"}</div>`;
         }
 
-        // Estrelinhas (máximo 9 por reino)
-        let estrelasHtml = '<div class="reino-estrelas">';
-        for (let i = 0; i < maxEstrelas; i++) {
-          estrelasHtml += `<i class='bx bxs-star ${i < totalEstrelas ? "ativa" : ""}'></i>`;
-        }
-        estrelasHtml += '</div>';
 
         card.innerHTML = `
           ${iconeHtml}
           <div class="reino-nome">${reino.nome}</div>
-          ${estrelasHtml}
           <div class="reino-progresso">${totalEstrelas} / ${maxEstrelas} ⭐</div>
-          ${!desbloqueado ? '<div class="reino-lock"><i class="bx bxs-lock"></i></div>' : ''}
         `;
 
         if (desbloqueado) {

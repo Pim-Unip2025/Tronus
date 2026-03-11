@@ -73,7 +73,7 @@ function logout() {
   localStorage.removeItem("reinoSelecionado");
   sessionStorage.removeItem("personagemId");
   localStorage.removeItem("personagemId");
-  window.location.href = "index.html";
+  window.location.href = "landing.html";
 }
 
 criarSidebar();
