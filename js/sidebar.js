@@ -30,6 +30,10 @@ function criarSidebar() {
           Configurações
         </a>
 
+        <button id="temaBtn" onclick="alternarTema()">
+          <i class='bx bx-sun'></i> Modo Claro
+        </button>
+
         <div style="flex:1"></div>
 
         <a class="sidebar-item danger" onclick="logout()">
@@ -76,4 +80,4 @@ function logout() {
   window.location.href = "landing.html";
 }
 
-criarSidebar();
+document.addEventListener("DOMContentLoaded", criarSidebar);
