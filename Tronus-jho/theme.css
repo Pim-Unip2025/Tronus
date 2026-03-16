@@ -1,0 +1,167 @@
+/* ============================================================
+   THEME.CSS — Variáveis de tema claro/escuro do TRONUS
+============================================================ */
+
+/* TEMA ESCURO (padrão) */
+:root,
+[data-tema="escuro"] {
+  --bg:           #1a1a1a;
+  --bg-card:      rgba(0, 0, 0, 0.5);
+  --bg-topbar:    rgba(20, 10, 0, 0.75);
+  --bg-sidebar:   rgba(61, 39, 5, 0.397);
+  --border:       rgba(212, 175, 55, 0.3);
+  --border-card:  rgba(255, 255, 255, 0.08);
+  --text:         #f0e6c8;
+  --text-dim:     #a89060;
+  --text-card:    #ffffff;
+  --text-card-dim: rgba(255, 255, 255, 0.65);
+  --gold:         #d4af37;
+  --gold-light:   #f5d020;
+  --overlay:      rgba(10, 5, 0, 0.55);
+}
+
+/* TEMA CLARO */
+[data-tema="claro"] {
+  --bg:           #f5f0e8;
+  --bg-card:      rgba(255, 255, 255, 0.75);
+  --bg-topbar:    rgba(240, 230, 200, 0.92);
+  --bg-sidebar:   rgba(240, 225, 185, 0.95);
+  --border:       rgba(139, 90, 20, 0.35);
+  --border-card:  rgba(139, 90, 20, 0.15);
+  --text:         #2a1a00;
+  --text-dim:     #7a5a20;
+  --text-card:    #1a0a00;
+  --text-card-dim: rgba(40, 20, 0, 0.7);
+  --gold:         #a07010;
+  --gold-light:   #c89020;
+  --overlay:      rgba(245, 235, 200, 0.45);
+}
+
+/* ============================================================
+   APLICA AS VARIÁVEIS NOS ELEMENTOS
+============================================================ */
+
+body {
+  background-color: var(--bg) !important;
+  color: var(--text) !important;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* Topbar */
+.topbar {
+  background: var(--bg-topbar) !important;
+  border-bottom-color: var(--border) !important;
+  transition: background 0.3s;
+}
+
+/* Navbar (landing) */
+.navbar.scrolled {
+  background: var(--bg-topbar) !important;
+}
+
+/* Cards de como funciona e equipe */
+.how-card,
+.team-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border-card) !important;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.how-card h3,
+.team-nome {
+  color: var(--text-card) !important;
+}
+
+.how-card p,
+.team-github {
+  color: var(--text-card-dim) !important;
+}
+
+/* Cards de reino (reinos.html) */
+.reino-card {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.reino-nome {
+  color: var(--text-card) !important;
+}
+
+.reino-progresso {
+  color: var(--text-card-dim) !important;
+}
+
+/* Seções */
+.section-title,
+.section-tag,
+.hero-title {
+  color: var(--text) !important;
+}
+
+.section-desc {
+  color: var(--text-dim) !important;
+}
+
+/* Sidebar */
+.sidebar {
+  background: var(--bg-sidebar) !important;
+  transition: background 0.3s;
+}
+
+.sidebar-item,
+.sidebar-title {
+  color: var(--text) !important;
+}
+
+/* Reinos section */
+.reinos-section {
+  background: var(--bg-card) !important;
+  transition: background 0.3s;
+}
+
+/* Footer */
+.footer {
+  background: var(--bg-card) !important;
+  border-top-color: var(--border-card) !important;
+}
+
+.footer-text {
+  color: var(--text-dim) !important;
+}
+
+/* Player info */
+.player-name { color: var(--text) !important; }
+.player-title { color: var(--gold) !important; }
+.stars-count { color: var(--text) !important; }
+.progress-label { color: var(--text-dim) !important; }
+
+/* Botão de tema no sidebar */
+#temaBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text);
+  transition: color 0.2s, background 0.2s;
+  text-align: left;
+}
+
+#temaBtn:hover {
+  color: var(--gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+#temaBtn i {
+  font-size: 18px;
+  color: var(--gold);
+}

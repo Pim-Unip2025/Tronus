@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="trilha.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <title>Trilha - TRONUS</title>
+</head>
+
+<script src="js/sidebar.js"></script>
+
+<body>
+  <i class='bx bx-music' id="musicControl"></i>
+
+  <!-- TOPO -->
+  <div class="topbar">
+    <button class="back-btn" onclick="window.location.href='reinos.html'">
+      Voltar
+    </button>
+    <span class="topbar-title" id="reinoNome">—</span>
+    <span class="topbar-sub" id="reinoProgresso">0 / 9 ⭐</span>
+  </div>
+
+  <!-- TRILHA -->
+  <div class="trilha-wrap" id="trilhaWrap"></div>
+
+  <!-- MODAL para registrar estrelas -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+      <h2 id="modalFaseNome">Fase 1</h2>
+      <p>Quantas estrelas você conquistou nesta fase?</p>
+      <div class="modal-estrelas" id="modalEstrelas">
+        <i class='bx bxs-star' data-val="1"></i>
+        <i class='bx bxs-star' data-val="2"></i>
+        <i class='bx bxs-star' data-val="3"></i>
+      </div>
+      <div class="modal-btns">
+        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
+        <button class="btn-confirmar" onclick="confirmarEstrelas()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="js/database.js"></script>
+  <script>
+
+    let faseAtual = null;
+    let estrelasEscolhidas = 0;
+    let personagemId = null;
+
+    initDatabase().then(() => {
+
+      const reino = JSON.parse(sessionStorage.getItem("reinoSelecionado")) 
+           || JSON.parse(localStorage.getItem("reinoSelecionado"));
+
+      personagemId = sessionStorage.getItem("personagemId") 
+            || localStorage.getItem("personagemId");
+
+      if (!reino || !personagemId) {
+        window.location.href = "reinos.html";
+        return;
+      }
+
+      document.getElementById("reinoNome").innerText = reino.nome;
+
+      const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
+      document.getElementById("reinoProgresso").innerText = totalEstrelas + " / " + (reino.fases.length * 3) + " ⭐";
+
+      const wrap = document.getElementById("trilhaWrap");
+
+      reino.fases.forEach((fase, index) => {
+
+        // Fase desbloqueada se for a primeira ou a anterior tiver pelo menos 1 estrela
+        const desbloqueada = index === 0 || reino.fases[index - 1].estrelas > 0;
+        const completa     = fase.estrelas === 3;
+
+        const item = document.createElement("div");
+        item.classList.add("fase-item");
+
+        // Círculo
+        const circulo = document.createElement("div");
+        circulo.classList.add("fase-circulo");
+        if (!desbloqueada) circulo.classList.add("bloqueada");
+        if (completa) circulo.classList.add("completa");
+
+        if (desbloqueada) {
+          circulo.innerHTML = `<span class="fase-numero">${index + 1}</span>`;
+          circulo.onclick = () => abrirModal(fase);
+        } else {
+          circulo.innerHTML = `<i class='bx bxs-lock fase-lock-icon'></i>`;
+        }
+
+        // Estrelas
+        let estrelasHtml = '<div class="fase-estrelas">';
+        for (let i = 0; i < 3; i++) {
+          estrelasHtml += `<i class='bx bxs-star ${i < fase.estrelas ? "ativa" : ""}'></i>`;
+        }
+        estrelasHtml += '</div>';
+
+        const label = document.createElement("div");
+        label.classList.add("fase-label");
+        label.innerText = fase.nome;
+
+        item.appendChild(circulo);
+        item.innerHTML += estrelasHtml;
+        item.appendChild(label);
+
+        wrap.appendChild(item);
+      });
+
+    });
+
+    // -----------------------------------------------
+    // MODAL
+    // -----------------------------------------------
+    function abrirModal(fase) {
+      faseAtual = fase;
+      estrelasEscolhidas = fase.estrelas || 0;
+
+      document.getElementById("modalFaseNome").innerText = fase.nome;
+      atualizarEstrelasModal(estrelasEscolhidas);
+
+      document.getElementById("modalOverlay").classList.add("ativo");
+    }
+
+    function fecharModal() {
+      document.getElementById("modalOverlay").classList.remove("ativo");
+      faseAtual = null;
+      estrelasEscolhidas = 0;
+    }
+
+    function atualizarEstrelasModal(val) {
+      document.querySelectorAll(".modal-estrelas i").forEach((star, i) => {
+        star.classList.toggle("ativa", i < val);
+      });
+    }
+
+    // Clique nas estrelas do modal
+    document.querySelectorAll(".modal-estrelas i").forEach(star => {
+      star.addEventListener("click", () => {
+        estrelasEscolhidas = parseInt(star.dataset.val);
+        atualizarEstrelasModal(estrelasEscolhidas);
+      });
+    });
+
+    function confirmarEstrelas() {
+      if (estrelasEscolhidas === 0) {
+        alert("Selecione pelo menos 1 estrela.");
+        return;
+      }
+
+      atualizarProgresso(personagemId, faseAtual.id, estrelasEscolhidas);
+
+      fecharModal();
+
+      // Recarrega a tela com dados atualizados
+      const reino = JSON.parse(sessionStorage.getItem("reinoSelecionado"));
+      const faseIndex = reino.fases.findIndex(f => f.id === faseAtual.id);
+      reino.fases[faseIndex].estrelas = estrelasEscolhidas;
+      sessionStorage.setItem("reinoSelecionado", JSON.stringify(reino));
+
+      location.reload();
+    }
+
+  </script>
+
+ 
+  <audio id="hoverSound" preload="auto">
+    <source src="sons/botao.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="js/sound.js"></script>
+
+  <audio id="bgMusic" loop preload="auto">
+  <source src="sons/bg.mp3" type="audio/mpeg">
+</audio>
+
+
+</body>
+</html>

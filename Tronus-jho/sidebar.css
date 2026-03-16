@@ -1,0 +1,167 @@
+/* ============================================================
+   MENU LATERAL — sidebar.css
+============================================================ */
+
+/* BOTÃO DE ABRIR O MENU */
+.menu-toggle {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 200;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(20, 10, 0, 0.85);
+  border: 2px solid rgba(212,175,55,0.5);
+  color: #d4af37;
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+  backdrop-filter: blur(4px);
+}
+
+.menu-toggle:hover {
+  background: rgba(61, 39, 5, 0.397);
+  border-color: #d4af37;
+}
+
+/* OVERLAY ESCURO ao abrir o menu */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+}
+
+.sidebar-overlay.ativo {
+  display: block;
+}
+
+/* PAINEL LATERAL */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -280px;
+  width: 260px;
+  height: 100vh;
+  background: rgba(61, 39, 5, 0.397);
+  border: 2px solid rgba(255,255,255,.2);
+  border-right: 2px solid rgba(212,175,55,0.3);
+  z-index: 400;
+  display: flex;
+  flex-direction: column;
+  padding: 30px 0;
+  transition: left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar.ativo {
+  left: 0;
+}
+
+/* CABEÇALHO DO MENU */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(212,175,55,0.2);
+  margin-bottom: 16px;
+}
+
+.sidebar-logo {
+  font-family: 'Cinzel', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #d4af37;
+  letter-spacing: 3px;
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  color: #a89060;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.2s;
+  line-height: 1;
+  margin-top: -70px;
+  margin-left: -100px;
+}
+
+.sidebar-close:hover {
+  color: #d4af37;
+}
+
+/* ITENS DO MENU */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 0 16px;
+  gap: 4px;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+  color: #f0e6c8;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.sidebar-item:hover {
+  background: rgba(212,175,55,0.1);
+  border-color: rgba(212,175,55,0.2);
+  color: #d4af37;
+}
+
+.sidebar-item i {
+  font-size: 20px;
+  color: #d4af37;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar-item.danger {
+  color: #e07070;
+  margin-top: auto;
+}
+
+.sidebar-item.danger i {
+  color: #e07070;
+}
+
+.sidebar-item.danger:hover {
+  background: rgba(224,112,112,0.1);
+  border-color: rgba(224,112,112,0.3);
+  color: #e07070;
+}
+
+/* RODAPÉ DO MENU */
+.sidebar-footer {
+  padding: 16px 24px 0;
+  border-top: 1px solid rgba(212,175,55,0.2);
+  font-size: 12px;
+  color: #a89060;
+  font-style: italic;
+  text-align: center;
+}
+
+.sidebar-logo{
+width:350px;
+margin-top:10px;
+margin-bottom:10px;
+margin-left: -50px;
+}
