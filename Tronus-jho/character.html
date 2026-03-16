@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<title>Criar Personagem</title>
+
+</head>
+
+<body>
+  <i class='bx bx-music' id="musicControl"></i>
+
+<div id="loading-screen">
+
+  <img src="img/carregar.png" class="loading-bg">
+
+  <div class="loading-bottom">
+    <img src="img/ampulheta.png" class="ampulheta">
+    <p>Entrando no reino...</p>
+  </div>
+
+</div>
+
+<div id="sky"></div>
+
+<main class="container character-container">
+
+
+<!-- BARRA DE PROGRESSO -->
+
+<div class="progress-bar">
+
+<div class="progress-step active">
+<div class="circle">1</div>
+<p>Gênero</p>
+</div>
+
+<div class="progress-step">
+<div class="circle">2</div>
+<p>Nome</p>
+</div>
+
+<div class="progress-step">
+<div class="circle">3</div>
+<p>Personagem</p>
+</div>
+
+
+</div>
+
+<!-- PASSO 1 -->
+
+<div class="step active" id="step1">
+
+<h2>Escolha seu gênero</h2>
+
+<div class="gender-buttons">
+
+<button class="login" onclick="selectGender('male')">
+Masculino
+</button>
+
+<button class="login" onclick="selectGender('female')">
+Feminino
+</button>
+
+</div>
+
+</div>
+
+<!-- PASSO 2 -->
+
+<div class="step" id="step2">
+
+<h2>Nome do personagem</h2>
+
+<div class="input-box">
+<input id="username" placeholder="Nome do personagem">
+</div>
+
+<button class="login" onclick="nextStep(3)">
+Continuar
+</button>
+
+</div>
+
+<!-- PASSO 3 -->
+
+<div class="step" id="step3">
+
+<h2>Escolha seu personagem</h2>
+
+<div id="characters" class="characters"></div>
+
+</div>
+
+<!-- PASSO 4 -->
+
+<div class="step" id="step4">
+
+<h2>Ficha do Personagem</h2>
+
+<div class="character-sheet">
+
+<div class="sheet-avatar">
+<img id="previewImage">
+</div>
+
+<div class="sheet-info">
+
+<p id="playerName"></p>
+<p id="playerEmail"></p>
+
+<button class="login" onclick="window.location.href='reinos.html'">
+Prosseguir
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</main>
+
+<script src="js/script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+<script src="js/database.js"></script>
+<script src="js/character_db.js"></script>
+
+<i class='bx bx-music' id="musicControl"></i>
+
+  <audio id="hoverSound" preload="auto">
+    <source src="sons/botao.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="js/sound.js"></script>
+
+  <audio id="bgMusic" loop preload="auto">
+  <source src="sons/bg.mp3" type="audio/mpeg">
+</audio>
+
+
+</body>
+</html>

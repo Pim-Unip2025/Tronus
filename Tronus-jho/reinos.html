@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <link rel="stylesheet" href="sidebar.css">
+  <link rel="stylesheet" href="reinos.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <title>Reinos - TRONUS</title>
+</head>
+
+<body>
+<div id="sky"></div>
+<i class='bx bx-music' id="musicControl"></i>
+  <!-- TOPO -->
+  <div class="topbar">
+    <div class="player-info">
+      <img class="player-avatar" id="avatarImg" src="" alt="Avatar">
+      <div class="player-details">
+        <span class="player-name" id="playerName">—</span>
+        <span class="player-title" id="playerTitle">Plebeu</span>
+      </div>
+    </div>
+
+    <div class="player-stats">
+      <div class="stars-count">
+        <i class='bx bxs-star'></i>
+        <span id="totalEstrelas">0</span> estrelas
+      </div>
+      <div class="progress-wrap">
+        <span class="progress-label" id="progressLabel">0 / 50 para Rei</span>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TÍTULO -->
+<div class="page-title">
+  <img src="img/reinos.png" class="reinos-logo">
+  <p>Conquiste os reinos e avance em sua jornada</p>
+</div>
+
+  <!-- REINOS -->
+  <div class="reinos-grid" id="reinosGrid"></div>
+
+  <script src="js/script.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="js/database.js"></script>
+
+
+  <script>
+
+    // Ícones de cada reino (adicione os arquivos em img/ conforme for gerando)
+    const reinoIcones = {
+      "Python":                "img/python.jpeg",
+      "C++":                   "img/c++.jpeg",
+      "Engenharia de Software": "img/soft.jpeg",
+      "Banco de Dados":        "img/bd.jpeg",
+      "Redes":                 "img/redes.jpeg",
+    };
+
+    // Emojis de fallback caso não tenha imagem
+    const reinoEmojis = {
+      "Python":                "🐍",
+      "C++":                   "⚙️",
+      "Engenharia de Software": "📐",
+      "Banco de Dados":        "🗄️",
+      "Redes":                 "🌐",
+    };
+
+    initDatabase().then(() => {
+
+      const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado")) 
+             || JSON.parse(localStorage.getItem("usuarioLogado"));
+
+      if (!usuario) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      const personagem = buscarPersonagem(usuario.id);
+
+      if (!personagem) {
+        window.location.href = "character.html";
+        return;
+      }
+
+      // Preenche o topo
+      document.getElementById("avatarImg").src      = personagem.avatar;
+      document.getElementById("playerName").innerText  = personagem.nome;
+      document.getElementById("playerTitle").innerText = personagem.titulo_atual;
+      document.getElementById("totalEstrelas").innerText = personagem.total_estrelas;
+
+      // Barra de progresso (meta: 50 estrelas = Rei)
+      const pct = Math.min((personagem.total_estrelas / 50) * 100, 100);
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressLabel").innerText =
+        personagem.total_estrelas + " / 50 para Rei";
+
+      // Busca progresso
+      const progresso = buscarProgresso(personagem.id);
+
+      // Agrupa por reino
+      const reinos = {};
+      progresso.forEach(row => {
+        if (!reinos[row.reino_id]) {
+          reinos[row.reino_id] = {
+            id: row.reino_id,
+            nome: row.reino_nome,
+            fases: []
+          };
+        }
+        reinos[row.reino_id].fases.push({
+          id: row.fase_id,
+          nome: row.fase_nome,
+          estrelas: row.estrelas
+        });
+      });
+
+      const grid = document.getElementById("reinosGrid");
+      const reinosList = Object.values(reinos);
+
+      reinosList.forEach((reino, index) => {
+
+        const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
+        const maxEstrelas   = reino.fases.length * 3; // 9 estrelas por reino
+        const conquistado   = totalEstrelas === maxEstrelas;
+
+        const desbloqueado = true;
+
+        const card = document.createElement("div");
+        card.classList.add("reino-card");
+        if (!desbloqueado) card.classList.add("bloqueado");
+
+        // Ícone ou emoji
+        const icone = reinoIcones[reino.nome];
+        let iconeHtml = "";
+        if (icone) {
+          iconeHtml = `<img class="reino-icone" src="${icone}" alt="${reino.nome}">`;
+        } else {
+          iconeHtml = `<div class="reino-icone-placeholder">${reinoEmojis[reino.nome] || "⚔️"}</div>`;
+        }
+
+
+        card.innerHTML = `
+          ${iconeHtml}
+          <div class="reino-nome">${reino.nome}</div>
+          <div class="reino-progresso">${totalEstrelas} / ${maxEstrelas} ⭐</div>
+        `;
+
+        if (desbloqueado) {
+          card.onclick = () => {
+            sessionStorage.setItem("reinoSelecionado", JSON.stringify(reino));
+            sessionStorage.setItem("personagemId", personagem.id);
+            localStorage.setItem("reinoSelecionado", JSON.stringify(reino));
+            localStorage.setItem("personagemId", personagem.id);
+            window.location.href = "trilha.html";
+          };
+        }
+
+        grid.appendChild(card);
+      });
+
+    });
+
+  </script>
+  <script src="js/sidebar.js"></script>
+
+
+  <audio id="hoverSound" preload="auto">
+    <source src="sons/botao.mp3" type="audio/mpeg">
+  </audio>
+
+  <script src="js/sound.js"></script>
+
+  <audio id="bgMusic" loop preload="auto">
+  <source src="sons/bg.mp3" type="audio/mpeg">
+</audio>
+
+
+</body>
+
+</html>
