@@ -150,7 +150,10 @@
         estrelasHtml += "</div>";
 
         item.appendChild(circulo);
-        item.innerHTML += estrelasHtml;
+
+        const starsEl = document.createElement("div");
+        starsEl.innerHTML = estrelasHtml;
+        item.appendChild(starsEl.firstElementChild);
 
         const label = document.createElement("div");
         label.classList.add("fase-label");
