@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <title>Análise de Desempenho - TRONUS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: url('img/fundo_reinos.jpg') center / cover fixed;
+      font-family: 'Crimson Text', serif;
+      color: #f0e6c8;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0;
+      background: rgba(8,4,0,0.72); z-index: 0;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 40px;
+      background: rgba(20,10,0,0.8);
+      border-bottom: 2px solid rgba(212,175,55,0.35);
+      backdrop-filter: blur(6px);
+    }
+    .back-btn {
+      background: none; border: 1px solid rgba(212,175,55,0.4);
+      color: #d4af37; padding: 8px 16px; border-radius: 8px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px;
+      transition: 0.3s;
+    }
+    .back-btn:hover { background: rgba(212,175,55,0.1); }
+    .page-title {
+      font-family: 'Cinzel', serif; font-size: 20px;
+      font-weight: 700; color: #f0e6c8; letter-spacing: 3px;
+    }
+
+    /* CONTEÚDO */
+    .dash-wrap {
+      position: relative; z-index: 10;
+      max-width: 860px; margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* CARDS DE RESUMO */
+    .resumo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 14px; margin-bottom: 36px;
+    }
+    .resumo-card {
+      background: rgba(20,10,0,0.8);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 14px; padding: 18px 16px;
+      text-align: center; backdrop-filter: blur(6px);
+    }
+    .resumo-valor {
+      font-family: 'Cinzel',serif; font-size: 30px;
+      font-weight: 700; color: #d4af37; display: block;
+    }
+    .resumo-label { font-size: 12px; color: #a89060; font-style: italic; margin-top: 4px; }
+
+    /* SEÇÃO */
+    .section-titulo {
+      font-family: 'Cinzel',serif; font-size: 15px;
+      color: #d4af37; letter-spacing: 2px;
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+      padding-bottom: 8px; margin-bottom: 20px; margin-top: 36px;
+    }
+
+    /* TABELA POR REINO/FASE */
+    .tabela-desempenho {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(20,10,0,0.75);
+      border-radius: 14px; overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+    .tabela-desempenho th {
+      background: rgba(212,175,55,0.12);
+      color: #d4af37; font-family: 'Cinzel',serif;
+      font-size: 12px; letter-spacing: 1px;
+      padding: 12px 16px; text-align: left;
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+    }
+    .tabela-desempenho td {
+      padding: 10px 16px; font-size: 14px; color: #c8b880;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .tabela-desempenho tr:last-child td { border-bottom: none; }
+    .tabela-desempenho tr:hover td { background: rgba(212,175,55,0.05); }
+
+    /* BARRA DE PROGRESSO */
+    .bar-bg {
+      height: 8px; background: rgba(255,255,255,0.08);
+      border-radius: 4px; overflow: hidden; min-width: 80px;
+    }
+    .bar-fill {
+      height: 100%; border-radius: 4px;
+      background: linear-gradient(90deg,#d4af37,#f5d020);
+      transition: width 0.6s ease;
+    }
+
+    /* ESTRELAS */
+    .star-i { color: rgba(212,175,55,0.25); font-size: 14px; }
+    .star-i.on { color: #d4af37; }
+
+    /* REINO BADGE */
+    .reino-badge {
+      font-family: 'Cinzel',serif; font-size: 11px;
+      font-weight: 700; color: #f0e6c8; letter-spacing: 1px;
+    }
+    .fase-nome { color: #a89060; font-size: 13px; font-style: italic; }
+
+    /* VAZIO */
+    .dash-vazio {
+      text-align: center; padding: 60px 0;
+      color: #6b5a30; font-style: italic; font-size: 15px;
+    }
+
+    /* GRÁFICO DE BARRAS (CSS puro) */
+    .grafico-wrap {
+      background: rgba(20,10,0,0.75);
+      border: 1px solid rgba(212,175,55,0.25);
+      border-radius: 14px; padding: 24px 20px;
+      backdrop-filter: blur(6px);
+    }
+    .grafico-cols {
+      display: flex; align-items: flex-end; gap: 10px;
+      height: 140px; border-bottom: 1px solid rgba(212,175,55,0.2);
+      padding-bottom: 4px;
+    }
+    .grafico-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .grafico-barra-wrap { width: 100%; display: flex; align-items: flex-end; height: 120px; }
+    .grafico-barra {
+      width: 100%; background: linear-gradient(0deg,#d4af37,#f5d020);
+      border-radius: 4px 4px 0 0; min-height: 4px;
+      transition: height 0.6s ease;
+    }
+    .grafico-pct  { font-size: 11px; color: #d4af37; font-family:'Cinzel',serif; }
+    .grafico-labels {
+      display: flex; gap: 10px; margin-top: 8px;
+    }
+    .grafico-label { flex: 1; text-align: center; font-size: 10px; color: #a89060; font-style: italic; }
+
+    @media (max-width:480px) {
+      .topbar { padding: 12px 16px; }
+      .resumo-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<script src="js/sidebar.js"></script>
+<body>
+
+  <div class="topbar">
+    <button class="back-btn" onclick="history.back()">← Voltar</button>
+    <span class="page-title">Análise de Desempenho</span>
+  </div>
+
+  <div class="dash-wrap">
+
+    <!-- RESUMO GERAL -->
+    <h3 class="section-titulo">Resumo Geral</h3>
+    <div class="resumo-grid" id="resumoGrid">
+      <div class="resumo-card">
+        <span class="resumo-valor" id="rTotalRespostas">—</span>
+        <div class="resumo-label">Questões respondidas</div>
+      </div>
+      <div class="resumo-card">
+        <span class="resumo-valor" id="rTotalAcertos">—</span>
+        <div class="resumo-label">Questões corretas</div>
+      </div>
+      <div class="resumo-card">
+        <span class="resumo-valor" id="rTaxaGeral">—%</span>
+        <div class="resumo-label">Taxa de acerto geral</div>
+      </div>
+      <div class="resumo-card">
+        <span class="resumo-valor" id="rEstrelas">—</span>
+        <div class="resumo-label">Estrelas conquistadas</div>
+      </div>
+      <div class="resumo-card">
+        <span class="resumo-valor" id="rFasesCompletas">—</span>
+        <div class="resumo-label">Fases com 3 estrelas</div>
+      </div>
+    </div>
+
+    <!-- GRÁFICO POR REINO -->
+    <h3 class="section-titulo">Taxa de Acerto por Reino</h3>
+    <div class="grafico-wrap">
+      <div class="grafico-cols" id="graficoCols"></div>
+      <div class="grafico-labels" id="graficoLabels"></div>
+    </div>
+
+    <!-- TABELA DETALHADA -->
+    <h3 class="section-titulo">Detalhamento por Fase</h3>
+    <div id="tabelaWrap">
+      <table class="tabela-desempenho">
+        <thead>
+          <tr>
+            <th>Reino</th>
+            <th>Fase</th>
+            <th>Tentativas</th>
+            <th>Acertos</th>
+            <th>Taxa</th>
+            <th>Barra</th>
+            <th>Estrelas</th>
+          </tr>
+        </thead>
+        <tbody id="tabelaBody"></tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script src="js/script.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="js/database.js"></script>
+
+  <script>
+    initDatabase().then(() => {
+      const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado"))
+             || JSON.parse(localStorage.getItem("usuarioLogado"));
+      if (!usuario) { window.location.href = "index.html"; return; }
+
+      const personagem = buscarPersonagem(usuario.id);
+      if (!personagem) { window.location.href = "character.html"; return; }
+
+      const resumo = buscarResumoGeral(personagem.id);
+      document.getElementById("rTotalRespostas").innerText = resumo.total_respostas || 0;
+      document.getElementById("rTotalAcertos").innerText   = resumo.total_acertos  || 0;
+      document.getElementById("rTaxaGeral").innerText      = (resumo.taxa_geral || 0) + "%";
+      document.getElementById("rEstrelas").innerText       = resumo.total_estrelas || 0;
+      document.getElementById("rFasesCompletas").innerText = resumo.fases_completas || 0;
+
+      const stats = buscarEstatisticas(personagem.id);
+
+      // Agrupa por reino para o gráfico
+      const reinoMap = {};
+      stats.forEach(row => {
+        if (!reinoMap[row.reino]) reinoMap[row.reino] = { acertos: 0, tentativas: 0 };
+        reinoMap[row.reino].acertos    += Number(row.acertos    || 0);
+        reinoMap[row.reino].tentativas += Number(row.tentativas || 0);
+      });
+
+      const reinoNomes = Object.keys(reinoMap);
+      const graficoCols   = document.getElementById("graficoCols");
+      const graficoLabels = document.getElementById("graficoLabels");
+
+      reinoNomes.forEach(nome => {
+        const d   = reinoMap[nome];
+        const pct = d.tentativas > 0 ? Math.round((d.acertos / d.tentativas) * 100) : 0;
+        const h   = Math.max(4, (pct / 100) * 120);
+
+        const col = document.createElement("div");
+        col.classList.add("grafico-col");
+        col.innerHTML = `
+          <span class="grafico-pct">${pct}%</span>
+          <div class="grafico-barra-wrap">
+            <div class="grafico-barra" style="height:${h}px"></div>
+          </div>
+        `;
+        graficoCols.appendChild(col);
+
+        const lbl = document.createElement("div");
+        lbl.classList.add("grafico-label");
+        lbl.innerText = nome.length > 6 ? nome.substring(0,6) + "." : nome;
+        graficoLabels.appendChild(lbl);
+      });
+
+      // Tabela detalhada
+      const tbody = document.getElementById("tabelaBody");
+      let lastReino = "";
+      stats.forEach(row => {
+        const tr  = document.createElement("tr");
+        const pct = Number(row.taxa_acerto || 0);
+
+        let estrelasHtml = "";
+        for (let i = 0; i < 3; i++) {
+          estrelasHtml += `<i class='bx bxs-star star-i ${i < row.estrelas ? "on" : ""}'></i>`;
+        }
+
+        tr.innerHTML = `
+          <td class="reino-badge">${row.reino !== lastReino ? row.reino : ""}</td>
+          <td class="fase-nome">${row.fase}</td>
+          <td>${row.tentativas || 0}</td>
+          <td>${row.acertos || 0}</td>
+          <td>${pct}%</td>
+          <td><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div></td>
+          <td>${estrelasHtml}</td>
+        `;
+        lastReino = row.reino;
+        tbody.appendChild(tr);
+      });
+
+      if (!stats.length) {
+        tbody.innerHTML = `<tr><td colspan="7" class="dash-vazio">
+          Nenhuma questão respondida ainda. Acesse um reino e complete um quiz!
+        </td></tr>`;
+      }
+    });
+  </script>
+</body>
+</html>

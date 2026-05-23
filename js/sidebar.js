@@ -4,6 +4,24 @@
 
 function criarSidebar() {
 
+  const usuario = JSON.parse(
+    sessionStorage.getItem("usuarioLogado") ||
+    localStorage.getItem("usuarioLogado") || "{}"
+  );
+  const papel = usuario.papel || 'aluno';
+
+  const painelLink = papel === 'professor'
+    ? `<a class="sidebar-item" onclick="fecharSidebar(); window.location.href='professor.html'">
+         <i class='bx bx-chalkboard'></i>
+         Painel do Professor
+       </a>`
+    : papel === 'admin'
+    ? `<a class="sidebar-item" onclick="fecharSidebar(); window.location.href='admin.html'">
+         <i class='bx bx-shield-alt-2'></i>
+         Painel Admin
+       </a>`
+    : '';
+
   const html = `
     <button class="menu-toggle" onclick="abrirSidebar()" title="Menu">
       <i class='bx bx-menu'></i>
@@ -24,6 +42,8 @@ function criarSidebar() {
           <i class='bx bx-map-alt'></i>
           Reinos
         </a>
+
+        ${painelLink}
 
         <a class="sidebar-item" onclick="fecharSidebar(); alert('Em breve!')">
           <i class='bx bx-cog'></i>
@@ -71,6 +91,7 @@ function fecharSidebar() {
 }
 
 function logout() {
+  if (!confirm("Tem certeza que deseja sair?")) return;
   sessionStorage.removeItem("usuarioLogado");
   localStorage.removeItem("usuarioLogado");
   sessionStorage.removeItem("reinoSelecionado");

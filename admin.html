@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <title>Painel Admin — TRONUS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: url('img/fundo_reinos.jpg') center / cover fixed;
+      font-family: 'Crimson Text', serif;
+      color: #f0e6c8;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0;
+      background: rgba(8,4,0,0.76); z-index: 0;
+    }
+
+    .topbar {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 40px;
+      background: rgba(20,10,0,0.85);
+      border-bottom: 2px solid rgba(212,175,55,0.35);
+      backdrop-filter: blur(6px);
+    }
+    .back-btn {
+      background: none; border: 1px solid rgba(212,175,55,0.4);
+      color: #d4af37; padding: 8px 16px; border-radius: 8px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px; transition: 0.3s;
+    }
+    .back-btn:hover { background: rgba(212,175,55,0.1); }
+    .page-title {
+      font-family: 'Cinzel', serif; font-size: 18px;
+      font-weight: 700; color: #f0e6c8; letter-spacing: 3px; flex: 1;
+    }
+    .adm-badge {
+      font-family: 'Cinzel', serif; font-size: 12px; color: #a89060;
+      background: rgba(212,175,55,0.1); border: 1px solid rgba(212,175,55,0.25);
+      padding: 6px 14px; border-radius: 20px;
+    }
+
+    .adm-wrap {
+      position: relative; z-index: 10;
+      max-width: 900px; margin: 0 auto;
+      padding: 36px 24px 80px;
+    }
+
+    .section-titulo {
+      font-family: 'Cinzel',serif; font-size: 14px;
+      color: #d4af37; letter-spacing: 2px;
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+      padding-bottom: 8px; margin-bottom: 20px; margin-top: 32px;
+    }
+    .section-titulo:first-child { margin-top: 0; }
+
+    /* CARDS DE STATS */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+      gap: 14px; margin-bottom: 12px;
+    }
+    .stat-card {
+      background: rgba(20,10,0,0.8);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 14px; padding: 18px 16px;
+      text-align: center; backdrop-filter: blur(6px);
+    }
+    .stat-val {
+      font-family: 'Cinzel',serif; font-size: 32px;
+      font-weight: 700; color: #d4af37; display: block;
+    }
+    .stat-label { font-size: 12px; color: #a89060; font-style: italic; margin-top: 4px; }
+
+    /* TABELA USUÁRIOS */
+    .tabela-usuarios {
+      width: 100%; border-collapse: collapse;
+      background: rgba(20,10,0,0.75);
+      border-radius: 14px; overflow: hidden;
+      backdrop-filter: blur(6px);
+    }
+    .tabela-usuarios th {
+      background: rgba(212,175,55,0.1); color: #d4af37;
+      font-family: 'Cinzel',serif; font-size: 11px;
+      letter-spacing: 1px; padding: 12px 16px; text-align: left;
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+    }
+    .tabela-usuarios td {
+      padding: 10px 16px; font-size: 13px; color: #c8b880;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .tabela-usuarios tr:last-child td { border-bottom: none; }
+    .tabela-usuarios tr:hover td { background: rgba(212,175,55,0.04); }
+
+    .papel-badge {
+      display: inline-block; font-size: 10px;
+      font-family: 'Cinzel',serif; padding: 3px 10px;
+      border-radius: 20px; letter-spacing: 1px;
+    }
+    .papel-aluno     { background: rgba(100,150,255,0.15); color: #88aaff; border: 1px solid rgba(100,150,255,0.3); }
+    .papel-professor { background: rgba(100,210,100,0.15); color: #88dd88; border: 1px solid rgba(100,210,100,0.3); }
+    .papel-admin     { background: rgba(212,175,55,0.15);  color: #d4af37; border: 1px solid rgba(212,175,55,0.3); }
+
+    .btn-del-user {
+      background: none; border: 1px solid rgba(180,50,50,0.3);
+      color: #c45; padding: 4px 10px; border-radius: 6px;
+      cursor: pointer; font-size: 11px; font-family:'Cinzel',serif;
+      transition: 0.2s;
+    }
+    .btn-del-user:hover { background: rgba(180,50,50,0.15); }
+
+    .em-desenvolvimento {
+      background: rgba(20,10,0,0.7);
+      border: 1px dashed rgba(212,175,55,0.2);
+      border-radius: 14px; padding: 30px;
+      text-align: center; color: #6b5a30;
+      font-style: italic; font-size: 14px;
+      backdrop-filter: blur(4px);
+    }
+    .em-desenvolvimento i { font-size: 28px; display: block; margin-bottom: 10px; color: #3a2e10; }
+
+    @media(max-width:600px) {
+      .topbar { padding: 12px 16px; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<script src="js/sidebar.js"></script>
+<body>
+
+  <div class="topbar">
+    <button class="back-btn" onclick="history.back()">← Voltar</button>
+    <span class="page-title">Painel Administrativo</span>
+    <span class="adm-badge" id="admBadge">—</span>
+  </div>
+
+  <div class="adm-wrap">
+
+    <!-- ESTATÍSTICAS GERAIS -->
+    <h3 class="section-titulo">Estatísticas Gerais do Sistema</h3>
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card">
+        <span class="stat-val" id="sUsuarios">—</span>
+        <div class="stat-label">Usuários cadastrados</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="sAlunos">—</span>
+        <div class="stat-label">Alunos ativos</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="sPersonagens">—</span>
+        <div class="stat-label">Personagens criados</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="sQuestoes">—</span>
+        <div class="stat-label">Questões no banco</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-val" id="sRespostas">—</span>
+        <div class="stat-label">Respostas registradas</div>
+      </div>
+    </div>
+
+    <!-- LISTA DE USUÁRIOS -->
+    <h3 class="section-titulo">Usuários Cadastrados</h3>
+    <table class="tabela-usuarios">
+      <thead>
+        <tr>
+          <th>#</th><th>Nome</th><th>E-mail</th><th>Papel</th><th>Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaUsuarios"></tbody>
+    </table>
+
+    <!-- MÓDULOS EM DESENVOLVIMENTO -->
+    <h3 class="section-titulo">Módulos Previstos (próximas versões)</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="em-desenvolvimento">
+        <i class='bx bx-buildings'></i>
+        Gestão de Turmas
+      </div>
+      <div class="em-desenvolvimento">
+        <i class='bx bx-link'></i>
+        Vincular Professores a Turmas
+      </div>
+      <div class="em-desenvolvimento">
+        <i class='bx bx-star'></i>
+        Configurar Regras de XP
+      </div>
+      <div class="em-desenvolvimento">
+        <i class='bx bx-bar-chart-square'></i>
+        Relatórios Gerais Exportáveis
+      </div>
+    </div>
+
+  </div>
+
+  <script src="js/theme.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="js/database.js"></script>
+  <script>
+
+    initDatabase().then(() => {
+      const u = JSON.parse(sessionStorage.getItem("usuarioLogado"))
+             || JSON.parse(localStorage.getItem("usuarioLogado"));
+
+      if (!u || u.papel !== 'admin') {
+        window.location.href = "index.html";
+        return;
+      }
+
+      document.getElementById("admBadge").innerText = u.nome;
+
+      // ── Estatísticas gerais ──────────────────
+      function stat(sql) {
+        const r = db.exec(sql);
+        return r.length ? (r[0].values[0][0] || 0) : 0;
+      }
+
+      document.getElementById("sUsuarios").innerText   = stat(`SELECT COUNT(*) FROM usuarios`);
+      document.getElementById("sAlunos").innerText     = stat(`SELECT COUNT(*) FROM usuarios WHERE papel = 'aluno'`);
+      document.getElementById("sPersonagens").innerText= stat(`SELECT COUNT(*) FROM personagens`);
+      document.getElementById("sQuestoes").innerText   = stat(`SELECT COUNT(*) FROM questoes`);
+      document.getElementById("sRespostas").innerText  = stat(`SELECT COUNT(*) FROM respostas_usuario`);
+
+      // ── Lista de usuários ────────────────────
+      const result = db.exec(`
+        SELECT id, nome, email, papel
+        FROM usuarios
+        ORDER BY papel, nome
+      `);
+
+      const tbody = document.getElementById("tabelaUsuarios");
+
+      if (!result.length || !result[0].values.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#6b5a30;font-style:italic;padding:20px">Nenhum usuário.</td></tr>`;
+        return;
+      }
+
+      result[0].values.forEach(row => {
+        const [id, nome, email, papel] = row;
+        const isEspecial = papel === 'admin' || papel === 'professor';
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="color:#6b5a30">${id}</td>
+          <td>${nome}</td>
+          <td style="color:#a89060">${email}</td>
+          <td><span class="papel-badge papel-${papel}">${papel}</span></td>
+          <td>${isEspecial
+            ? `<span style="color:#3a2e10;font-size:11px;font-style:italic">protegido</span>`
+            : `<button class="btn-del-user" onclick="deletarUsuario(${id}, ${JSON.stringify(nome)}, '${papel}', this)">
+                 <i class='bx bx-trash'></i> Excluir
+               </button>`}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+
+    function deletarUsuario(id, nome, papel, btn) {
+      if (!confirm(`Excluir o usuário "${nome}"? Esta ação é irreversível.`)) return;
+      db.run(`DELETE FROM respostas_usuario WHERE personagem_id IN (SELECT id FROM personagens WHERE usuario_id = ?)`, [id]);
+      db.run(`DELETE FROM progresso_fases    WHERE personagem_id IN (SELECT id FROM personagens WHERE usuario_id = ?)`, [id]);
+      db.run(`DELETE FROM personagens        WHERE usuario_id = ?`, [id]);
+      db.run(`DELETE FROM usuarios           WHERE id = ?`, [id]);
+      saveDatabase();
+      btn.closest("tr").remove();
+      // Atualiza contadores
+      const sU = document.getElementById("sUsuarios");
+      sU.innerText = Math.max(0, parseInt(sU.innerText) - 1);
+      if (papel === 'aluno') {
+        const sAl = document.getElementById("sAlunos");
+        sAl.innerText = Math.max(0, parseInt(sAl.innerText) - 1);
+      }
+    }
+
+  </script>
+</body>
+</html>

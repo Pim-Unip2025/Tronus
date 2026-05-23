@@ -18,157 +18,347 @@
 
   <!-- TOPO -->
   <div class="topbar">
-    <button class="back-btn" onclick="window.location.href='reinos.html'">
-      ← Voltar
-    </button>
+    <button class="back-btn" onclick="window.location.href='reinos.html'">← Voltar</button>
     <span class="topbar-title" id="reinoNome">—</span>
     <span class="topbar-sub" id="reinoProgresso">0 / 9 ⭐</span>
+    <button class="dashboard-btn" onclick="window.location.href='dashboard.html'" title="Análise de Desempenho">
+      <i class='bx bx-bar-chart-alt-2'></i> Análise
+    </button>
   </div>
 
   <!-- TRILHA -->
   <div class="trilha-wrap" id="trilhaWrap"></div>
 
-  <!-- MODAL para registrar estrelas -->
-  <div class="modal-overlay" id="modalOverlay">
-    <div class="modal">
-      <h2 id="modalFaseNome">Fase 1</h2>
-      <p>Quantas estrelas você conquistou nesta fase?</p>
-      <div class="modal-estrelas" id="modalEstrelas">
-        <i class='bx bxs-star' data-val="1"></i>
-        <i class='bx bxs-star' data-val="2"></i>
-        <i class='bx bxs-star' data-val="3"></i>
+  <!-- ATIVIDADES DO REINO -->
+  <div class="atividades-section">
+    <h3 class="atividades-titulo">📋 Atividades deste Reino</h3>
+    <div class="atividades-grid" id="atividadesGrid"></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════
+       MODAL DE QUIZ
+  ═══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalQuizOverlay">
+    <div class="modal modal-quiz">
+
+      <button class="btn-fechar-quiz" onclick="fecharQuiz()" title="Fechar">✕</button>
+
+      <div class="quiz-header">
+        <span class="quiz-fase-nome" id="quizFaseNome">Fase 1</span>
+        <span class="quiz-prog-texto" id="quizProgressText">Questão 1 de 5</span>
       </div>
-      <div class="modal-btns">
-        <button class="btn-cancelar" onclick="fecharModal()">Cancelar</button>
-        <button class="btn-confirmar" onclick="confirmarEstrelas()">Confirmar</button>
+      <div class="quiz-progress-bar-bg">
+        <div class="quiz-progress-bar-fill" id="quizProgressFill" style="width:0%"></div>
       </div>
+
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-alternativas" id="quizAlternativas"></div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="btn-proximo" id="btnProximo" style="display:none">Próxima →</button>
+
+      <div class="quiz-score" id="quizScore" style="display:none">
+        <div class="score-stars" id="scoreStars"></div>
+        <div class="score-text"  id="scoreText"></div>
+        <button class="btn-confirmar" onclick="fecharQuiz()">Concluir</button>
+      </div>
+
     </div>
   </div>
+
+  <!-- ═══════════════════════════════════════════
+       MODAL LIBRAS
+  ═══════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modalLibras">
+    <div class="modal modal-libras">
+      <button class="btn-fechar-quiz" onclick="fecharLibras()" title="Fechar">✕</button>
+      <h2 class="libras-titulo">👋 Glossário LIBRAS — Tecnologia da Informação</h2>
+      <p class="libras-sub">Termos essenciais de TI em Língua Brasileira de Sinais</p>
+      <div class="libras-grid" id="librasGrid"></div>
+      <p class="libras-referencia">
+        Referência:
+        <a href="https://www.spreadthesign.com/pt.br/search/" target="_blank" rel="noopener">
+          Spread The Sign — Dicionário de LIBRAS ↗
+        </a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Botão flutuante LIBRAS -->
+  <button class="libras-fab" onclick="abrirLibras()" title="Acessibilidade — Glossário LIBRAS">
+    <span class="libras-fab-icon">👋</span>
+    <span class="libras-fab-texto">LIBRAS</span>
+  </button>
 
   <script src="js/script.js"></script>
   <script src="js/theme.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
   <script src="js/database.js"></script>
+
   <script>
-
-    let faseAtual = null;
-    let estrelasEscolhidas = 0;
     let personagemId = null;
+    let reinoGlobal  = null;
 
+    const quiz = { faseAtual: null, questoes: [], index: 0, acertos: 0, respondida: false };
+
+    // ── Inicialização ────────────────────────────────────────
     initDatabase().then(() => {
+      const reino = JSON.parse(sessionStorage.getItem("reinoSelecionado"))
+             || JSON.parse(localStorage.getItem("reinoSelecionado"));
+      personagemId = sessionStorage.getItem("personagemId")
+             || localStorage.getItem("personagemId");
 
-      const reino = JSON.parse(sessionStorage.getItem("reinoSelecionado")) 
-           || JSON.parse(localStorage.getItem("reinoSelecionado"));
-
-      personagemId = sessionStorage.getItem("personagemId") 
-            || localStorage.getItem("personagemId");
-
-      if (!reino || !personagemId) {
-        window.location.href = "reinos.html";
-        return;
-      }
+      if (!reino || !personagemId) { window.location.href = "reinos.html"; return; }
+      reinoGlobal = reino;
 
       document.getElementById("reinoNome").innerText = reino.nome;
-
       const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
-      document.getElementById("reinoProgresso").innerText = totalEstrelas + " / " + (reino.fases.length * 3) + " ⭐";
+      document.getElementById("reinoProgresso").innerText =
+        totalEstrelas + " / " + (reino.fases.length * 3) + " ⭐";
 
+      renderTrilha(reino);
+      renderAtividades(reino);
+    });
+
+    // ── Renderiza trilha ─────────────────────────────────────
+    function renderTrilha(reino) {
       const wrap = document.getElementById("trilhaWrap");
+      wrap.innerHTML = "";
 
       reino.fases.forEach((fase, index) => {
-
-        // Fase desbloqueada se for a primeira ou a anterior tiver pelo menos 1 estrela
         const desbloqueada = index === 0 || reino.fases[index - 1].estrelas > 0;
         const completa     = fase.estrelas === 3;
 
         const item = document.createElement("div");
         item.classList.add("fase-item");
 
-        // Círculo
         const circulo = document.createElement("div");
         circulo.classList.add("fase-circulo");
         if (!desbloqueada) circulo.classList.add("bloqueada");
-        if (completa) circulo.classList.add("completa");
+        if (completa)      circulo.classList.add("completa");
 
         if (desbloqueada) {
           circulo.innerHTML = `<span class="fase-numero">${index + 1}</span>`;
-          circulo.onclick = () => abrirModal(fase);
+          circulo.onclick   = () => abrirQuiz(fase);
         } else {
           circulo.innerHTML = `<i class='bx bxs-lock fase-lock-icon'></i>`;
         }
 
-        // Estrelas
         let estrelasHtml = '<div class="fase-estrelas">';
         for (let i = 0; i < 3; i++) {
           estrelasHtml += `<i class='bx bxs-star ${i < fase.estrelas ? "ativa" : ""}'></i>`;
         }
-        estrelasHtml += '</div>';
+        estrelasHtml += "</div>";
+
+        item.appendChild(circulo);
+        item.innerHTML += estrelasHtml;
 
         const label = document.createElement("div");
         label.classList.add("fase-label");
         label.innerText = fase.nome;
-
-        item.appendChild(circulo);
-        item.innerHTML += estrelasHtml;
         item.appendChild(label);
 
         wrap.appendChild(item);
       });
-
-    });
-
-    // -----------------------------------------------
-    // MODAL
-    // -----------------------------------------------
-    function abrirModal(fase) {
-      faseAtual = fase;
-      estrelasEscolhidas = fase.estrelas || 0;
-
-      document.getElementById("modalFaseNome").innerText = fase.nome;
-      atualizarEstrelasModal(estrelasEscolhidas);
-
-      document.getElementById("modalOverlay").classList.add("ativo");
     }
 
-    function fecharModal() {
-      document.getElementById("modalOverlay").classList.remove("ativo");
-      faseAtual = null;
-      estrelasEscolhidas = 0;
-    }
+    // ── Renderiza atividades ─────────────────────────────────
+    function renderAtividades(reino) {
+      const grid = document.getElementById("atividadesGrid");
+      grid.innerHTML = "";
+      const hoje = new Date().toLocaleDateString("pt-BR");
 
-    function atualizarEstrelasModal(val) {
-      document.querySelectorAll(".modal-estrelas i").forEach((star, i) => {
-        star.classList.toggle("ativa", i < val);
+      reino.fases.forEach((fase, index) => {
+        const questoes     = buscarQuestoesPorFase(fase.id);
+        const desbloqueada = index === 0 || reino.fases[index - 1].estrelas > 0;
+        if (!questoes || !questoes.length) return;
+
+        const nivelEmoji = { "Fácil": "🟢", "Médio": "🟡", "Difícil": "🔴" };
+        const nivel = questoes[0]?.nivel || "Médio";
+
+        const card = document.createElement("div");
+        card.classList.add("atividade-card", desbloqueada ? "desbloqueada" : "bloqueada-card");
+        card.innerHTML = `
+          <div class="atividade-badge">${nivelEmoji[nivel] || "🟡"} ${nivel}</div>
+          <div class="atividade-nome">Quiz — ${reino.nome} · Fase ${index + 1}</div>
+          <div class="atividade-desc">Responda ${questoes.length} questões de múltipla escolha e ganhe até 3 estrelas.</div>
+          <div class="atividade-footer">
+            <span class="atividade-date"><i class='bx bx-calendar'></i> ${hoje}</span>
+            <span class="atividade-count"><i class='bx bxs-help-circle'></i> ${questoes.length} questões</span>
+          </div>
+        `;
+        if (desbloqueada) card.onclick = () => abrirQuiz(fase);
+        grid.appendChild(card);
       });
+
+      if (!grid.children.length) {
+        grid.innerHTML = `<p class="atividades-vazio">Nenhuma atividade disponível para este reino ainda.</p>`;
+      }
     }
 
-    // Clique nas estrelas do modal
-    document.querySelectorAll(".modal-estrelas i").forEach(star => {
-      star.addEventListener("click", () => {
-        estrelasEscolhidas = parseInt(star.dataset.val);
-        atualizarEstrelasModal(estrelasEscolhidas);
-      });
-    });
-
-    function confirmarEstrelas() {
-      if (estrelasEscolhidas === 0) {
-        alert("Selecione pelo menos 1 estrela.");
+    // ── Abre quiz ────────────────────────────────────────────
+    function abrirQuiz(fase) {
+      const questoes = buscarQuestoesPorFase(fase.id);
+      if (!questoes || !questoes.length) {
+        alert("Este reino ainda não tem questões cadastradas. Em breve!");
         return;
       }
+      quiz.faseAtual  = fase;
+      quiz.questoes   = questoes;
+      quiz.index      = 0;
+      quiz.acertos    = 0;
+      quiz.respondida = false;
 
-      atualizarProgresso(personagemId, faseAtual.id, estrelasEscolhidas);
+      document.getElementById("quizFaseNome").innerText = fase.nome;
+      document.getElementById("quizScore").style.display = "none";
+      document.getElementById("modalQuizOverlay").classList.add("ativo");
+      renderQuestao();
+    }
 
-      fecharModal();
+    function renderQuestao() {
+      const q     = quiz.questoes[quiz.index];
+      const total = quiz.questoes.length;
 
-      // Recarrega a tela com dados atualizados
-      const reino = JSON.parse(sessionStorage.getItem("reinoSelecionado"));
-      const faseIndex = reino.fases.findIndex(f => f.id === faseAtual.id);
-      reino.fases[faseIndex].estrelas = estrelasEscolhidas;
-      sessionStorage.setItem("reinoSelecionado", JSON.stringify(reino));
+      document.getElementById("quizProgressText").innerText = `Questão ${quiz.index + 1} de ${total}`;
+      document.getElementById("quizProgressFill").style.width = ((quiz.index / total) * 100) + "%";
+      document.getElementById("quizQuestion").innerText = q.enunciado;
+      document.getElementById("quizFeedback").textContent = "";
+      document.getElementById("quizFeedback").className   = "quiz-feedback";
+      document.getElementById("btnProximo").style.display = "none";
+      document.getElementById("quizScore").style.display      = "none";
+      document.getElementById("quizQuestion").style.display   = "block";
+      document.getElementById("quizAlternativas").style.display = "flex";
 
+      const altContainer = document.getElementById("quizAlternativas");
+      altContainer.innerHTML = "";
+      q.alternativas.forEach(alt => {
+        const btn = document.createElement("button");
+        btn.classList.add("quiz-alt-btn");
+        btn.innerHTML = `<span class="alt-letra">${alt.letra}</span><span class="alt-texto">${alt.texto}</span>`;
+        btn.onclick = () => responder(alt, btn, q);
+        altContainer.appendChild(btn);
+      });
+      quiz.respondida = false;
+    }
+
+    function responder(alt, btnClicado, q) {
+      if (quiz.respondida) return;
+      quiz.respondida = true;
+
+      registrarResposta(personagemId, q.id, quiz.faseAtual.id, alt.correta ? 1 : 0);
+      if (alt.correta) quiz.acertos++;
+
+      document.querySelectorAll(".quiz-alt-btn").forEach(b => {
+        b.disabled = true;
+        const letra   = b.querySelector(".alt-letra").innerText;
+        const thisAlt = q.alternativas.find(a => a.letra === letra);
+        if (thisAlt?.correta)              b.classList.add("alt-correta");
+        else if (b === btnClicado && !alt.correta) b.classList.add("alt-errada");
+      });
+
+      const feedback = document.getElementById("quizFeedback");
+      if (alt.correta) {
+        feedback.textContent = "✓ Correto! Muito bem!";
+        feedback.className   = "quiz-feedback feedback-correto";
+      } else {
+        const correta = q.alternativas.find(a => a.correta);
+        feedback.textContent = `✗ Incorreto. Resposta: (${correta?.letra}) ${correta?.texto}`;
+        feedback.className   = "quiz-feedback feedback-errado";
+      }
+
+      const btnProx = document.getElementById("btnProximo");
+      btnProx.style.display = "block";
+      if (quiz.index < quiz.questoes.length - 1) {
+        btnProx.innerText = "Próxima →";
+        btnProx.onclick   = proximaQuestao;
+      } else {
+        btnProx.innerText = "Ver Resultado";
+        btnProx.onclick   = mostrarResultado;
+      }
+    }
+
+    function proximaQuestao() { quiz.index++; renderQuestao(); }
+
+    function mostrarResultado() {
+      const acertos = quiz.acertos;
+      const total   = quiz.questoes.length;
+
+      let estrelas = 0;
+      if (acertos >= 4)      estrelas = 3;
+      else if (acertos === 3) estrelas = 2;
+      else if (acertos >= 1) estrelas = 1;
+
+      const anteriores = quiz.faseAtual.estrelas || 0;
+      const melhor     = Math.max(estrelas, anteriores);
+      if (melhor > 0) atualizarProgresso(personagemId, quiz.faseAtual.id, melhor);
+
+      document.getElementById("quizQuestion").style.display    = "none";
+      document.getElementById("quizAlternativas").style.display = "none";
+      document.getElementById("quizFeedback").textContent = "";
+      document.getElementById("btnProximo").style.display  = "none";
+
+      let estrelasHtml = "";
+      for (let i = 0; i < 3; i++) {
+        estrelasHtml += `<i class='bx bxs-star ${i < estrelas ? "ativa" : ""}'></i>`;
+      }
+      document.getElementById("scoreStars").innerHTML = estrelasHtml;
+
+      const msgs = [
+        "Não desanime! Revise e tente novamente! 💪",
+        "Bom começo! Continue treinando! ⚔️",
+        "Quase lá! Mais um esforço! 🌟",
+        "Excelente! Fase conquistada! 🏆",
+      ];
+      document.getElementById("scoreText").innerHTML =
+        `<strong>${acertos}/${total}</strong> questões corretas<br>${msgs[estrelas]}`;
+      document.getElementById("quizScore").style.display = "block";
+    }
+
+    function fecharQuiz() {
+      document.getElementById("modalQuizOverlay").classList.remove("ativo");
       location.reload();
     }
 
+    // ── LIBRAS ───────────────────────────────────────────────
+    const glossarioLibras = [
+      { termo: "Computador",    descricao: "Mãos abertas no peito, dedos movendo como se digitasse.",          link: "computador" },
+      { termo: "Programação",   descricao: "Indicador direito 'escreve' sobre a palma da mão esquerda.",       link: "programa%C3%A7%C3%A3o" },
+      { termo: "Internet",      descricao: "Dedos entrelaçados girando um ao redor do outro na frente do rosto.", link: "internet" },
+      { termo: "Software",      descricao: "Mão em 'S' tocando levemente a palma oposta.",                     link: "software" },
+      { termo: "Hardware",      descricao: "Mão espalmada bate suavemente no peito duas vezes.",               link: "hardware" },
+      { termo: "Algoritmo",     descricao: "Mão em 'A' move-se em etapas da esquerda para a direita.",         link: "algoritmo" },
+      { termo: "Variável",      descricao: "Mão em 'V' balança suavemente — indica algo que muda.",            link: "vari%C3%A1vel" },
+      { termo: "Função",        descricao: "Mão em 'F' gira no pulso uma vez.",                                link: "fun%C3%A7%C3%A3o" },
+      { termo: "Banco de Dados","descricao": "Palma plana virada para cima, depois mãos empilhando objetos.",  link: "banco+de+dados" },
+      { termo: "Rede",          descricao: "Dedos entrelaçados das duas mãos — representa conexão.",           link: "rede" },
+    ];
+
+    function abrirLibras() {
+      const grid = document.getElementById("librasGrid");
+      if (!grid.children.length) {
+        glossarioLibras.forEach(item => {
+          const card = document.createElement("div");
+          card.classList.add("libras-card");
+          card.innerHTML = `
+            <div class="libras-termo">${item.termo}</div>
+            <div class="libras-desc">${item.descricao}</div>
+            <a class="libras-link"
+               href="https://www.spreadthesign.com/pt.br/search/?q=${item.link}"
+               target="_blank" rel="noopener">Ver sinal ↗</a>
+          `;
+          grid.appendChild(card);
+        });
+      }
+      document.getElementById("modalLibras").classList.add("ativo");
+    }
+
+    function fecharLibras() {
+      document.getElementById("modalLibras").classList.remove("ativo");
+    }
+
+    document.addEventListener("click", e => {
+      if (e.target.id === "modalLibras")      fecharLibras();
+      if (e.target.id === "modalQuizOverlay") fecharQuiz();
+    });
   </script>
 
 </body>

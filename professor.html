@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="sidebar.css">
+  <title>Painel do Professor — TRONUS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      background: url('img/fundo_reinos.jpg') center / cover fixed;
+      font-family: 'Crimson Text', serif;
+      color: #f0e6c8;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0;
+      background: rgba(8,4,0,0.74); z-index: 0;
+    }
+
+    /* TOPBAR */
+    .topbar {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 40px;
+      background: rgba(20,10,0,0.85);
+      border-bottom: 2px solid rgba(212,175,55,0.35);
+      backdrop-filter: blur(6px);
+    }
+    .back-btn {
+      background: none; border: 1px solid rgba(212,175,55,0.4);
+      color: #d4af37; padding: 8px 16px; border-radius: 8px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px;
+      transition: 0.3s;
+    }
+    .back-btn:hover { background: rgba(212,175,55,0.1); }
+    .page-title {
+      font-family: 'Cinzel', serif; font-size: 18px;
+      font-weight: 700; color: #f0e6c8; letter-spacing: 3px; flex: 1;
+    }
+    .prof-badge {
+      font-family: 'Cinzel', serif; font-size: 12px;
+      color: #a89060; background: rgba(212,175,55,0.1);
+      border: 1px solid rgba(212,175,55,0.25);
+      padding: 6px 14px; border-radius: 20px;
+    }
+
+    /* WRAP */
+    .prof-wrap {
+      position: relative; z-index: 10;
+      max-width: 900px; margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    /* TABS */
+    .tab-bar {
+      display: flex; gap: 8px; margin-bottom: 28px;
+    }
+    .tab-btn {
+      background: rgba(20,10,0,0.7);
+      border: 1px solid rgba(212,175,55,0.25);
+      color: #a89060; padding: 10px 24px; border-radius: 10px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px;
+      letter-spacing: 1px; transition: 0.2s;
+    }
+    .tab-btn:hover { border-color: rgba(212,175,55,0.5); color: #d4af37; }
+    .tab-btn.ativo {
+      background: rgba(212,175,55,0.15);
+      border-color: rgba(212,175,55,0.6); color: #d4af37;
+    }
+
+    /* SEÇÃO */
+    .section-titulo {
+      font-family: 'Cinzel',serif; font-size: 14px;
+      color: #d4af37; letter-spacing: 2px;
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+      padding-bottom: 8px; margin-bottom: 20px; margin-top: 28px;
+    }
+    .section-titulo:first-child { margin-top: 0; }
+
+    /* SELECT FASE */
+    .fase-select-wrap { margin-bottom: 20px; }
+    .fase-select-wrap label {
+      display: block; font-size: 13px; color: #a89060;
+      margin-bottom: 8px; font-style: italic;
+    }
+    select.fase-select {
+      background: rgba(20,10,0,0.8);
+      border: 1px solid rgba(212,175,55,0.3); color: #f0e6c8;
+      padding: 10px 16px; border-radius: 10px; font-size: 14px;
+      font-family: 'Crimson Text',serif; width: 100%; max-width: 400px;
+      cursor: pointer;
+    }
+    select.fase-select:focus { outline: none; border-color: #d4af37; }
+
+    /* LISTA DE QUESTÕES */
+    .questao-item {
+      background: rgba(20,10,0,0.75);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 12px; padding: 16px 18px;
+      margin-bottom: 10px; display: flex;
+      align-items: flex-start; gap: 14px;
+      backdrop-filter: blur(4px);
+    }
+    .questao-num {
+      font-family: 'Cinzel',serif; font-size: 13px;
+      color: #d4af37; min-width: 28px; margin-top: 2px;
+    }
+    .questao-texto {
+      flex: 1; font-size: 14px; color: #c8b880;
+      white-space: pre-wrap; line-height: 1.5;
+    }
+    .questao-meta {
+      font-size: 11px; color: #6b5a30; margin-top: 4px; font-style: italic;
+    }
+    .btn-excluir {
+      background: none; border: 1px solid rgba(180,50,50,0.4);
+      color: #c45; padding: 6px 12px; border-radius: 8px;
+      cursor: pointer; font-size: 12px; font-family: 'Cinzel',serif;
+      transition: 0.2s; white-space: nowrap; margin-top: 2px;
+    }
+    .btn-excluir:hover { background: rgba(180,50,50,0.15); border-color: #c45; }
+
+    /* BOTÃO NOVA QUESTÃO */
+    .btn-nova-questao {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(212,175,55,0.1);
+      border: 1px dashed rgba(212,175,55,0.4);
+      color: #d4af37; padding: 12px 20px; border-radius: 12px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px;
+      letter-spacing: 1px; width: 100%; justify-content: center;
+      transition: 0.2s; margin-top: 12px;
+    }
+    .btn-nova-questao:hover { background: rgba(212,175,55,0.18); }
+
+    /* FORMULÁRIO DE NOVA QUESTÃO */
+    .form-questao {
+      background: rgba(20,10,0,0.8);
+      border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 14px; padding: 24px;
+      margin-top: 12px; backdrop-filter: blur(6px);
+    }
+    .form-titulo {
+      font-family: 'Cinzel',serif; font-size: 13px;
+      color: #d4af37; letter-spacing: 1px; margin-bottom: 16px;
+    }
+    .form-label {
+      display: block; font-size: 12px; color: #a89060;
+      margin-bottom: 6px; margin-top: 14px; font-style: italic;
+    }
+    textarea.form-input, input.form-input, select.form-input {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(212,175,55,0.25); color: #f0e6c8;
+      padding: 10px 14px; border-radius: 8px; font-size: 14px;
+      font-family: 'Crimson Text',serif; resize: vertical;
+    }
+    textarea.form-input { min-height: 120px; }
+    textarea.form-input:focus, input.form-input:focus, select.form-input:focus {
+      outline: none; border-color: rgba(212,175,55,0.6);
+    }
+    .alts-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
+    .alt-row { display: flex; align-items: center; gap: 10px; }
+    .alt-letra {
+      font-family: 'Cinzel',serif; font-size: 13px;
+      color: #d4af37; min-width: 20px;
+    }
+    .alt-radio { accent-color: #d4af37; width: 16px; height: 16px; cursor: pointer; }
+    .alt-input {
+      flex: 1; background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(212,175,55,0.2); color: #f0e6c8;
+      padding: 8px 12px; border-radius: 8px; font-size: 13px;
+      font-family: 'Crimson Text',serif;
+    }
+    .alt-input:focus { outline: none; border-color: rgba(212,175,55,0.5); }
+    .form-actions { display: flex; gap: 12px; margin-top: 20px; }
+    .btn-salvar {
+      background: rgba(212,175,55,0.2);
+      border: 1px solid rgba(212,175,55,0.5); color: #d4af37;
+      padding: 10px 24px; border-radius: 10px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px;
+      transition: 0.2s;
+    }
+    .btn-salvar:hover { background: rgba(212,175,55,0.3); }
+    .btn-cancelar {
+      background: none; border: 1px solid rgba(255,255,255,0.1);
+      color: #6b5a30; padding: 10px 20px; border-radius: 10px;
+      cursor: pointer; font-family: 'Cinzel',serif; font-size: 13px;
+      transition: 0.2s;
+    }
+    .btn-cancelar:hover { border-color: rgba(255,255,255,0.2); color: #a89060; }
+
+    /* BUSCA ALUNOS */
+    .search-wrap { position: relative; margin-bottom: 20px; }
+    .search-input {
+      width: 100%; background: rgba(20,10,0,0.8);
+      border: 1px solid rgba(212,175,55,0.3); color: #f0e6c8;
+      padding: 12px 18px 12px 44px; border-radius: 12px;
+      font-size: 14px; font-family: 'Crimson Text',serif;
+    }
+    .search-input:focus { outline: none; border-color: rgba(212,175,55,0.6); }
+    .search-ico {
+      position: absolute; left: 14px; top: 50%;
+      transform: translateY(-50%); color: #6b5a30; font-size: 18px;
+    }
+
+    /* CARD DO ALUNO */
+    .aluno-card {
+      background: rgba(20,10,0,0.75);
+      border: 1px solid rgba(212,175,55,0.2);
+      border-radius: 12px; padding: 0;
+      margin-bottom: 12px; overflow: hidden;
+      backdrop-filter: blur(4px);
+    }
+    .aluno-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 18px; cursor: pointer;
+      border-bottom: 1px solid rgba(212,175,55,0.1);
+      transition: 0.2s;
+    }
+    .aluno-header:hover { background: rgba(212,175,55,0.05); }
+    .aluno-avatar-placeholder {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(212,175,55,0.15);
+      border: 1px solid rgba(212,175,55,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .aluno-info { flex: 1; }
+    .aluno-nome { font-family: 'Cinzel',serif; font-size: 13px; color: #f0e6c8; }
+    .aluno-sub { font-size: 12px; color: #6b5a30; font-style: italic; margin-top: 2px; }
+    .aluno-estrelas { font-size: 13px; color: #d4af37; }
+    .aluno-detalhe { display: none; padding: 16px 18px; }
+    .aluno-detalhe.aberto { display: block; }
+
+    /* TABELA DESEMPENHO ALUNO */
+    .tabela-aluno {
+      width: 100%; border-collapse: collapse;
+    }
+    .tabela-aluno th {
+      font-family: 'Cinzel',serif; font-size: 11px;
+      color: #a89060; letter-spacing: 1px; text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid rgba(212,175,55,0.15);
+    }
+    .tabela-aluno td {
+      padding: 8px 12px; font-size: 13px; color: #c8b880;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+    }
+    .tabela-aluno tr:last-child td { border-bottom: none; }
+    .bar-bg { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; min-width: 60px; }
+    .bar-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,#d4af37,#f5d020); }
+
+    /* EMPTY STATE */
+    .estado-vazio {
+      text-align: center; padding: 40px 0;
+      color: #6b5a30; font-style: italic; font-size: 15px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(20,10,0,0.95); border: 1px solid rgba(212,175,55,0.5);
+      color: #d4af37; padding: 12px 28px; border-radius: 12px;
+      font-family: 'Cinzel',serif; font-size: 13px; z-index: 9999;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; }
+
+    @media(max-width:600px) {
+      .topbar { padding: 12px 16px; }
+      .prof-wrap { padding: 20px 16px 60px; }
+    }
+  </style>
+</head>
+<script src="js/sidebar.js"></script>
+<body>
+
+  <div class="topbar">
+    <button class="back-btn" onclick="history.back()">← Voltar</button>
+    <span class="page-title">Painel do Professor</span>
+    <span class="prof-badge" id="profBadge">—</span>
+  </div>
+
+  <div class="prof-wrap">
+
+    <!-- TABS -->
+    <div class="tab-bar">
+      <button class="tab-btn ativo" id="tabBtnQuestoes" onclick="mostrarTab('questoes')">
+        <i class='bx bx-book-open'></i> Questões
+      </button>
+      <button class="tab-btn" id="tabBtnAlunos" onclick="mostrarTab('alunos')">
+        <i class='bx bx-group'></i> Alunos
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB: QUESTÕES                               -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="tab-questoes">
+
+      <h3 class="section-titulo">Gerenciar Questões — Reino Python</h3>
+
+      <div class="fase-select-wrap">
+        <label>Selecione a fase:</label>
+        <select class="fase-select" id="selectFase" onchange="carregarQuestoes()">
+          <option value="">— escolha uma fase —</option>
+        </select>
+      </div>
+
+      <div id="listaQuestoes">
+        <div class="estado-vazio">Selecione uma fase para ver as questões.</div>
+      </div>
+
+      <button class="btn-nova-questao" id="btnNovaQuestao" onclick="toggleForm()" style="display:none">
+        <i class='bx bx-plus'></i> Nova Questão
+      </button>
+
+      <!-- FORMULÁRIO -->
+      <div class="form-questao" id="formQuestao" style="display:none">
+        <div class="form-titulo">✦ Nova Questão</div>
+
+        <label class="form-label">Enunciado (use \n ou Enter para quebras de linha)</label>
+        <textarea class="form-input" id="fEnunciado" placeholder="Ex: Sobre tipagem em Python, considere:\n\nI. ..."></textarea>
+
+        <label class="form-label">Nível de dificuldade</label>
+        <select class="form-input" id="fNivel">
+          <option>Fácil</option>
+          <option selected>Médio</option>
+          <option>Difícil</option>
+        </select>
+
+        <label class="form-label">Alternativas — marque a correta com o círculo</label>
+        <div class="alts-grid" id="altsGrid">
+          <!-- gerado pelo JS -->
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-salvar" onclick="salvarQuestao()">Salvar Questão</button>
+          <button class="btn-cancelar" onclick="toggleForm()">Cancelar</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- TAB: ALUNOS                                 -->
+    <!-- ═══════════════════════════════════════════ -->
+    <div id="tab-alunos" style="display:none">
+
+      <h3 class="section-titulo">Desempenho dos Alunos</h3>
+
+      <div class="search-wrap">
+        <i class='bx bx-search search-ico'></i>
+        <input class="search-input" id="searchInput"
+               placeholder="Buscar aluno pelo nome de usuário..."
+               oninput="buscarAluno(this.value)">
+      </div>
+
+      <div id="resultadoAlunos">
+        <div class="estado-vazio">Digite o nome para buscar um aluno.</div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/theme.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
+  <script src="js/database.js"></script>
+  <script>
+
+    let professorUsuario = null;
+    let faseAtualId      = null;
+    let reinoId          = null;
+
+    // ────────────────────────────────────────────
+    // INIT
+    // ────────────────────────────────────────────
+    initDatabase().then(() => {
+      const u = JSON.parse(sessionStorage.getItem("usuarioLogado"))
+             || JSON.parse(localStorage.getItem("usuarioLogado"));
+
+      if (!u || u.papel !== 'professor') {
+        window.location.href = "index.html";
+        return;
+      }
+
+      professorUsuario = u;
+      document.getElementById("profBadge").innerText = u.nome;
+
+      reinoId = u.professor_reino_id;
+
+      if (!reinoId) {
+        document.getElementById("listaQuestoes").innerHTML =
+          `<div class="estado-vazio">Nenhum reino associado a este professor. Contate o administrador.</div>`;
+        document.getElementById("selectFase").disabled = true;
+        return;
+      }
+
+      // Popula select de fases
+      const fases = buscarFasesPorReino(reinoId);
+      const sel   = document.getElementById("selectFase");
+      fases.forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f.id;
+        opt.text  = f.nome;
+        sel.appendChild(opt);
+      });
+    });
+
+    // ────────────────────────────────────────────
+    // TABS
+    // ────────────────────────────────────────────
+    function mostrarTab(tab) {
+      document.getElementById("tab-questoes").style.display = tab === 'questoes' ? 'block' : 'none';
+      document.getElementById("tab-alunos").style.display   = tab === 'alunos'   ? 'block' : 'none';
+      document.getElementById("tabBtnQuestoes").classList.toggle("ativo", tab === 'questoes');
+      document.getElementById("tabBtnAlunos").classList.toggle("ativo",   tab === 'alunos');
+    }
+
+    // ────────────────────────────────────────────
+    // QUESTÕES
+    // ────────────────────────────────────────────
+    function carregarQuestoes() {
+      const sel   = document.getElementById("selectFase");
+      faseAtualId = sel.value ? Number(sel.value) : null;
+      const lista = document.getElementById("listaQuestoes");
+      const btnNova = document.getElementById("btnNovaQuestao");
+
+      // Esconde form ao trocar de fase
+      document.getElementById("formQuestao").style.display = 'none';
+
+      if (!faseAtualId) {
+        lista.innerHTML = `<div class="estado-vazio">Selecione uma fase para ver as questões.</div>`;
+        btnNova.style.display = 'none';
+        return;
+      }
+
+      btnNova.style.display = 'flex';
+      renderQuestoes();
+    }
+
+    function renderQuestoes() {
+      const lista   = document.getElementById("listaQuestoes");
+      const questoes = listarQuestoesDaFase(faseAtualId);
+
+      if (!questoes.length) {
+        lista.innerHTML = `<div class="estado-vazio">Nenhuma questão nesta fase ainda.</div>`;
+        return;
+      }
+
+      lista.innerHTML = questoes.map((q, i) => `
+        <div class="questao-item">
+          <span class="questao-num">${i + 1}.</span>
+          <div style="flex:1">
+            <div class="questao-texto">${q.enunciado}</div>
+            <div class="questao-meta">${q.nivel_dificuldade} · ${q.total_alts} alternativas</div>
+          </div>
+          <button class="btn-excluir" onclick="deletarQuestao(${q.id})">
+            <i class='bx bx-trash'></i> Excluir
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function deletarQuestao(id) {
+      if (!confirm("Excluir esta questão? Esta ação também remove as respostas dos alunos relacionadas.")) return;
+      excluirQuestao(id);
+      renderQuestoes();
+      mostrarToast("Questão excluída.");
+    }
+
+    // ────────────────────────────────────────────
+    // FORMULÁRIO
+    // ────────────────────────────────────────────
+    function toggleForm() {
+      const form = document.getElementById("formQuestao");
+      const aberto = form.style.display !== 'none';
+      form.style.display = aberto ? 'none' : 'block';
+      if (!aberto) renderAltsForm();
+    }
+
+    function renderAltsForm() {
+      const letras = ['A','B','C','D','E'];
+      document.getElementById("altsGrid").innerHTML = letras.map(l => `
+        <div class="alt-row">
+          <span class="alt-letra">${l}</span>
+          <input type="radio" name="altCorreta" value="${l}" class="alt-radio" title="Marcar como correta">
+          <input type="text" class="alt-input" id="alt${l}" placeholder="Texto da alternativa ${l}">
+        </div>
+      `).join('');
+    }
+
+    function salvarQuestao() {
+      if (!faseAtualId) { mostrarToast("Selecione uma fase primeiro."); return; }
+
+      const enunciado = document.getElementById("fEnunciado").value.trim();
+      const nivel     = document.getElementById("fNivel").value;
+
+      if (!enunciado) { mostrarToast("Preencha o enunciado."); return; }
+
+      const correta = document.querySelector('input[name="altCorreta"]:checked')?.value;
+      if (!correta) { mostrarToast("Marque a alternativa correta."); return; }
+
+      const letras = ['A','B','C','D','E'];
+      const alts   = [];
+      for (const l of letras) {
+        const texto = document.getElementById(`alt${l}`).value.trim();
+        if (!texto) { mostrarToast(`Preencha a alternativa ${l}.`); return; }
+        alts.push({ letra: l, texto, correta: l === correta });
+      }
+
+      criarQuestao(faseAtualId, enunciado, nivel, alts);
+
+      // Reset form
+      document.getElementById("fEnunciado").value = '';
+      document.getElementById("formQuestao").style.display = 'none';
+      renderQuestoes();
+      mostrarToast("Questão criada com sucesso!");
+    }
+
+    // ────────────────────────────────────────────
+    // ALUNOS
+    // ────────────────────────────────────────────
+    function buscarAluno(nome) {
+      const area = document.getElementById("resultadoAlunos");
+      if (!nome || nome.trim().length < 2) {
+        area.innerHTML = `<div class="estado-vazio">Digite ao menos 2 caracteres para buscar.</div>`;
+        return;
+      }
+
+      const alunos = buscarAlunosPorNome(nome.trim());
+
+      if (!alunos.length) {
+        area.innerHTML = `<div class="estado-vazio">Nenhum aluno encontrado com esse nome.</div>`;
+        return;
+      }
+
+      area.innerHTML = alunos.map(a => {
+        const temPersonagem = !!a.pid;
+        return `
+          <div class="aluno-card">
+            <div class="aluno-header" onclick="toggleAluno(this, ${a.pid || 0})">
+              <div class="aluno-avatar-placeholder">🧙</div>
+              <div class="aluno-info">
+                <div class="aluno-nome">${a.usuario_nome}</div>
+                <div class="aluno-sub">${temPersonagem ? `${a.personagem_nome} · ${a.titulo_atual}` : 'Sem personagem criado'}</div>
+              </div>
+              <span class="aluno-estrelas">⭐ ${a.total_estrelas || 0}</span>
+              <i class='bx bx-chevron-down' style="color:#6b5a30;margin-left:8px"></i>
+            </div>
+            <div class="aluno-detalhe" id="detalhe-${a.pid || 0}">
+              ${temPersonagem ? '<div style="color:#6b5a30;font-style:italic;font-size:13px">Carregando...</div>' : '<div style="color:#6b5a30;font-style:italic;padding:8px 0">Aluno ainda não criou um personagem.</div>'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function toggleAluno(header, pid) {
+      const detalhe = document.getElementById(`detalhe-${pid}`);
+      if (!detalhe || !pid) return;
+
+      const aberto = detalhe.classList.contains('aberto');
+      if (aberto) {
+        detalhe.classList.remove('aberto');
+        return;
+      }
+
+      // Carrega stats apenas uma vez (cache via data-attribute)
+      if (detalhe.dataset.carregado) {
+        detalhe.classList.add('aberto');
+        return;
+      }
+
+      const stats = buscarDesempenhoAluno(pid);
+      if (!stats.length) {
+        detalhe.innerHTML = `<div style="color:#6b5a30;font-style:italic;padding:8px 0">Nenhuma atividade registrada ainda.</div>`;
+      } else {
+        detalhe.innerHTML = `
+          <table class="tabela-aluno">
+            <thead>
+              <tr>
+                <th>Reino</th><th>Fase</th><th>Tentativas</th>
+                <th>Acertos</th><th>Taxa</th><th>Barra</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${stats.map(s => `
+                <tr>
+                  <td>${s.reino}</td>
+                  <td>${s.fase}</td>
+                  <td>${s.tentativas || 0}</td>
+                  <td>${s.acertos || 0}</td>
+                  <td>${s.taxa_acerto || 0}%</td>
+                  <td><div class="bar-bg"><div class="bar-fill" style="width:${s.taxa_acerto || 0}%"></div></div></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+
+      detalhe.dataset.carregado = '1';
+      detalhe.classList.add('aberto');
+    }
+
+    // ────────────────────────────────────────────
+    // TOAST
+    // ────────────────────────────────────────────
+    function mostrarToast(msg) {
+      const t = document.getElementById("toast");
+      t.innerText = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2800);
+    }
+
+  </script>
+</body>
+</html>

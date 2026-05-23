@@ -22,6 +22,16 @@ initDatabase().then(() => {
     sessionStorage.setItem("usuarioLogado", JSON.stringify(usuario));
     localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
 
+    // Redireciona conforme o papel do usuário
+    if (usuario.papel === 'admin') {
+      window.location.href = "admin.html";
+      return;
+    }
+    if (usuario.papel === 'professor') {
+      window.location.href = "professor.html";
+      return;
+    }
+
     const personagem = buscarPersonagem(usuario.id);
     if (personagem) {
       window.location.href = "reinos.html";
