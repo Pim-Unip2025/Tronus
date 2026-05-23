@@ -169,9 +169,10 @@ function migrateDatabase() {
     );
   `);
 
-  // Adiciona colunas de papel/professor_reino_id se ainda não existirem
+  // Adiciona colunas se ainda não existirem (bancos criados antes das migrações)
   try { db.run(`ALTER TABLE usuarios ADD COLUMN papel TEXT DEFAULT 'aluno'`); } catch(e) {}
   try { db.run(`ALTER TABLE usuarios ADD COLUMN professor_reino_id INTEGER DEFAULT NULL`); } catch(e) {}
+  try { db.run(`ALTER TABLE questoes  ADD COLUMN nivel_dificuldade TEXT DEFAULT 'Médio'`); } catch(e) {}
 
   const res = db.exec(`SELECT COUNT(*) FROM questoes`);
   const count = res[0]?.values[0][0] || 0;
@@ -649,7 +650,7 @@ function buscarProgresso(personagemId) {
 
 function buscarQuestoesPorFase(faseId) {
   const result = db.exec(`
-    SELECT q.id, q.enunciado, q.nivel,
+    SELECT q.id, q.enunciado, q.nivel_dificuldade,
            a.id as alt_id, a.letra, a.texto, a.correta
     FROM questoes q
     JOIN alternativas a ON a.questao_id = q.id
@@ -814,7 +815,7 @@ function excluirQuestao(questaoId) {
  */
 function listarQuestoesDaFase(faseId) {
   const result = db.exec(`
-    SELECT q.id, q.enunciado, q.nivel,
+    SELECT q.id, q.enunciado, q.nivel_dificuldade,
            COUNT(a.id) AS total_alts
     FROM questoes q
     LEFT JOIN alternativas a ON a.questao_id = q.id
