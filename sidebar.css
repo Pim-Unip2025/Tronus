@@ -3,6 +3,11 @@
    Inclua esse arquivo no <head> das páginas que usam o menu
 ============================================================ */
 
+/* Garante espaço para o menu-toggle em qualquer topbar que use sidebar */
+.topbar {
+  padding-left: 76px !important;
+}
+
 /* BOTÃO DE ABRIR O MENU */
 .menu-toggle {
   position: fixed;

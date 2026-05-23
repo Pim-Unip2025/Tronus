@@ -55,6 +55,22 @@ body {
   transition: background 0.3s;
 }
 
+/* Textos dentro da topbar — adaptam ao tema */
+.topbar-title,
+.page-title {
+  color: var(--text) !important;
+}
+
+.topbar-sub {
+  color: var(--text-dim) !important;
+}
+
+.back-btn,
+.dashboard-btn {
+  color: var(--gold) !important;
+  border-color: var(--border) !important;
+}
+
 /* Navbar (landing) */
 .navbar.scrolled {
   background: var(--bg-topbar) !important;
