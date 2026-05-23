@@ -335,6 +335,11 @@ const doc = new Document({
           "RF08 — O sistema deve exibir um painel de análise com taxa de acerto por fase e reino.",
           "RF09 — O sistema deve oferecer glossário de termos de TI em LIBRAS.",
           "RF10 — O sistema deve permitir a redefinição de senha via número de celular.",
+          "RF11 — O sistema deve disponibilizar painel exclusivo ao professor para criar e excluir questões por fase.",
+          "RF12 — O sistema deve permitir que o professor busque alunos por nome e visualize o desempenho individual.",
+          "RF13 — O sistema deve disponibilizar painel exclusivo ao administrador com estatísticas gerais e CRUD de usuários.",
+          "RF14 — O sistema deve exibir confirmação (double-check) ao usuário antes de efetuar logout.",
+          "RF15 — O sistema deve redirecionar automaticamente o usuário para a interface correspondente ao seu papel (aluno, professor ou admin) após o login.",
         ].map(txt => bullet(txt)),
         emptyLine(),
         h2("3.3 Requisitos Não Funcionais"),
@@ -359,10 +364,15 @@ const doc = new Document({
             tableRow(["Must have", "Listagem de Reinos com progresso", "Sprint 2"]),
             tableRow(["Must have", "Quiz por fase com 5 questões", "Sprint 2"]),
             tableRow(["Must have", "Sistema de estrelas e títulos", "Sprint 3"]),
-            tableRow(["Should have", "Painel de análise de desempenho", "Sprint 3"]),
+            tableRow(["Must have", "Questões Python no estilo ENADE (5 por fase)", "Sprint 3"]),
+            tableRow(["Should have", "Painel de análise de desempenho (dashboard)", "Sprint 3"]),
             tableRow(["Should have", "Tema dark/light", "Sprint 3"]),
             tableRow(["Should have", "Glossário LIBRAS", "Sprint 4"]),
-            tableRow(["Could have", "Questões para todos os reinos", "Sprint 4"]),
+            tableRow(["Should have", "Painel do Professor (CRUD questões, desempenho alunos)", "Sprint 4"]),
+            tableRow(["Should have", "Painel do Administrador (stats, CRUD usuários)", "Sprint 4"]),
+            tableRow(["Should have", "Controle de acesso por papel (aluno / professor / admin)", "Sprint 4"]),
+            tableRow(["Should have", "Double-check de logout", "Sprint 4"]),
+            tableRow(["Could have", "Questões para todos os reinos", "Sprint 5"]),
             tableRow(["Could have", "Ranking entre usuários", "Sprint 5"]),
           ],
         }),
@@ -371,8 +381,8 @@ const doc = new Document({
         p("O desenvolvimento foi organizado em 4 sprints de duas semanas cada, seguindo o framework Scrum simplificado:"),
         bullet("Sprint 1 (Semanas 1–2): Autenticação completa, criação de personagem. Critério: usuário consegue se cadastrar, logar e criar personagem sem erros."),
         bullet("Sprint 2 (Semanas 3–4): Reinos, trilha e quiz funcional. Critério: quiz exibe 5 questões, registra acertos e atribui estrelas automaticamente."),
-        bullet("Sprint 3 (Semanas 5–6): Dashboard de análise, tema e progresso persistente. Critério: dados são mantidos após fechar o navegador."),
-        bullet("Sprint 4 (Semanas 7–8): Glossário LIBRAS, responsividade e ajustes finais. Critério: interface funciona em tela de 320 px."),
+        bullet("Sprint 3 (Semanas 5–6): Dashboard de análise, questões ENADE Python, tema e progresso persistente. Critério: dados são mantidos após fechar o navegador; quiz exibe questões no formato I/II/III/IV com feedback por alternativa."),
+        bullet("Sprint 4 (Semanas 7–8): Painel do professor (CRUD questões, busca de alunos), painel do admin (stats, CRUD usuários), controle de acesso por papel, double-check de logout, glossário LIBRAS e responsividade. Critério: professor consegue criar e excluir questões; admin visualiza estatísticas e exclui usuários; interface funciona em tela de 320 px."),
 
         // ══════════════════════════════════════════════════════════════
         // ETAPA 3 — BANCO DE DADOS
@@ -398,7 +408,7 @@ const doc = new Document({
           columnWidths: [2000, 4026, 3000],
           rows: [
             tableRow(["Tabela", "Atributos Principais", "Relacionamentos"], true),
-            tableRow(["usuarios", "id (PK), nome (UNIQUE), email (UNIQUE), celular, senha", "1:1 com personagens"]),
+            tableRow(["usuarios", "id (PK), nome (UNIQUE), email (UNIQUE), celular, senha, papel (aluno|professor|admin), professor_reino_id (FK)", "1:1 com personagens; papel define o nível de acesso"]),
             tableRow(["personagens", "id (PK), usuario_id (FK), nome, genero, avatar, titulo_atual, total_estrelas", "N:1 com usuarios"]),
             tableRow(["reinos", "id (PK), nome, descricao", "1:N com fases"]),
             tableRow(["fases", "id (PK), reino_id (FK), nome", "N:1 com reinos; 1:N com questoes"]),
@@ -410,11 +420,20 @@ const doc = new Document({
         }),
         emptyLine(),
         h2("4.4 Script DDL de Criação do Banco"),
-        p("O banco de dados é criado e gerenciado pela biblioteca sql.js (SQLite compilado em WebAssembly), executado diretamente no navegador. O script de criação das tabelas principais é apresentado a seguir:"),
+        p("O banco de dados é criado e gerenciado pela biblioteca sql.js (SQLite compilado em WebAssembly), executado diretamente no navegador. O script DDL das tabelas principais é apresentado a seguir:"),
         new Paragraph({
           spacing: { after: 120 },
           children: [new TextRun({
             text:
+              "CREATE TABLE usuarios (\n" +
+              "  id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
+              "  nome TEXT UNIQUE NOT NULL,\n" +
+              "  email TEXT UNIQUE NOT NULL,\n" +
+              "  celular TEXT NOT NULL,\n" +
+              "  senha TEXT NOT NULL,\n" +
+              "  papel TEXT DEFAULT 'aluno',         -- aluno | professor | admin\n" +
+              "  professor_reino_id INTEGER DEFAULT NULL\n" +
+              ");\n\n" +
               "CREATE TABLE questoes (\n" +
               "  id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
               "  fase_id INTEGER NOT NULL,\n" +
@@ -441,6 +460,13 @@ const doc = new Document({
             size: 18, font: "Courier New", color: "333333",
           })],
         }),
+        emptyLine(),
+        h3("4.4.1 Controle de Acesso por Papel (Role-Based Access Control)"),
+        p("A coluna papel na tabela usuarios implementa um controle de acesso baseado em papéis (RBAC). Três papéis estão definidos:"),
+        bullet("aluno — acesso ao fluxo de jogo (reinos, trilha, quiz, dashboard pessoal). Criado automaticamente no cadastro."),
+        bullet("professor — acesso ao painel do professor (professor.html): criar/excluir questões por fase, visualizar desempenho de alunos por nome. Vinculado a um reino via professor_reino_id."),
+        bullet("admin — acesso ao painel administrativo (admin.html): estatísticas gerais do sistema, listagem e exclusão de usuários."),
+        p("Ao efetuar login, o sistema verifica o campo papel e redireciona automaticamente: alunos para reinos.html, professores para professor.html e administradores para admin.html. Dois usuários especiais são criados automaticamente na inicialização do banco — prof_python (professor do Reino Python) e admin — cujas credenciais estão documentadas no arquivo LOGINS.md do repositório."),
         emptyLine(),
         h2("4.5 Consultas SQL Relevantes"),
         p("Exemplos de consultas utilizadas pelo sistema para análise de desempenho:"),
@@ -491,16 +517,23 @@ const doc = new Document({
         }),
         emptyLine(),
         h2("5.2 Telas Desenvolvidas"),
-        p("O sistema é composto por sete telas principais:"),
+        p("O sistema é composto por dez telas, organizadas por perfil de acesso:"),
+        h3("5.2.1 Telas do Aluno"),
         ...[
           "landing.html — Página de boas-vindas com apresentação da plataforma.",
-          "index.html — Tela de login com suporte a nome de usuário ou e-mail.",
-          "register.html — Cadastro de novo usuário.",
+          "index.html — Tela de login com suporte a nome de usuário ou e-mail e redirecionamento por papel.",
+          "register.html — Cadastro de novo usuário (papel 'aluno' atribuído por padrão).",
           "forgot_password.html — Redefinição de senha via número de celular.",
           "character.html — Criação de personagem (nome, gênero, avatar).",
           "reinos.html — Seleção do Reino com exibição de progresso e barra de título.",
-          "trilha.html — Trilha de fases com quiz interativo, cards de atividades e painel LIBRAS.",
-          "dashboard.html — Análise de desempenho com gráficos e tabela detalhada.",
+          "trilha.html — Trilha de fases com quiz interativo (estilo ENADE), cards de atividades e botão de acessibilidade LIBRAS.",
+          "dashboard.html — Painel de análise de desempenho individual com gráfico por reino e tabela detalhada por fase.",
+        ].map(t => bullet(t)),
+        emptyLine(),
+        h3("5.2.2 Telas de Gestão"),
+        ...[
+          "professor.html — Painel do Professor: aba 'Questões' (criar/excluir questões por fase) e aba 'Alunos' (busca por nome e visualização de desempenho individual expandível).",
+          "admin.html — Painel do Administrador: estatísticas gerais do sistema (usuários, questões, respostas), listagem completa de usuários com exclusão e módulos futuros sinalizados.",
         ].map(t => bullet(t)),
         emptyLine(),
         h2("5.3 Responsividade"),
@@ -511,7 +544,14 @@ const doc = new Document({
         bullet("Botão LIBRAS reposicionado para o canto inferior direito, afastado de elementos interativos."),
         p("Testes foram realizados nos breakpoints de 320 px (smartphone compacto), 768 px (tablet) e 1280 px (desktop), utilizando o DevTools do Google Chrome."),
         h2("5.4 Integração Front-End e Banco de Dados"),
-        p("A integração entre a camada de apresentação e o banco de dados é feita diretamente em JavaScript. O arquivo js/database.js centraliza todas as funções de acesso ao banco: cadastrarUsuario(), loginUsuario(), buscarQuestoesPorFase(), registrarResposta(), buscarEstatisticas(), entre outras. Cada tela importa este arquivo e chama as funções necessárias após a inicialização assíncrona do banco (initDatabase())."),
+        p("A integração entre a camada de apresentação e o banco de dados é feita diretamente em JavaScript. O arquivo js/database.js centraliza todas as funções de acesso ao banco, organizadas por domínio:"),
+        bullet("Autenticação: cadastrarUsuario(), loginUsuario(), redefinirSenha()."),
+        bullet("Personagem e progresso: salvarPersonagem(), buscarPersonagem(), atualizarProgresso(), atualizarTitulo()."),
+        bullet("Quiz: buscarQuestoesPorFase(), registrarResposta()."),
+        bullet("Analytics: buscarEstatisticas(), buscarResumoGeral()."),
+        bullet("Painel do professor: criarQuestao(), excluirQuestao(), listarQuestoesDaFase(), buscarAlunosPorNome(), buscarDesempenhoAluno(), buscarFasesPorReino()."),
+        bullet("Seeds e migração: seedReinos(), seedQuestoes(), seedUsuariosEspeciais(), migrateDatabase() — garante compatibilidade com bancos já existentes no localStorage sem perda de dados."),
+        p("Cada tela importa este arquivo e chama as funções necessárias após a inicialização assíncrona do banco via initDatabase(). A função migrateDatabase() aplica ALTER TABLE de forma idempotente (try/catch), permitindo que usuários com versões antigas do banco recebam as novas colunas automaticamente na próxima visita."),
 
         // ══════════════════════════════════════════════════════════════
         // ETAPA 5 — UX/UI DESIGN
@@ -634,9 +674,10 @@ const doc = new Document({
         pageBreak(),
         h1("9  CONCLUSÃO"),
         p("O presente trabalho demonstrou a viabilidade técnica e pedagógica da plataforma Tronus como solução gamificada de avaliação e apoio ao aprendizado para estudantes universitários de ADS. Ao longo do desenvolvimento, a equipe integrou conhecimentos de oito disciplinas distintas em um único produto funcional, coerente e documentado."),
-        p("Do ponto de vista técnico, a escolha por tecnologias web puras (HTML5, CSS3, JavaScript) e banco de dados SQLite embarcado (sql.js) permitiu a entrega de uma aplicação sem dependência de servidores, com boa usabilidade e responsividade. O sistema de quiz com questões no estilo ENADE, combinado ao painel de análise de desempenho, cumpre o objetivo central da plataforma: transformar a interação do estudante em dados acionáveis para o seu desenvolvimento."),
-        p("Os indicadores de análise implementados — taxa de acerto por fase e reino, gráfico de barras e tabela detalhada — oferecem ao estudante uma visão clara de seus pontos fortes e das áreas que demandam revisão. A incorporação do glossário de LIBRAS representa um passo concreto em direção à acessibilidade digital, alinhada à legislação brasileira e aos princípios de inclusão."),
-        p("Como trabalhos futuros, a equipe propõe: (i) implementação de backend com Node.js e banco de dados centralizado para suporte a múltiplos dispositivos; (ii) expansão do banco de questões para todos os reinos; (iii) desenvolvimento do módulo de Machine Learning para recomendação personalizada de conteúdo; e (iv) incorporação de vídeos de LIBRAS nos enunciados das questões."),
+        p("Do ponto de vista técnico, a escolha por tecnologias web puras (HTML5, CSS3, JavaScript) e banco de dados SQLite embarcado (sql.js) permitiu a entrega de uma aplicação sem dependência de servidores, com boa usabilidade e responsividade. O sistema de quiz com questões no estilo ENADE — com enunciados compostos por afirmativas I, II, III e IV — combinado ao painel de análise de desempenho, cumpre o objetivo central da plataforma: transformar a interação do estudante em dados acionáveis para o seu desenvolvimento."),
+        p("O controle de acesso por papéis (RBAC) diferencia três perfis: aluno, professor e administrador. O painel do professor permite gerenciar questões por fase e acompanhar o desempenho individual dos alunos por busca nominal. O painel do administrador oferece visibilidade sobre as estatísticas gerais do sistema e o gerenciamento de usuários. Ambos os perfis especiais são pré-cadastrados automaticamente na inicialização do banco, com credenciais documentadas."),
+        p("Os indicadores de análise implementados — taxa de acerto por fase e reino, gráfico de barras por reino e tabela detalhada — oferecem ao estudante uma visão clara de seus pontos fortes e das áreas que demandam revisão. A incorporação do glossário de LIBRAS representa um passo concreto em direção à acessibilidade digital, alinhada à legislação brasileira e aos princípios de inclusão. O double-check de logout e o redirecionamento inteligente por papel reforçam a qualidade da experiência do usuário."),
+        p("Como trabalhos futuros, a equipe propõe: (i) implementação de backend com Node.js e banco de dados centralizado para suporte a múltiplos dispositivos e turmas; (ii) expansão do banco de questões para todos os reinos (C++, Engenharia de Software, Banco de Dados, Redes); (iii) módulo completo de administração de turmas, vínculos professor–turma e regras de XP configuráveis; (iv) desenvolvimento do módulo de Machine Learning para recomendação personalizada de conteúdo; e (v) incorporação de vídeos de LIBRAS nos enunciados das questões."),
         p("Conclui-se que o PIM III contribuiu significativamente para a formação prática da equipe, consolidando competências técnicas e colaborativas essenciais ao exercício profissional na área de Análise e Desenvolvimento de Sistemas."),
 
         // ══════════════════════════════════════════════════════════════
