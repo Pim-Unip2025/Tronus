@@ -115,6 +115,27 @@
     }
     .btn-del-user:hover { background: rgba(180,50,50,0.15); }
 
+    /* SELECT DE REINO PARA PROFESSOR */
+    .select-reino {
+      background: rgba(20,10,0,0.8);
+      border: 1px solid rgba(212,175,55,0.3);
+      color: #f0e6c8; padding: 4px 8px;
+      border-radius: 6px; font-size: 11px;
+      font-family: 'Cinzel',serif; cursor: pointer;
+    }
+    .select-reino:focus { outline: none; border-color: #d4af37; }
+    .select-reino option { background: #1a0a00; color: #f0e6c8; }
+
+    /* TOAST */
+    .toast-adm {
+      position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(20,10,0,0.95); border: 1px solid rgba(212,175,55,0.5);
+      color: #d4af37; padding: 12px 28px; border-radius: 12px;
+      font-family: 'Cinzel',serif; font-size: 13px; z-index: 9999;
+      opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    }
+    .toast-adm.show { opacity: 1; }
+
     .em-desenvolvimento {
       background: rgba(20,10,0,0.7);
       border: 1px dashed rgba(212,175,55,0.2);
@@ -172,11 +193,14 @@
     <table class="tabela-usuarios">
       <thead>
         <tr>
-          <th>#</th><th>Nome</th><th>E-mail</th><th>Papel</th><th>Ação</th>
+          <th>#</th><th>Nome</th><th>E-mail</th><th>Papel</th><th>Reino</th><th>Ação</th>
         </tr>
       </thead>
       <tbody id="tabelaUsuarios"></tbody>
     </table>
+
+    <!-- TOAST -->
+    <div class="toast-adm" id="toastAdm"></div>
 
     <!-- MÓDULOS EM DESENVOLVIMENTO -->
     <h3 class="section-titulo">Módulos Previstos (próximas versões)</h3>
@@ -229,9 +253,13 @@
       document.getElementById("sQuestoes").innerText   = stat(`SELECT COUNT(*) FROM questoes`);
       document.getElementById("sRespostas").innerText  = stat(`SELECT COUNT(*) FROM respostas_usuario`);
 
+      // ── Lista de reinos (para dropdown do professor) ──
+      const reinosRes = db.exec(`SELECT id, nome FROM reinos ORDER BY id`);
+      const reinos = reinosRes.length ? reinosRes[0].values : [];
+
       // ── Lista de usuários ────────────────────
       const result = db.exec(`
-        SELECT id, nome, email, papel
+        SELECT id, nome, email, papel, professor_reino_id
         FROM usuarios
         ORDER BY papel, nome
       `);
@@ -239,29 +267,73 @@
       const tbody = document.getElementById("tabelaUsuarios");
 
       if (!result.length || !result[0].values.length) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#6b5a30;font-style:italic;padding:20px">Nenhum usuário.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#6b5a30;font-style:italic;padding:20px">Nenhum usuário.</td></tr>`;
         return;
       }
 
       result[0].values.forEach(row => {
-        const [id, nome, email, papel] = row;
-        const isEspecial = papel === 'admin' || papel === 'professor';
+        const [id, nome, email, papel, reinoId] = row;
+        const isAdmin     = papel === 'admin';
+        const isProfessor = papel === 'professor';
+
+        // Coluna de reino: dropdown para professores, "—" para o resto
+        let reinoHtml = '<span style="color:#3a2e10">—</span>';
+        if (isProfessor) {
+          const options = reinos.map(([rId, rNome]) =>
+            `<option value="${rId}" ${rId === reinoId ? 'selected' : ''}>${rNome}</option>`
+          ).join('');
+          reinoHtml = `
+            <select class="select-reino" onchange="vincularProfessorReino(${id}, this.value)">
+              <option value="">Nenhum</option>
+              ${options}
+            </select>
+          `;
+        }
+
+        // Coluna de ação
+        let acaoHtml;
+        if (isAdmin || isProfessor) {
+          acaoHtml = `<span style="color:#3a2e10;font-size:11px;font-style:italic">protegido</span>`;
+        } else {
+          acaoHtml = `<button class="btn-del-user" onclick="deletarUsuario(${id}, ${JSON.stringify(nome)}, '${papel}', this)">
+                       <i class='bx bx-trash'></i> Excluir
+                     </button>`;
+        }
+
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td style="color:#6b5a30">${id}</td>
           <td>${nome}</td>
           <td style="color:#a89060">${email}</td>
           <td><span class="papel-badge papel-${papel}">${papel}</span></td>
-          <td>${isEspecial
-            ? `<span style="color:#3a2e10;font-size:11px;font-style:italic">protegido</span>`
-            : `<button class="btn-del-user" onclick="deletarUsuario(${id}, ${JSON.stringify(nome)}, '${papel}', this)">
-                 <i class='bx bx-trash'></i> Excluir
-               </button>`}
-          </td>
+          <td>${reinoHtml}</td>
+          <td>${acaoHtml}</td>
         `;
         tbody.appendChild(tr);
       });
     });
+
+    function vincularProfessorReino(userId, reinoId) {
+      const valor = reinoId ? Number(reinoId) : null;
+      db.run(`UPDATE usuarios SET professor_reino_id = ? WHERE id = ?`, [valor, userId]);
+      saveDatabase();
+
+      // Busca nome do reino para o toast
+      let msg = "Reino removido do professor.";
+      if (valor) {
+        const r = db.exec(`SELECT nome FROM reinos WHERE id = ?`, [valor]);
+        const nome = r.length ? r[0].values[0][0] : "";
+        msg = `Professor vinculado ao Reino ${nome}.`;
+      }
+      mostrarToastAdm(msg);
+    }
+
+    function mostrarToastAdm(msg) {
+      const t = document.getElementById("toastAdm");
+      t.innerText = msg;
+      t.classList.add("show");
+      setTimeout(() => t.classList.remove("show"), 2800);
+    }
 
     function deletarUsuario(id, nome, papel, btn) {
       if (!confirm(`Excluir o usuário "${nome}"? Esta ação é irreversível.`)) return;
