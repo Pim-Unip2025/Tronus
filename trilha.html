@@ -29,12 +29,6 @@
   <!-- TRILHA -->
   <div class="trilha-wrap" id="trilhaWrap"></div>
 
-  <!-- ATIVIDADES DO REINO -->
-  <div class="atividades-section">
-    <h3 class="atividades-titulo">📋 Atividades deste Reino</h3>
-    <div class="atividades-grid" id="atividadesGrid"></div>
-  </div>
-
   <!-- ═══════════════════════════════════════════
        MODAL DE QUIZ
   ═══════════════════════════════════════════ -->
@@ -107,6 +101,14 @@
              || localStorage.getItem("personagemId");
 
       if (!reino || !personagemId) { window.location.href = "reinos.html"; return; }
+
+      // Re-busca progresso do banco para ter estrelas atualizadas após quiz
+      const progresso = buscarProgresso(personagemId);
+      reino.fases.forEach(fase => {
+        const p = progresso.find(r => r.fase_id === fase.id);
+        if (p) fase.estrelas = p.estrelas;
+      });
+
       reinoGlobal = reino;
 
       document.getElementById("reinoNome").innerText = reino.nome;
@@ -115,7 +117,6 @@
         totalEstrelas + " / " + (reino.fases.length * 3) + " ⭐";
 
       renderTrilha(reino);
-      renderAtividades(reino);
     });
 
     // ── Renderiza trilha ─────────────────────────────────────
