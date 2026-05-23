@@ -378,6 +378,7 @@
     let professorUsuario = null;
     let faseAtualId      = null;
     let reinoId          = null;
+    let reinoNome        = null;
 
     // ────────────────────────────────────────────
     // INIT
@@ -401,6 +402,18 @@
           `<div class="estado-vazio">Nenhum reino associado a este professor. Contate o administrador.</div>`;
         document.getElementById("selectFase").disabled = true;
         return;
+      }
+
+      // Busca nome do reino para filtrar desempenho dos alunos
+      const rRes = db.exec(`SELECT nome FROM reinos WHERE id = ?`, [reinoId]);
+      reinoNome  = rRes[0]?.values[0][0] || null;
+
+      // Atualiza título da aba de questões com o nome do reino
+      if (reinoNome) {
+        document.querySelector('#tab-questoes .section-titulo').innerText =
+          `Gerenciar Questões — Reino ${reinoNome}`;
+        document.querySelector('#tab-alunos .section-titulo').innerText =
+          `Desempenho dos Alunos — Reino ${reinoNome}`;
       }
 
       // Popula select de fases
@@ -512,9 +525,11 @@
       const alts   = [];
       for (const l of letras) {
         const texto = document.getElementById(`alt${l}`).value.trim();
-        if (!texto) { mostrarToast(`Preencha a alternativa ${l}.`); return; }
+        if (!texto) continue; // alternativas em branco são ignoradas
         alts.push({ letra: l, texto, correta: l === correta });
       }
+      if (alts.length < 2) { mostrarToast("Preencha ao menos 2 alternativas."); return; }
+      if (!alts.find(a => a.correta)) { mostrarToast("A alternativa marcada como correta deve ser preenchida."); return; }
 
       criarQuestao(faseAtualId, enunciado, nivel, alts);
 
@@ -579,7 +594,9 @@
         return;
       }
 
-      const stats = buscarDesempenhoAluno(pid);
+      // Filtra apenas o reino do professor
+      const statsRaw = buscarDesempenhoAluno(pid);
+      const stats = reinoNome ? statsRaw.filter(s => s.reino === reinoNome) : statsRaw;
       if (!stats.length) {
         detalhe.innerHTML = `<div style="color:#6b5a30;font-style:italic;padding:8px 0">Nenhuma atividade registrada ainda.</div>`;
       } else {
