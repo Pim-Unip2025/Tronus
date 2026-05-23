@@ -129,14 +129,17 @@
       reinosList.forEach((reino, index) => {
 
         const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
-        const maxEstrelas   = reino.fases.length * 3; // 9 estrelas por reino
-        const conquistado   = totalEstrelas === maxEstrelas;
+        const maxEstrelas   = reino.fases.length * 3;
 
-        const desbloqueado = true;
+        // Verifica se o reino tem questões cadastradas
+        const temQuestoes = reino.fases.some(f => {
+          const q = buscarQuestoesPorFase(f.id);
+          return q && q.length > 0;
+        });
 
         const card = document.createElement("div");
         card.classList.add("reino-card");
-        if (!desbloqueado) card.classList.add("bloqueado");
+        if (!temQuestoes) card.classList.add("em-breve");
 
         // Ícone ou emoji
         const icone = reinoIcones[reino.nome];
@@ -147,14 +150,18 @@
           iconeHtml = `<div class="reino-icone-placeholder">${reinoEmojis[reino.nome] || "⚔️"}</div>`;
         }
 
+        const badgeHtml = !temQuestoes
+          ? `<div class="reino-badge-breve">✦ Em Breve</div>`
+          : "";
 
         card.innerHTML = `
           ${iconeHtml}
           <div class="reino-nome">${reino.nome}</div>
-          <div class="reino-progresso">${totalEstrelas} / ${maxEstrelas} ⭐</div>
+          <div class="reino-progresso">${temQuestoes ? `${totalEstrelas} / ${maxEstrelas} ⭐` : "Questões em desenvolvimento"}</div>
+          ${badgeHtml}
         `;
 
-        if (desbloqueado) {
+        if (temQuestoes) {
           card.onclick = () => {
             sessionStorage.setItem("reinoSelecionado", JSON.stringify(reino));
             sessionStorage.setItem("personagemId", personagem.id);

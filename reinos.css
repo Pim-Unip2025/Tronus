@@ -195,6 +195,34 @@ body::before {
   border-color: rgba(212, 175, 55, 0.35);
 }
 
+/* Reino sem questões — "Em Breve" */
+.reino-card.em-breve {
+  opacity: 0.6;
+  cursor: default;
+  filter: grayscale(0.4);
+  border-color: rgba(212,175,55,0.2);
+  position: relative;
+}
+
+.reino-card.em-breve:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: rgba(212,175,55,0.2);
+}
+
+.reino-badge-breve {
+  display: inline-block;
+  margin-top: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #a89060;
+  background: rgba(212,175,55,0.1);
+  border: 1px solid rgba(212,175,55,0.25);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
 .reino-icone {
   width: 120px;
   height: 150px;

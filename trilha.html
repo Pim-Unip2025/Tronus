@@ -77,6 +77,17 @@
     </div>
   </div>
 
+  <!-- Toast "Em Breve" -->
+  <div id="toastEmBreve" style="
+    display:none; position:fixed; bottom:36px; left:50%;
+    transform:translateX(-50%);
+    background:rgba(20,10,0,0.95); border:1px solid rgba(212,175,55,0.4);
+    color:#d4af37; padding:14px 28px; border-radius:14px;
+    font-family:'Cinzel',serif; font-size:13px; letter-spacing:1px;
+    z-index:9999; text-align:center; backdrop-filter:blur(8px);
+    box-shadow:0 4px 20px rgba(0,0,0,0.5); pointer-events:none;
+  ">✦ Questões em desenvolvimento — em breve!</div>
+
   <!-- Botão flutuante LIBRAS -->
   <button class="libras-fab" onclick="abrirLibras()" title="Acessibilidade — Glossário LIBRAS">
     <span class="libras-fab-icon">👋</span>
@@ -198,11 +209,18 @@
       }
     }
 
+    // ── Toast Em Breve ───────────────────────────────────────
+    function mostrarEmBreve() {
+      const t = document.getElementById("toastEmBreve");
+      t.style.display = "block";
+      setTimeout(() => { t.style.display = "none"; }, 3000);
+    }
+
     // ── Abre quiz ────────────────────────────────────────────
     function abrirQuiz(fase) {
       const questoes = buscarQuestoesPorFase(fase.id);
       if (!questoes || !questoes.length) {
-        alert("Este reino ainda não tem questões cadastradas. Em breve!");
+        mostrarEmBreve();
         return;
       }
       quiz.faseAtual  = fase;
