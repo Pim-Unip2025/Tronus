@@ -649,7 +649,7 @@ function buscarProgresso(personagemId) {
 
 function buscarQuestoesPorFase(faseId) {
   const result = db.exec(`
-    SELECT q.id, q.enunciado, q.nivel_dificuldade,
+    SELECT q.id, q.enunciado, q.nivel,
            a.id as alt_id, a.letra, a.texto, a.correta
     FROM questoes q
     JOIN alternativas a ON a.questao_id = q.id
@@ -814,7 +814,7 @@ function excluirQuestao(questaoId) {
  */
 function listarQuestoesDaFase(faseId) {
   const result = db.exec(`
-    SELECT q.id, q.enunciado, q.nivel_dificuldade,
+    SELECT q.id, q.enunciado, q.nivel,
            COUNT(a.id) AS total_alts
     FROM questoes q
     LEFT JOIN alternativas a ON a.questao_id = q.id
