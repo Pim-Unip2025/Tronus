@@ -174,10 +174,18 @@ function migrateDatabase() {
   try { db.run(`ALTER TABLE usuarios ADD COLUMN professor_reino_id INTEGER DEFAULT NULL`); } catch(e) {}
   try { db.run(`ALTER TABLE questoes  ADD COLUMN nivel_dificuldade TEXT DEFAULT 'Médio'`); } catch(e) {}
 
-  const res = db.exec(`SELECT COUNT(*) FROM questoes`);
-  const count = res[0]?.values[0][0] || 0;
-  if (count === 0) {
-    seedQuestoes();
+  // Re-seed se o Python ainda não tiver questões (cobre banco antigo com seed falho)
+  try {
+    const pyRes = db.exec(`
+      SELECT COUNT(*) FROM questoes q
+      JOIN fases f ON f.id = q.fase_id
+      JOIN reinos r ON r.id = f.reino_id
+      WHERE r.nome = 'Python'
+    `);
+    const pyCount = pyRes[0]?.values[0][0] || 0;
+    if (pyCount === 0) seedQuestoes();
+  } catch(e) {
+    console.warn("seedQuestoes check falhou:", e);
   }
 
   seedUsuariosEspeciais();
