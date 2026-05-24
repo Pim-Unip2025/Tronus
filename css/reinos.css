@@ -10,7 +10,7 @@
 
 body {
   min-height: 100vh;
-  background: url('img/fundo_reinos.jpg') center center / cover no-repeat fixed;
+  background: url('../img/fundo_reinos.jpg') center center / cover no-repeat fixed;
   font-family: 'Crimson Text', serif;
   color: #f0e6c8;
 }
