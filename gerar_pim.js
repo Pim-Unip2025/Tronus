@@ -33,7 +33,7 @@ function h3(text) {
 }
 function p(text, opts = {}) {
   return new Paragraph({
-    spacing: { after: 160 },
+    spacing: { after: 160, line: 360 }, // 1,5 entrelinhas (ABNT)
     alignment: AlignmentType.JUSTIFIED,
     indent: { firstLine: 708 }, // 1,25 cm
     children: [new TextRun({ text, size: 24, font: "Arial", ...opts })],
@@ -41,14 +41,14 @@ function p(text, opts = {}) {
 }
 function pNoIndent(text, opts = {}) {
   return new Paragraph({
-    spacing: { after: 120 },
+    spacing: { after: 120, line: 360 },
     alignment: AlignmentType.JUSTIFIED,
     children: [new TextRun({ text, size: 24, font: "Arial", ...opts })],
   });
 }
 function bullet(text) {
   return new Paragraph({
-    spacing: { after: 100 },
+    spacing: { after: 100, line: 360 },
     indent: { left: 720, hanging: 360 },
     children: [
       new TextRun({ text: "•  ", size: 24, font: "Arial" }),
@@ -149,7 +149,14 @@ const doc = new Document({
         centered("UX e UI Design", { size: 24 }),
         centered("Machine Learning e Análise de Dados", { size: 24 }),
         centered("Comunicação, Liderança e LIBRAS", { size: 24 }),
-        emptyLine(), emptyLine(), emptyLine(), emptyLine(),
+        emptyLine(), emptyLine(),
+        centered("Enzo Gabriel de Castro Oliveira — RA: R714195", { size: 22 }),
+        centered("Jhonatan Henrique de Oliveira Rosa — RA: H654IJ1", { size: 22 }),
+        centered("Luiz Henrique Regis dos Santos — RA: F381551", { size: 22 }),
+        centered("Nickolas Roberto Pereira Goulart Barreto — RA: F35CBG6", { size: 22 }),
+        centered("Pedro Bueno da Silva — RA: H7460C0", { size: 22 }),
+        centered("Renata Victoria Batista de Faria — RA: H74IAI3", { size: 22 }),
+        emptyLine(), emptyLine(),
         centered("São Paulo", { size: 24 }),
         centered("2026", { size: 24 }),
       ],
@@ -252,12 +259,14 @@ const doc = new Document({
           ["2", "ETAPA 1 — DEFINIÇÃO DO NEGÓCIO FICTÍCIO", "5"],
           ["3", "ETAPA 2 — ENGENHARIA DE SOFTWARE ÁGIL APLICADA", "7"],
           ["4", "ETAPA 3 — MODELAGEM DE BANCO DE DADOS E NoSQL", "10"],
-          ["5", "ETAPA 4 — DESENVOLVIMENTO WEB RESPONSIVO", "14"],
-          ["6", "ETAPA 5 — UX E UI DESIGN", "17"],
-          ["7", "ETAPA 6 — MACHINE LEARNING E ANÁLISE DE DADOS", "19"],
-          ["8", "ETAPA 7 — COMUNICAÇÃO, LIDERANÇA E LIBRAS", "22"],
-          ["9", "CONCLUSÃO", "24"],
-          ["", "REFERÊNCIAS", "25"],
+          ["5", "ETAPA 4 — PROGRAMAÇÃO ORIENTADA A OBJETOS", "14"],
+          ["6", "ETAPA 5 — DESENVOLVIMENTO WEB RESPONSIVO", "17"],
+          ["7", "ETAPA 6 — UX E UI DESIGN", "20"],
+          ["8", "ETAPA 7 — MACHINE LEARNING E ANÁLISE DE DADOS", "22"],
+          ["9", "ETAPA 8 — COMUNICAÇÃO, LIDERANÇA E LIBRAS", "25"],
+          ["10", "ETAPA 9 — INTEGRAÇÃO E AVALIAÇÃO FINAL", "28"],
+          ["11", "CONCLUSÃO", "30"],
+          ["", "REFERÊNCIAS", "31"],
         ].map(([num, titulo, pag]) =>
           new Paragraph({
             spacing: { after: 80 },
@@ -277,7 +286,7 @@ const doc = new Document({
         p("O presente Projeto Integrado Multidisciplinar (PIM III) descreve o desenvolvimento da plataforma Tronus, criada no âmbito de uma empresa fictícia de EdTech denominada Tronus EdTech. O sistema propõe transformar o processo de aprendizagem de calouros universitários em uma experiência gamificada, na qual cada disciplina do curso de Análise e Desenvolvimento de Sistemas (ADS) é representada como um \"Reino\" a ser conquistado."),
         p("O objetivo geral deste projeto é desenvolver uma plataforma web de avaliação e apoio à aprendizagem, integrando conceitos de engenharia de software ágil, modelagem de dados, desenvolvimento web responsivo, UX/UI design e análise de indicadores de desempenho, com atenção à acessibilidade e à Lei Geral de Proteção de Dados (LGPD)."),
         p("Do ponto de vista metodológico, o trabalho foi organizado segundo as etapas do PIM III, cada uma correspondendo a um capítulo do presente documento. As tecnologias utilizadas incluem HTML5, CSS3, JavaScript, sql.js (SQLite no navegador) e princípios de design responsivo, contemplando todos os perfis de dispositivos."),
-        p("Este documento está estruturado em oito etapas: (1) definição do negócio fictício; (2) engenharia de software ágil; (3) modelagem de banco de dados; (4) desenvolvimento web responsivo; (5) UX/UI design; (6) análise de dados; (7) comunicação, liderança e LIBRAS; seguidas da conclusão e referências."),
+        p("Este documento está estruturado em nove etapas: (1) definição do negócio fictício; (2) engenharia de software ágil; (3) modelagem de banco de dados; (4) programação orientada a objetos; (5) desenvolvimento web responsivo; (6) UX/UI design; (7) análise de dados; (8) comunicação, liderança e LIBRAS; (9) integração e avaliação final — seguidas da conclusão e referências."),
 
         // ══════════════════════════════════════════════════════════════
         // ETAPA 1 — NEGÓCIO FICTÍCIO
@@ -496,11 +505,64 @@ const doc = new Document({
         p("Na versão atual, a escolha pelo SQLite via sql.js é justificada pela simplicidade de implantação (sem servidor), pela portabilidade e pelo suporte nativo a transações ACID — características adequadas a um ambiente acadêmico offline."),
 
         // ══════════════════════════════════════════════════════════════
-        // ETAPA 4 — WEB RESPONSIVO
+        // ETAPA 4 — PROGRAMAÇÃO ORIENTADA A OBJETOS
         // ══════════════════════════════════════════════════════════════
         pageBreak(),
-        h1("5  ETAPA 4 — DESENVOLVIMENTO WEB RESPONSIVO"),
-        h2("5.1 Arquitetura Geral da Aplicação"),
+        h1("5  ETAPA 4 — PROGRAMAÇÃO ORIENTADA A OBJETOS"),
+        h2("5.1 Conceitos Fundamentais de POO"),
+        p("A Programação Orientada a Objetos (POO) é um paradigma de desenvolvimento de software que organiza o código em torno de objetos — estruturas que encapsulam dados (atributos) e comportamentos (métodos). Os quatro pilares da POO são:"),
+        bullet("Encapsulamento: restrição do acesso direto aos dados internos de um objeto, expondo apenas uma interface controlada. No Tronus, as funções de database.js encapsulam toda a lógica de acesso ao banco — nenhuma tela acessa o objeto db diretamente para manipulação de dados de negócio."),
+        bullet("Abstração: simplificação de sistemas complexos por meio de interfaces de alto nível. Funções como cadastrarUsuario(), loginUsuario() e buscarEstatisticas() abstraem consultas SQL complexas em chamadas simples e reutilizáveis."),
+        bullet("Herança: mecanismo pelo qual uma classe derivada herda atributos e métodos de uma classe base. No projeto, o conceito é aplicado conceitualmente na hierarquia de papéis (aluno → professor → admin), onde cada papel herda as permissões do anterior e adiciona as suas."),
+        bullet("Polimorfismo: capacidade de um mesmo método se comportar de maneira diferente conforme o contexto. No Tronus, a função de redirecionamento pós-login exemplifica polimorfismo comportamental: o mesmo evento (login bem-sucedido) resulta em destinos diferentes (reinos.html, professor.html ou admin.html) dependendo do papel do usuário."),
+        emptyLine(),
+        h2("5.2 Aplicação de POO no Projeto Tronus"),
+        p("Embora o JavaScript não seja uma linguagem puramente orientada a objetos como C# ou Java, ele suporta plenamente os conceitos de POO por meio de objetos literais, protótipos e, a partir do ES6, a sintaxe de classes. No Tronus, os princípios de POO foram aplicados de forma estrutural:"),
+        h3("5.2.1 Entidades como Objetos"),
+        p("Cada entidade do sistema é representada como um objeto JavaScript com atributos definidos. A tabela a seguir apresenta o mapeamento:"),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [2200, 3413, 3413],
+          rows: [
+            tableRow(["Entidade", "Atributos", "Métodos Associados"], true),
+            tableRow(["Usuario", "id, nome, email, celular, senha, papel", "cadastrarUsuario(), loginUsuario(), redefinirSenha()"]),
+            tableRow(["Personagem", "id, usuario_id, nome, genero, avatar, titulo_atual, total_estrelas", "salvarPersonagem(), buscarPersonagem(), atualizarTitulo()"]),
+            tableRow(["Reino", "id, nome, descricao", "buscarReinos(), buscarFasesPorReino()"]),
+            tableRow(["Questao", "id, fase_id, enunciado, nivel_dificuldade", "criarQuestao(), excluirQuestao(), buscarQuestoesPorFase()"]),
+            tableRow(["ProgressoFase", "id, personagem_id, fase_id, estrelas", "atualizarProgresso(), buscarProgresso()"]),
+          ],
+        }),
+        emptyLine(),
+        h3("5.2.2 Módulo database.js como Classe de Serviço"),
+        p("O arquivo js/database.js funciona como uma classe de serviço (Service Layer), centralizando toda a lógica de persistência e regras de negócio. Essa abordagem segue o padrão de projeto Repository, no qual a camada de apresentação (HTML/CSS) não conhece os detalhes de implementação do banco de dados — ela apenas invoca métodos de alto nível."),
+        p("Esse desacoplamento entre interface e dados é um dos benefícios centrais da POO: alterações no banco (por exemplo, migrar de SQLite para PostgreSQL em versão futura) não exigiriam alterações nas telas, apenas na camada de serviço."),
+        emptyLine(),
+        h2("5.3 Diagrama de Classes Conceitual"),
+        p("O diagrama de classes a seguir representa a estrutura conceitual do sistema Tronus, mapeando as entidades, seus atributos, métodos e relacionamentos:"),
+        pNoIndent("┌──────────────────────┐       ┌──────────────────────┐", { font: "Courier New", size: 18 }),
+        pNoIndent("│      Usuario         │ 1   1 │    Personagem        │", { font: "Courier New", size: 18 }),
+        pNoIndent("│──────────────────────│───────│──────────────────────│", { font: "Courier New", size: 18 }),
+        pNoIndent("│ id, nome, email      │       │ id, nome, genero     │", { font: "Courier New", size: 18 }),
+        pNoIndent("│ celular, senha, papel│       │ avatar, titulo       │", { font: "Courier New", size: 18 }),
+        pNoIndent("│──────────────────────│       │ total_estrelas       │", { font: "Courier New", size: 18 }),
+        pNoIndent("│ +cadastrar()         │       │──────────────────────│", { font: "Courier New", size: 18 }),
+        pNoIndent("│ +login()             │       │ +salvar()            │", { font: "Courier New", size: 18 }),
+        pNoIndent("│ +redefinirSenha()    │       │ +atualizarTitulo()   │", { font: "Courier New", size: 18 }),
+        pNoIndent("└──────────────────────┘       └──────────────────────┘", { font: "Courier New", size: 18 }),
+        emptyLine(),
+        h2("5.4 Justificativa: JavaScript vs. C#"),
+        p("O template do PIM III sugere o uso de C# como linguagem para demonstrar conceitos de POO. No entanto, a decisão de utilizar JavaScript foi motivada pela natureza inteiramente web da plataforma Tronus:"),
+        bullet("Coerência arquitetural: manter uma única linguagem (JavaScript) em toda a aplicação elimina a complexidade de integrar um backend C# com um frontend web, especialmente em um projeto acadêmico com prazo limitado."),
+        bullet("Suporte a POO: o JavaScript moderno (ES6+) oferece suporte nativo a classes, herança (extends), encapsulamento (closures e campos privados com #) e polimorfismo, tornando-o adequado para a demonstração dos conceitos exigidos."),
+        bullet("Evolução planejada: em versões futuras (PIM IV), a equipe planeja implementar um backend com Node.js (JavaScript server-side) ou C# (.NET), quando o requisito de persistência centralizada em servidor for obrigatório."),
+        p("Assim, todos os conceitos fundamentais de POO — encapsulamento, abstração, herança e polimorfismo — são demonstrados e aplicados na implementação atual, ainda que em JavaScript ao invés de C#."),
+
+        // ══════════════════════════════════════════════════════════════
+        // ETAPA 5 — WEB RESPONSIVO
+        // ══════════════════════════════════════════════════════════════
+        pageBreak(),
+        h1("6  ETAPA 5 — DESENVOLVIMENTO WEB RESPONSIVO"),
+        h2("6.1 Arquitetura Geral da Aplicação"),
         p("A plataforma Tronus é uma Single Page Application (SPA) estática, composta integralmente por HTML5, CSS3 e JavaScript vanilla, sem dependência de frameworks ou servidores de aplicação. A comunicação com o banco de dados é feita via sql.js, que executa um motor SQLite compilado em WebAssembly (WASM) diretamente no navegador."),
         new Table({
           width: { size: 9026, type: WidthType.DXA },
@@ -516,9 +578,9 @@ const doc = new Document({
           ],
         }),
         emptyLine(),
-        h2("5.2 Telas Desenvolvidas"),
+        h2("6.2 Telas Desenvolvidas"),
         p("O sistema é composto por dez telas, organizadas por perfil de acesso:"),
-        h3("5.2.1 Telas do Aluno"),
+        h3("6.2.1 Telas do Aluno"),
         ...[
           "landing.html — Página de boas-vindas com apresentação da plataforma.",
           "index.html — Tela de login com suporte a nome de usuário ou e-mail e redirecionamento por papel.",
@@ -530,20 +592,20 @@ const doc = new Document({
           "dashboard.html — Painel de análise de desempenho individual com gráfico por reino e tabela detalhada por fase.",
         ].map(t => bullet(t)),
         emptyLine(),
-        h3("5.2.2 Telas de Gestão"),
+        h3("6.2.2 Telas de Gestão"),
         ...[
           "professor.html — Painel do Professor: aba 'Questões' (criar/excluir questões por fase) e aba 'Alunos' (busca por nome e visualização de desempenho individual expandível).",
           "admin.html — Painel do Administrador: estatísticas gerais do sistema (usuários, questões, respostas), listagem completa de usuários com exclusão e módulos futuros sinalizados.",
         ].map(t => bullet(t)),
         emptyLine(),
-        h2("5.3 Responsividade"),
+        h2("6.3 Responsividade"),
         p("A responsividade foi implementada por meio de CSS Flexbox, CSS Grid e media queries. As principais adaptações para dispositivos móveis incluem:"),
         bullet("Sidebar retrátil que se oculta em telas menores que 480 px."),
         bullet("Grid de Reinos que colapsa de 3 colunas para 1 coluna em dispositivos móveis."),
         bullet("Alternativas do quiz ocupando 100% da largura em telas pequenas."),
         bullet("Botão LIBRAS reposicionado para o canto inferior direito, afastado de elementos interativos."),
         p("Testes foram realizados nos breakpoints de 320 px (smartphone compacto), 768 px (tablet) e 1280 px (desktop), utilizando o DevTools do Google Chrome."),
-        h2("5.4 Integração Front-End e Banco de Dados"),
+        h2("6.4 Integração Front-End e Banco de Dados"),
         p("A integração entre a camada de apresentação e o banco de dados é feita diretamente em JavaScript. O arquivo js/database.js centraliza todas as funções de acesso ao banco, organizadas por domínio:"),
         bullet("Autenticação: cadastrarUsuario(), loginUsuario(), redefinirSenha()."),
         bullet("Personagem e progresso: salvarPersonagem(), buscarPersonagem(), atualizarProgresso(), atualizarTitulo()."),
@@ -554,11 +616,11 @@ const doc = new Document({
         p("Cada tela importa este arquivo e chama as funções necessárias após a inicialização assíncrona do banco via initDatabase(). A função migrateDatabase() aplica ALTER TABLE de forma idempotente (try/catch), permitindo que usuários com versões antigas do banco recebam as novas colunas automaticamente na próxima visita."),
 
         // ══════════════════════════════════════════════════════════════
-        // ETAPA 5 — UX/UI DESIGN
+        // ETAPA 6 — UX/UI DESIGN
         // ══════════════════════════════════════════════════════════════
         pageBreak(),
-        h1("6  ETAPA 5 — UX E UI DESIGN"),
-        h2("6.1 Personas"),
+        h1("7  ETAPA 6 — UX E UI DESIGN"),
+        h2("7.1 Personas"),
         h3("Persona 1 — Carlos, o Calouro"),
         bullet("Idade: 19 anos | Semestre: 1º ADS"),
         bullet("Motivação: Quer aprender programação, mas se sente sobrecarregado com o volume de conteúdo."),
@@ -571,16 +633,16 @@ const doc = new Document({
         bullet("Frustrações: Estuda sozinha, sem saber se está no caminho certo."),
         bullet("Expectativa com a plataforma: Acompanhar sua evolução em cada tópico e identificar pontos fracos."),
         emptyLine(),
-        h2("6.2 Fluxos de Navegação"),
+        h2("7.2 Fluxos de Navegação"),
         p("O fluxo principal do usuário segue o seguinte caminho:"),
         p("Landing Page → Login → (Cadastro) → Criar Personagem → Selecionar Reino → Trilha de Fases → Quiz → Resultado (estrelas) → Dashboard de Análise"),
-        h2("6.3 Identidade Visual"),
+        h2("7.3 Identidade Visual"),
         p("A identidade visual da plataforma adota um tema medieval fantástico para reforçar a narrativa de RPG:"),
         bullet("Paleta de cores: dourado (#d4af37), preto profundo (#0a0500) e pergaminho (#f0e6c8)."),
         bullet("Tipografia: Cinzel (títulos medievais) + Crimson Text (corpo do texto) + Poppins (UI moderna)."),
         bullet("Fundo: imagem de mapa de reino com overlay escuro para garantir legibilidade."),
         bullet("Ícones: Boxicons para consistência visual em toda a interface."),
-        h2("6.4 Princípios de Usabilidade Aplicados"),
+        h2("7.4 Princípios de Usabilidade Aplicados"),
         bullet("Visibilidade do estado do sistema: barras de progresso, estrelas e título do personagem sempre visíveis."),
         bullet("Feedback imediato: após cada resposta do quiz, o sistema indica em verde (correto) ou vermelho (errado)."),
         bullet("Prevenção de erros: fases bloqueadas evitam que o usuário avance sem completar etapas anteriores."),
@@ -588,11 +650,11 @@ const doc = new Document({
         bullet("Tema dark/light: botão de alternância para reduzir fadiga visual em diferentes contextos de uso."),
 
         // ══════════════════════════════════════════════════════════════
-        // ETAPA 6 — ANÁLISE DE DADOS
+        // ETAPA 7 — ANÁLISE DE DADOS
         // ══════════════════════════════════════════════════════════════
         pageBreak(),
-        h1("7  ETAPA 6 — MACHINE LEARNING E ANÁLISE DE DADOS"),
-        h2("7.1 Dados Relevantes para Análise"),
+        h1("8  ETAPA 7 — MACHINE LEARNING E ANÁLISE DE DADOS"),
+        h2("8.1 Dados Relevantes para Análise"),
         p("A plataforma Tronus coleta, para cada usuário, os seguintes dados relevantes para análise de desempenho:"),
         ...[
           "questao_id: identificador da questão respondida.",
@@ -602,7 +664,7 @@ const doc = new Document({
           "personagem_id: identificador do estudante.",
           "estrelas: quantidade de estrelas obtidas por fase (0 a 3).",
         ].map(t => bullet(t)),
-        h2("7.2 Indicadores de Desempenho Gerados"),
+        h2("8.2 Indicadores de Desempenho Gerados"),
         new Table({
           width: { size: 9026, type: WidthType.DXA },
           columnWidths: [3500, 3000, 2526],
@@ -617,36 +679,36 @@ const doc = new Document({
           ],
         }),
         emptyLine(),
-        h2("7.3 Dashboard de Análise — Tela dashboard.html"),
+        h2("8.3 Dashboard de Análise — Tela dashboard.html"),
         p("O painel de análise de dados (dashboard.html) apresenta as informações de desempenho de forma visual e interativa, permitindo que o estudante compreenda facilmente seus pontos fortes e fracos."),
         p("Componentes do dashboard:"),
         bullet("Resumo geral: cards com total de questões respondidas, total de acertos, taxa de acerto geral, estrelas conquistadas e fases com 3 estrelas."),
         bullet("Gráfico de barras (CSS puro): exibe a taxa de acerto por Reino. Barras mais altas indicam maior domínio do conteúdo."),
         bullet("Tabela detalhada: lista todos os Reinos e Fases com colunas de tentativas, acertos, taxa de acerto, barra visual de progresso e estrelas."),
-        h2("7.4 Aplicação de Técnicas de Análise de Dados"),
+        h2("8.4 Aplicação de Técnicas de Análise de Dados"),
         p("As análises são realizadas por meio de consultas SQL com funções agregadas (COUNT, SUM, AVG, ROUND) diretamente no banco SQLite embarcado. Embora o escopo atual utilize estatística descritiva básica, a arquitetura foi projetada para suportar técnicas mais avançadas em versões futuras:"),
         bullet("Recomendação por conteúdo (filtragem colaborativa): sugerir questões das áreas com maior índice de erro para reforço personalizado."),
         bullet("Modelo preditivo de evasão: identificar estudantes com baixo engajamento (poucas tentativas, queda na taxa de acerto ao longo do tempo) e acionar alertas."),
         bullet("Clusterização de perfis: agrupar estudantes com padrões de desempenho semelhantes para sugerir estratégias de estudo personalizadas."),
-        h2("7.5 Interpretação dos Resultados"),
+        h2("8.5 Interpretação dos Resultados"),
         p("Os resultados gerados pelo dashboard permitem ao estudante tomar decisões pedagógicas embasadas em dados. Por exemplo: um estudante com taxa de acerto de 40% no Reino de Python — Fase 2 (Estruturas de Controle) recebe o sinal de que deve revisar laços de repetição e comandos de desvio de fluxo antes de avançar para a Fase 3."),
         p("A proposta de valor é transformar dados de interação (respostas certas e erradas) em inteligência educacional acionável, apoiando a tomada de decisão do estudante de forma autônoma e contínua."),
 
         // ══════════════════════════════════════════════════════════════
-        // ETAPA 7 — COMUNICAÇÃO, LIDERANÇA E LIBRAS
+        // ETAPA 8 — COMUNICAÇÃO, LIDERANÇA E LIBRAS
         // ══════════════════════════════════════════════════════════════
         pageBreak(),
-        h1("8  ETAPA 7 — COMUNICAÇÃO, LIDERANÇA, NEGOCIAÇÃO E LIBRAS"),
-        h2("8.1 Estratégias de Comunicação na Equipe"),
+        h1("9  ETAPA 8 — COMUNICAÇÃO, LIDERANÇA, NEGOCIAÇÃO E LIBRAS"),
+        h2("9.1 Estratégias de Comunicação na Equipe"),
         p("A comunicação da equipe de desenvolvimento foi estruturada em três canais principais:"),
         bullet("Reuniões de sprint (semanais): planejamento e revisão das entregas via videoconferência, com registro em ata digital."),
         bullet("Repositório GitHub (Pim-Unip2025/Tronus): controle de versão e histórico de alterações acessível a todos os membros."),
         bullet("Sprint Planning (planilha SPRINT PLANNING.xlsx): backlog priorizado e distribuição de tarefas por membro."),
-        h2("8.2 Situações de Liderança e Negociação"),
+        h2("9.2 Situações de Liderança e Negociação"),
         p("Durante o desenvolvimento, duas situações de negociação foram relevantes:"),
         bullet("Priorização do quiz vs. dashboard: a equipe debateu a ordem de implementação. O argumento vencedor foi que o quiz gera os dados que o dashboard exibe, portanto a ordem natural é quiz primeiro. Decisão tomada por consenso."),
         bullet("Escolha entre sql.js e backend Node.js: o líder técnico argumentou que sql.js eliminava a necessidade de hospedagem de servidor, simplificando a entrega no prazo. A proposta foi aceita pela equipe com a ressalva de documentar a limitação para versões futuras."),
-        h2("8.3 Proposta de Acessibilidade — LIBRAS"),
+        h2("9.3 Proposta de Acessibilidade — LIBRAS"),
         p("A Língua Brasileira de Sinais (LIBRAS), regulamentada pela Lei nº 10.436/2002 e decreto nº 5.626/2005, é reconhecida como meio legal de comunicação da comunidade surda no Brasil. Sua incorporação em sistemas digitais é um passo importante para a inclusão digital."),
         p("A plataforma Tronus implementa a seguinte proposta de acessibilidade em LIBRAS:"),
         bullet("Botão flutuante \"👋 LIBRAS\" acessível em todas as telas da trilha (posição fixa, canto inferior direito)."),
@@ -669,11 +731,73 @@ const doc = new Document({
         p("Em versões futuras, a equipe propõe a incorporação de vídeos embutidos de LIBRAS no próprio enunciado das questões, com legenda em Português, tornando o conteúdo acessível também a estudantes surdos ou com deficiência auditiva."),
 
         // ══════════════════════════════════════════════════════════════
+        // ETAPA 9 — INTEGRAÇÃO E AVALIAÇÃO FINAL
+        // ══════════════════════════════════════════════════════════════
+        pageBreak(),
+        h1("10  ETAPA 9 — INTEGRAÇÃO E AVALIAÇÃO FINAL"),
+        h2("10.1 Visão Integrada do Sistema"),
+        p("A plataforma Tronus foi desenvolvida com o objetivo de integrar, em um único produto funcional, os conhecimentos de nove disciplinas do curso de Análise e Desenvolvimento de Sistemas. A tabela a seguir apresenta a correspondência entre cada etapa do PIM e o componente do sistema que a materializa:"),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [3000, 3013, 3013],
+          rows: [
+            tableRow(["Etapa / Disciplina", "Componente no Tronus", "Evidência"], true),
+            tableRow(["Negócio Fictício", "Tronus EdTech (empresa)", "Missão, público-alvo, LGPD"]),
+            tableRow(["Engenharia Ágil", "Sprints, backlog MoSCoW", "Tabela de sprints, requisitos"]),
+            tableRow(["Banco de Dados", "sql.js (SQLite/WASM)", "DDL, consultas SQL, modelo lógico"]),
+            tableRow(["POO", "Módulo database.js", "Encapsulamento, abstração, polimorfismo"]),
+            tableRow(["Web Responsivo", "10 telas HTML5/CSS3/JS", "Media queries, Flexbox, Grid"]),
+            tableRow(["UX/UI Design", "Tema medieval, personas", "Paleta, fluxo de navegação"]),
+            tableRow(["Machine Learning", "Dashboard de análise", "KPIs, gráficos, tabela detalhada"]),
+            tableRow(["Comunicação e LIBRAS", "Glossário LIBRAS, equipe", "Botão acessível, sinais de TI"]),
+            tableRow(["Integração", "Presente capítulo", "Testes, avaliação, métricas"]),
+          ],
+        }),
+        emptyLine(),
+        h2("10.2 Testes Realizados"),
+        p("A equipe elaborou um roteiro de testes abrangente com 99 casos de teste distribuídos em 15 blocos funcionais, cobrindo todos os fluxos do sistema. Os blocos incluem:"),
+        bullet("CT-01 a CT-03: Landing page, registro e login — validação de campos, formatos de e-mail, senha mínima, celular com DDD e redirecionamento por papel."),
+        bullet("CT-04: Criação de personagem — seleção de gênero, avatar e nome obrigatório."),
+        bullet("CT-05 a CT-06: Tela de reinos e trilha — exibição de progresso, desbloqueio sequencial de fases, badge \"Em Breve\" para reinos sem questões."),
+        bullet("CT-07: Quiz — 5 questões por fase, feedback visual, cálculo de estrelas (0–3), atualização de progresso no banco."),
+        bullet("CT-08 a CT-10: Progresso, dashboard e sidebar — persistência entre sessões, gráfico por reino, alternância de tema."),
+        bullet("CT-11: Glossário LIBRAS — exibição de termos, links para Spread The Sign, modal acessível."),
+        bullet("CT-12 a CT-14: Painéis de professor e administrador — CRUD de questões, filtro por reino, busca de alunos, exclusão de usuários."),
+        bullet("CT-15: Regressão — navegação entre telas sem erros no console, dados consistentes."),
+        p("Todos os testes foram executados manualmente nos navegadores Google Chrome e Microsoft Edge, em resoluções de 320 px (mobile), 768 px (tablet) e 1280 px (desktop), conforme documentado no arquivo ROTEIRO_TESTES.md do repositório."),
+        emptyLine(),
+        h2("10.3 Avaliação dos Resultados"),
+        p("Os resultados obtidos foram avaliados com base nos objetivos definidos na introdução:"),
+        new Table({
+          width: { size: 9026, type: WidthType.DXA },
+          columnWidths: [4013, 2000, 3013],
+          rows: [
+            tableRow(["Objetivo", "Atingido?", "Observação"], true),
+            tableRow(["Plataforma web funcional de avaliação", "Sim", "10 telas operacionais, quiz com feedback"]),
+            tableRow(["Gamificação com estrelas e títulos", "Sim", "4 títulos (Plebeu → Rei), 3 estrelas/fase"]),
+            tableRow(["Banco de dados relacional modelado", "Sim", "8 tabelas, chaves estrangeiras, ACID"]),
+            tableRow(["Dashboard de análise de desempenho", "Sim", "Gráficos, KPIs, tabela detalhada"]),
+            tableRow(["Responsividade em dispositivos", "Sim", "Testado em 320 px, 768 px, 1280 px"]),
+            tableRow(["Acessibilidade em LIBRAS", "Parcial", "Glossário implementado; vídeos futuros"]),
+            tableRow(["Controle de acesso por papéis (RBAC)", "Sim", "3 papéis com painéis exclusivos"]),
+            tableRow(["Questões estilo ENADE para todos os reinos", "Parcial", "Python completo; demais reinos previstos"]),
+          ],
+        }),
+        emptyLine(),
+        h2("10.4 Limitações e Trabalhos Futuros"),
+        p("As principais limitações identificadas na versão atual são:"),
+        bullet("Armazenamento exclusivamente local (localStorage): os dados ficam restritos ao dispositivo e ao navegador do usuário. A implementação de um backend centralizado (prevista para o PIM IV) resolverá essa limitação."),
+        bullet("Questões disponíveis apenas para o Reino Python: os demais reinos (C++, Engenharia de Software, Banco de Dados, Redes) estão estruturados no banco mas aguardam a criação de questões, que pode ser feita pelo painel do professor."),
+        bullet("Glossário LIBRAS sem vídeos embutidos: a versão atual utiliza descrições textuais e links externos. A incorporação de vídeos de LIBRAS nos enunciados é uma melhoria planejada."),
+        bullet("Ausência de backend em C#/.NET: conforme a arquitetura definida, o sistema opera inteiramente no cliente. A migração para um backend server-side com persistência centralizada será realizada no próximo semestre."),
+        p("Os trabalhos futuros incluem: (i) backend com Node.js ou C# (.NET); (ii) banco de dados centralizado (PostgreSQL ou MongoDB); (iii) módulo de Machine Learning para recomendação personalizada; (iv) gestão de turmas e vínculos professor–turma; (v) vídeos de LIBRAS nos enunciados; e (vi) ranking competitivo entre usuários."),
+
+        // ══════════════════════════════════════════════════════════════
         // CONCLUSÃO
         // ══════════════════════════════════════════════════════════════
         pageBreak(),
-        h1("9  CONCLUSÃO"),
-        p("O presente trabalho demonstrou a viabilidade técnica e pedagógica da plataforma Tronus como solução gamificada de avaliação e apoio ao aprendizado para estudantes universitários de ADS. Ao longo do desenvolvimento, a equipe integrou conhecimentos de oito disciplinas distintas em um único produto funcional, coerente e documentado."),
+        h1("11  CONCLUSÃO"),
+        p("O presente trabalho demonstrou a viabilidade técnica e pedagógica da plataforma Tronus como solução gamificada de avaliação e apoio ao aprendizado para estudantes universitários de ADS. Ao longo do desenvolvimento, a equipe integrou conhecimentos de nove disciplinas distintas em um único produto funcional, coerente e documentado."),
         p("Do ponto de vista técnico, a escolha por tecnologias web puras (HTML5, CSS3, JavaScript) e banco de dados SQLite embarcado (sql.js) permitiu a entrega de uma aplicação sem dependência de servidores, com boa usabilidade e responsividade. O sistema de quiz com questões no estilo ENADE — com enunciados compostos por afirmativas I, II, III e IV — combinado ao painel de análise de desempenho, cumpre o objetivo central da plataforma: transformar a interação do estudante em dados acionáveis para o seu desenvolvimento."),
         p("O controle de acesso por papéis (RBAC) diferencia três perfis: aluno, professor e administrador. O painel do professor permite gerenciar questões por fase e acompanhar o desempenho individual dos alunos por busca nominal. O painel do administrador oferece visibilidade sobre as estatísticas gerais do sistema e o gerenciamento de usuários. Ambos os perfis especiais são pré-cadastrados automaticamente na inicialização do banco, com credenciais documentadas."),
         p("Os indicadores de análise implementados — taxa de acerto por fase e reino, gráfico de barras por reino e tabela detalhada — oferecem ao estudante uma visão clara de seus pontos fortes e das áreas que demandam revisão. A incorporação do glossário de LIBRAS representa um passo concreto em direção à acessibilidade digital, alinhada à legislação brasileira e aos princípios de inclusão. O double-check de logout e o redirecionamento inteligente por papel reforçam a qualidade da experiência do usuário."),
