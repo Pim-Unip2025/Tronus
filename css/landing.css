@@ -142,6 +142,12 @@
       letter-spacing: 4px;
     }
 
+    .hero-logo {
+      width: clamp(280px, 45vw, 550px);
+      margin-bottom: 14px;
+      filter: drop-shadow(0 4px 24px rgba(0,0,0,0.7));
+    }
+
     .hero-subtitle {
       font-family: 'Cinzel', serif;
       font-size: 15px;
