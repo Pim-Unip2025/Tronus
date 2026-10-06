@@ -97,6 +97,22 @@ out.push('');
 fs.writeFileSync(path.join(RAIZ, 'db/02_seeds.sql'), out.join('\n'));
 
 // --- usuários de teste ------------------------------------------------------
+// O bcrypt usa salt aleatório: regerar produz um hash diferente a cada vez,
+// mesmo sem nada ter mudado. Para o arquivo não aparecer modificado no git
+// sem motivo, só regeramos os usuários quando pedido explicitamente:
+//
+//     node db/_gerar_seeds.js --usuarios
+//
+const ARQ_USUARIOS = path.join(RAIZ, 'db/02b_seed_usuarios.sql');
+const forcarUsuarios = process.argv.includes('--usuarios');
+
+if (fs.existsSync(ARQ_USUARIOS) && !forcarUsuarios) {
+  console.log('02b_seed_usuarios.sql -> mantido (use --usuarios para regerar os hashes)');
+} else {
+  gerarUsuarios();
+}
+
+function gerarUsuarios() {
 const SALT = 10;
 const usuarios = [
   { nome: 'admin', email: 'admin@tronus.com', celular: '00000000000',
@@ -139,8 +155,9 @@ for (const user of usuarios) {
 u.push('COMMIT;');
 u.push('');
 
-fs.writeFileSync(path.join(RAIZ, 'db/02b_seed_usuarios.sql'), u.join('\n'));
+fs.writeFileSync(ARQ_USUARIOS, u.join('\n'));
+console.log(`02b_seed_usuarios.sql -> ${usuarios.length} usuários com hash bcrypt`);
+}
 
 const totalQ = banco.reduce((a, f) => a + f.length, 0);
 console.log(`02_seeds.sql        -> ${REINOS.length} reinos, ${REINOS.length * 3} fases, ${totalQ} questões`);
-console.log(`02b_seed_usuarios.sql -> ${usuarios.length} usuários com hash bcrypt`);
