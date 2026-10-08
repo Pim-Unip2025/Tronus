@@ -12,7 +12,8 @@
 -- fn_titulo_por_estrelas — fonte única dos limiares de progressão.
 --
 -- Origem: atualizarTitulo(), js/database.js linha 616.
--- Os limiares 15 / 30 / 50 ficam declarados AQUI e em nenhum outro lugar.
+-- Os limiares 15 / 30 / 45 ficam declarados AQUI e em nenhum outro lugar.
+-- Rei = 45 porque é o máximo possível: 5 Reinos x 3 fases x 3 estrelas.
 -- ----------------------------------------------------------------------------
 CREATE OR REPLACE FUNCTION fn_titulo_por_estrelas(p_total INTEGER)
 RETURNS VARCHAR(20)
@@ -24,7 +25,7 @@ BEGIN
         RETURN 'Plebeu';
     ELSIF p_total < 30 THEN
         RETURN 'Cavaleiro';
-    ELSIF p_total < 50 THEN
+    ELSIF p_total < 45 THEN
         RETURN 'Duque';
     ELSE
         RETURN 'Rei';
@@ -33,7 +34,7 @@ END;
 $$;
 
 COMMENT ON FUNCTION fn_titulo_por_estrelas IS
-    'Converte total de estrelas em título. Limiares: 15 Cavaleiro, 30 Duque, 50 Rei.';
+    'Converte total de estrelas em título. Limiares: 15 Cavaleiro, 30 Duque, 45 Rei (máximo: 15 fases x 3 estrelas).';
 
 
 -- ----------------------------------------------------------------------------

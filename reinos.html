@@ -31,7 +31,7 @@
         <span id="totalEstrelas">0</span> estrelas
       </div>
       <div class="progress-wrap">
-        <span class="progress-label" id="progressLabel">0 / 50 para Rei</span>
+        <span class="progress-label" id="progressLabel">0 / 45 para Rei</span>
         <div class="progress-bar-bg">
           <div class="progress-bar-fill" id="progressFill" style="width: 0%"></div>
         </div>
@@ -97,11 +97,11 @@
       document.getElementById("playerTitle").innerText = personagem.titulo_atual;
       document.getElementById("totalEstrelas").innerText = personagem.total_estrelas;
 
-      // Barra de progresso (meta: 50 estrelas = Rei)
-      const pct = Math.min((personagem.total_estrelas / 50) * 100, 100);
+      // Barra de progresso (meta: 45 estrelas = Rei, o máximo do jogo)
+      const pct = Math.min((personagem.total_estrelas / 45) * 100, 100);
       document.getElementById("progressFill").style.width = pct + "%";
       document.getElementById("progressLabel").innerText =
-        personagem.total_estrelas + " / 50 para Rei";
+        personagem.total_estrelas + " / 45 para Rei";
 
       // Busca progresso
       const progresso = buscarProgresso(personagem.id);

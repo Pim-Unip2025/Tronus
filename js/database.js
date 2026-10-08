@@ -620,7 +620,7 @@ function atualizarTitulo(personagemId) {
   );
   const total = result[0].values[0][0] || 0;
   let titulo = "Plebeu";
-  if (total >= 50) titulo = "Rei";
+  if (total >= 45) titulo = "Rei";
   else if (total >= 30) titulo = "Duque";
   else if (total >= 15) titulo = "Cavaleiro";
   db.run(
