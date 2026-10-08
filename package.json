@@ -1,0 +1,12 @@
+{
+  "name": "tronus",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Plataforma gamificada de apoio academico — PIM UNIP/ADS",
+  "scripts": {
+    "db:seeds": "node db/_gerar_seeds.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3"
+  }
+}

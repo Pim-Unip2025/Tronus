@@ -1,0 +1,37 @@
+name: keep-alive do banco
+
+# O projeto no Supabase é pausado após uma semana sem atividade no plano
+# gratuito. Este workflow faz uma consulta trivial toda segunda-feira só
+# para manter o projeto acordado.
+#
+# Importante: workflow agendado no GitHub Actions só roda na branch PADRÃO
+# do repositório. A nossa padrão é a develop, então está certo aqui.
+#
+# Pré-requisito: criar o secret DATABASE_URL em
+# Settings > Secrets and variables > Actions, com a connection string do
+# SESSION POOLER do Supabase (porta 5432).
+
+on:
+  schedule:
+    - cron: '0 12 * * 1'    # toda segunda, 12:00 UTC = 09:00 de Brasília
+  workflow_dispatch:         # permite disparar na mão pelo botão Run workflow
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Instalar cliente do PostgreSQL
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends postgresql-client
+
+      - name: Consulta trivial para manter o projeto ativo
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::O secret DATABASE_URL não está configurado."
+            exit 1
+          fi
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+            -c "select 'keep-alive ok em ' || now() as resultado;"
