@@ -18,6 +18,7 @@ criadas no `03`, e o `03` depende das tabelas do `01`.
 | `03_procedures.sql` | Procedures e funções de relatório |
 | `04_triggers.sql` | Triggers de consistência |
 | `99_validacao.sql` | Roteiro que prova que tudo acima funciona |
+| `migracoes/` | Mudanças para aplicar num banco que **já está no ar**, em ordem de data. Base nova não precisa delas: os scripts acima já vêm atualizados |
 
 > `01_schema.sql` começa com `DROP TABLE ... CASCADE`. **Ele apaga tudo antes
 > de recriar.** É proposital — o critério de pronto exige recriar a base do

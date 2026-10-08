@@ -32,7 +32,7 @@
 | ⭐ **Estrelas** | Cada fase vale até 3 estrelas |
 | 🎖️ **Cavaleiro** | Conquistado ao atingir 15 estrelas |
 | 🦅 **Duque** | Conquistado ao atingir 30 estrelas |
-| 👑 **Rei** | Conquistado ao atingir 50 estrelas — todos os reinos dominados |
+| 👑 **Rei** | Conquistado ao atingir 45 estrelas — todos os reinos dominados |
 
 ### ✨ Funcionalidades
 
