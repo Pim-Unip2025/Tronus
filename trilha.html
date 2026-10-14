@@ -9,7 +9,11 @@
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <title>Trilha - TRONUS</title>
+  <title>Trilha · Tronus</title>
+  <meta name="description" content="Tronus: plataforma gamificada da UNIP em que cada matéria é um Reino. Responda quizzes, ganhe estrelas e suba de Plebeu a Rei.">
+  <meta name="theme-color" content="#1e1308">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <link rel="stylesheet" href="css/comum.css">
 </head>
 
@@ -110,6 +114,7 @@
     // ── Inicialização ────────────────────────────────────────
     async function carregarTrilha() {
       if (!reinoId) return window.location.replace("reinos.html");
+      if (!reinoAtual) document.getElementById("trilhaWrap").innerHTML = esqueletos(3, "fase-circulo");
       try {
         const [reinos, fases, progresso] = await Promise.all([api.reinos(), api.fases(reinoId), api.meuProgresso()]);
         const reino = reinos.find((r) => r.id === reinoId);

@@ -94,3 +94,8 @@
   from { transform: translateX(-100%); }
   to   { transform: translateX(100%); }
 }
+
+/* Esqueletos de carregamento ocupam o lugar do conteúdo */
+.esqueleto { border: none !important; cursor: default !important; }
+.reino-card.esqueleto { height: 230px; }
+.fase-circulo.esqueleto { opacity: 0.6; }

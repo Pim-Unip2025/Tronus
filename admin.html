@@ -7,7 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/sidebar.css">
-  <title>Painel Admin — TRONUS</title>
+  <title>Painel Admin · Tronus</title>
+  <meta name="description" content="Tronus: plataforma gamificada da UNIP em que cada matéria é um Reino. Responda quizzes, ganhe estrelas e suba de Plebeu a Rei.">
+  <meta name="theme-color" content="#1e1308">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <style>
     .tabela-vazia { text-align:center; color:#6b5a30; font-style:italic; padding:20px; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -167,23 +171,23 @@
     <h3 class="section-titulo">Estatísticas Gerais do Sistema</h3>
     <div class="stats-grid" id="statsGrid">
       <div class="stat-card">
-        <span class="stat-val" id="sUsuarios">—</span>
+        <span class="stat-val carregando" id="sUsuarios">00</span>
         <div class="stat-label">Usuários cadastrados</div>
       </div>
       <div class="stat-card">
-        <span class="stat-val" id="sAlunos">—</span>
+        <span class="stat-val carregando" id="sAlunos">00</span>
         <div class="stat-label">Alunos ativos</div>
       </div>
       <div class="stat-card">
-        <span class="stat-val" id="sPersonagens">—</span>
+        <span class="stat-val carregando" id="sPersonagens">00</span>
         <div class="stat-label">Personagens criados</div>
       </div>
       <div class="stat-card">
-        <span class="stat-val" id="sQuestoes">—</span>
+        <span class="stat-val carregando" id="sQuestoes">00</span>
         <div class="stat-label">Questões no banco</div>
       </div>
       <div class="stat-card">
-        <span class="stat-val" id="sRespostas">—</span>
+        <span class="stat-val carregando" id="sRespostas">00</span>
         <div class="stat-label">Respostas registradas</div>
       </div>
     </div>
@@ -249,6 +253,7 @@
         document.getElementById("sPersonagens").textContent = s.personagens;
         document.getElementById("sQuestoes").textContent = s.questoes;
         document.getElementById("sRespostas").textContent = s.respostas;
+        pronto(document.querySelector(".stats-grid"));
       } catch (erro) {
         mostrarToastAdm(erro.message);
       }

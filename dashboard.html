@@ -7,7 +7,11 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link rel="stylesheet" href="css/sidebar.css">
-  <title>Análise de Desempenho - TRONUS</title>
+  <title>Meu desempenho · Tronus</title>
+  <meta name="description" content="Tronus: plataforma gamificada da UNIP em que cada matéria é um Reino. Responda quizzes, ganhe estrelas e suba de Plebeu a Rei.">
+  <meta name="theme-color" content="#1e1308">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -186,23 +190,23 @@
     <h3 class="section-titulo">Resumo Geral</h3>
     <div class="resumo-grid" id="resumoGrid">
       <div class="resumo-card">
-        <span class="resumo-valor" id="rTotalRespostas">—</span>
+        <span class="resumo-valor carregando" id="rTotalRespostas">00</span>
         <div class="resumo-label">Questões respondidas</div>
       </div>
       <div class="resumo-card">
-        <span class="resumo-valor" id="rTotalAcertos">—</span>
+        <span class="resumo-valor carregando" id="rTotalAcertos">00</span>
         <div class="resumo-label">Questões corretas</div>
       </div>
       <div class="resumo-card">
-        <span class="resumo-valor" id="rTaxaGeral">—%</span>
+        <span class="resumo-valor carregando" id="rTaxaGeral">00</span>
         <div class="resumo-label">Taxa de acerto geral</div>
       </div>
       <div class="resumo-card">
-        <span class="resumo-valor" id="rEstrelas">—</span>
+        <span class="resumo-valor carregando" id="rEstrelas">00</span>
         <div class="resumo-label">Estrelas conquistadas</div>
       </div>
       <div class="resumo-card">
-        <span class="resumo-valor" id="rFasesCompletas">—</span>
+        <span class="resumo-valor carregando" id="rFasesCompletas">00</span>
         <div class="resumo-label">Fases com 3 estrelas</div>
       </div>
     </div>
@@ -210,7 +214,7 @@
     <!-- GRÁFICO POR REINO -->
     <h3 class="section-titulo">Taxa de Acerto por Reino</h3>
     <div class="grafico-wrap">
-      <div class="barras-reino" id="barrasReino"></div>
+      <div class="barras-reino" id="barrasReino"><div class="barra-linha esqueleto carregando" style="height:14px"></div><div class="barra-linha esqueleto carregando" style="height:14px"></div><div class="barra-linha esqueleto carregando" style="height:14px"></div></div>
       <p class="grafico-nota">Percentual de questões respondidas corretamente em cada Reino, somando todas as tentativas.</p>
     </div>
 
@@ -243,6 +247,7 @@
     Sessao.exigir("aluno");
 
     Promise.all([api.meuResumo(), api.minhasEstatisticas()]).then(([resumo, stats]) => {
+      pronto();
       document.getElementById("rTotalRespostas").innerText = resumo.total_respostas || 0;
       document.getElementById("rTotalAcertos").innerText   = resumo.total_acertos  || 0;
       document.getElementById("rTaxaGeral").innerText      = (resumo.taxa_geral || 0) + "%";

@@ -9,7 +9,11 @@
   <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
   <link rel="stylesheet" href="css/theme.css">
   <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <title>Reinos - TRONUS</title>
+  <title>Reinos · Tronus</title>
+  <meta name="description" content="Tronus: plataforma gamificada da UNIP em que cada matéria é um Reino. Responda quizzes, ganhe estrelas e suba de Plebeu a Rei.">
+  <meta name="theme-color" content="#1e1308">
+  <link rel="icon" type="image/png" href="img/favicon.png">
+  <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   <link rel="stylesheet" href="css/comum.css">
 </head>
 
@@ -21,7 +25,7 @@
     <div class="player-info">
       <img class="player-avatar" id="avatarImg" src="" alt="Avatar">
       <div class="player-details">
-        <span class="player-name" id="playerName">—</span>
+        <span class="player-name carregando" id="playerName">Carregando</span>
         <span class="player-title" id="playerTitle">Plebeu</span>
       </div>
     </div>
@@ -29,7 +33,7 @@
     <div class="player-stats">
       <div class="stars-count">
         <i class='bx bxs-star'></i>
-        <span id="totalEstrelas">0</span> estrelas
+        <span id="totalEstrelas" class="carregando">00</span> estrelas
       </div>
       <div class="progress-wrap">
         <span class="progress-label" id="progressLabel">0 / 45 para Rei</span>
@@ -47,7 +51,7 @@
   </div>
 
   <!-- REINOS -->
-  <div class="reinos-grid" id="reinosGrid"></div>
+  <div class="reinos-grid" id="reinosGrid" aria-busy="true"></div>
 
   <script src="js/script.js"></script>
   <script src="js/theme.js"></script>
@@ -73,6 +77,7 @@
 
     async function carregar() {
       const grid = document.getElementById("reinosGrid");
+      grid.innerHTML = esqueletos(5, "reino-card");
       let personagem;
       try {
         personagem = await api.meuPersonagem();
@@ -87,6 +92,7 @@
       document.getElementById("playerName").textContent = personagem.nome;
       document.getElementById("playerTitle").textContent = personagem.titulo_atual;
       document.getElementById("totalEstrelas").textContent = personagem.total_estrelas;
+      pronto(document.querySelector(".topbar"));
 
       const prox = PROXIMO[personagem.titulo_atual];
       const meta = prox ? prox[1] : 45;
@@ -112,6 +118,7 @@
         );
 
         grid.innerHTML = "";
+        grid.removeAttribute("aria-busy");
         reinos.forEach((reino, i) => {
           const fases = progresso.filter((p) => p.reino_id === reino.id);
           const estrelas = fases.reduce((s, f) => s + f.estrelas, 0);
