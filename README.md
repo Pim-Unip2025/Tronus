@@ -51,7 +51,7 @@ git clone https://github.com/Pim-Unip2025/Tronus.git
 ```
 2. Abra a pasta no **VSCode**
 3. Instale a extensão **Live Server**
-4. Clique com o botão direito no `index.html` → **Open with Live Server**
+4. Clique com o botão direito no `login.html` → **Open with Live Server**
 5. Pronto! O projeto abrirá no navegador 🎉
 
 ### 🛠️ Tecnologias Utilizadas
@@ -100,7 +100,7 @@ git clone https://github.com/Pim-Unip2025/Tronus.git
 ```
 2. Open the folder in **VSCode**
 3. Install the **Live Server** extension
-4. Right-click `index.html` → **Open with Live Server**
+4. Right-click `login.html` → **Open with Live Server**
 5. Done! The project will open in your browser 🎉
 
 ### 🛠️ Tech Stack

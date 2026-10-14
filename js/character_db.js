@@ -74,7 +74,7 @@ function showSummary() {
 
   if (!usuario) {
     alert("Sessão expirada. Faça login novamente.");
-    window.location.href = "index.html";
+    window.location.href = "login.html";
     return;
   }
 

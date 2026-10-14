@@ -228,7 +228,7 @@
     initDatabase().then(() => {
       const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado"))
              || JSON.parse(localStorage.getItem("usuarioLogado"));
-      if (!usuario) { window.location.href = "index.html"; return; }
+      if (!usuario) { window.location.href = "login.html"; return; }
 
       const personagem = buscarPersonagem(usuario.id);
       if (!personagem) { window.location.href = "character.html"; return; }

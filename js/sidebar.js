@@ -98,7 +98,7 @@ function logout() {
   localStorage.removeItem("reinoSelecionado");
   sessionStorage.removeItem("personagemId");
   localStorage.removeItem("personagemId");
-  window.location.href = "landing.html";
+  window.location.href = "index.html";
 }
 
 criarSidebar();

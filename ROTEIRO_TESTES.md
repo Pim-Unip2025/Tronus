@@ -25,13 +25,13 @@
 
 ## CT-01 — Landing Page
 
-**Página:** `landing.html`
+**Página:** `index.html`
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Abrir `landing.html` | Página carrega sem erros no console | |
+| 1 | Abrir `index.html` | Página carrega sem erros no console | |
 | 2 | Rolar a página | Seções Hero, Como Funciona, Reinos, Equipe e Rodapé visíveis | |
-| 3 | Clicar em **Entrar** na navbar | Redireciona para `index.html` | |
+| 3 | Clicar em **Entrar** na navbar | Redireciona para `login.html` | |
 | 4 | Clicar em **Criar Conta** (hero ou navbar) | Redireciona para `register.html` | |
 | 5 | Redimensionar para mobile (<480px) | Layout responsivo, sem sobreposições | |
 
@@ -55,7 +55,7 @@
 
 ## CT-03 — Login
 
-**Página:** `index.html`
+**Página:** `login.html`
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
@@ -170,7 +170,7 @@
 | 4 | Clicar em **Trocar Tema** | Tema alterna entre escuro e claro | |
 | 5 | Verificar modo claro | Topbar, textos e cards legíveis (fundo claro, texto escuro) | |
 | 6 | Clicar em **Sair** | Caixa de confirmação: "Tem certeza que deseja sair?" | |
-| 7 | Confirmar saída | Sessão encerrada; redireciona para `index.html` | |
+| 7 | Confirmar saída | Sessão encerrada; redireciona para `login.html` | |
 | 8 | Cancelar saída | Permanece na página atual | |
 
 ---
@@ -198,7 +198,7 @@
 | 2 | Inserir celular do aluno cadastrado (ex.: `11999999999`) | Avanço para Passo 2; código exibido | |
 | 3 | Inserir código incorreto | Mensagem de código inválido | |
 | 4 | Inserir código correto | Campo para nova senha aparece | |
-| 5 | Definir nova senha e confirmar | Senha atualizada; redireciona para `index.html` | |
+| 5 | Definir nova senha e confirmar | Senha atualizada; redireciona para `login.html` | |
 | 6 | Login com a nova senha | Login efetuado com sucesso | |
 
 ---
@@ -212,8 +212,8 @@
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Tentar acessar `professor.html` sem login | Redireciona para `index.html` | |
-| 2 | Tentar acessar `professor.html` logado como aluno | Redireciona para `index.html` | |
+| 1 | Tentar acessar `professor.html` sem login | Redireciona para `login.html` | |
+| 2 | Tentar acessar `professor.html` logado como aluno | Redireciona para `login.html` | |
 | 3 | Acessar logado como professor | Painel carrega; badge exibe nome do professor | |
 | 4 | Verificar título das abas | "Gerenciar Questões — Reino Python" e "Desempenho dos Alunos — Reino Python" | |
 
@@ -252,8 +252,8 @@
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Tentar acessar `admin.html` sem login | Redireciona para `index.html` | |
-| 2 | Tentar acessar `admin.html` logado como aluno | Redireciona para `index.html` | |
+| 1 | Tentar acessar `admin.html` sem login | Redireciona para `login.html` | |
+| 2 | Tentar acessar `admin.html` logado como aluno | Redireciona para `login.html` | |
 | 3 | Acessar logado como admin | Painel carrega; badge exibe "admin" | |
 
 ### CT-14B — Estatísticas e Usuários

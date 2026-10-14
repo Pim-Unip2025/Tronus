@@ -21,37 +21,41 @@
 
 <form id="registerForm">
 
-<img src="img/logo.png" class="logo">
+<img src="img/logo.png" class="logo" alt="Tronus">
+
+<p id="registerMsg" class="form-msg" role="alert"></p>
 
 <div class="input-box">
-<input id="name" placeholder="Nome completo" type="text">
+<input id="name" placeholder="Nome de usuário (sem espaços)" type="text" autocomplete="username" aria-label="Nome de usuário">
 <i class='bx bx-user'></i>
 </div>
 
 <div class="input-box">
-  <input id="celular" placeholder="Celular (ex: 11999999999)" type="tel">
+  <input id="celular" placeholder="Celular (ex: 11999999999)" type="tel" autocomplete="tel" aria-label="Celular">
   <i class='bx bx-phone'></i>
 </div>
 
 <div class="input-box">
-<input id="email" placeholder="Email" type="email">
+<input id="email" placeholder="Email" type="email" autocomplete="email" aria-label="E-mail">
 <i class='bx bx-envelope'></i>
 </div>
 
 <div class="input-box">
-<input id="password" placeholder="Senha" type="password">
+<input id="password" placeholder="Senha" type="password" autocomplete="new-password" aria-label="Senha">
 <i class='bx bx-lock-alt'></i>
 </div>
 
 <div class="input-box">
-<input id="confirmPassword" placeholder="Confirmar senha" type="password">
+<input id="confirmPassword" placeholder="Confirmar senha" type="password" autocomplete="new-password" aria-label="Confirmar senha">
 <i class='bx bx-lock-alt'></i>
 </div>
 
-<button type="submit" class="login">Criar conta</button>
+<p class="form-dica">Senha: mínimo 8 caracteres, com maiúscula, minúscula, número e símbolo.</p>
+
+<button type="submit" class="login" id="registerBtn">Criar conta</button>
 
 <div class="register-link">
-<p>Já tem conta? <a href="index.html">Entrar</a></p>
+<p>Já tem conta? <a href="login.html">Entrar</a></p>
 </div>
 
 </form>
@@ -59,9 +63,8 @@
 </main>
 
 <script src="js/script.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-<script src="js/database.js"></script>
-<script src="js/register_db.js"></script>
+<script src="js/api.js"></script>
+<script src="js/cadastro.js"></script>
 
 </body>
 </html>
