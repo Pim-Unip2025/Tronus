@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap');
 
 *{
 margin:0;
@@ -385,4 +385,235 @@ color:#000;
 button.login:disabled{
 opacity:0.6;
 cursor:wait;
+}
+
+/* ============================================================
+   TEMA MEDIEVAL — telas de entrada (login, cadastro, recuperação e
+   criação de personagem) no mesmo visual escuro/dourado do jogo.
+   Sobrescreve as regras acima.
+============================================================ */
+
+:root{
+--ouro:#d4af37;
+--ouro-claro:#f5d020;
+--ouro-fraco:rgba(212,175,55,0.35);
+--pergaminho:#f0e6c8;
+--texto-suave:#c9b48a;
+}
+
+*{
+font-family:'Crimson Text',serif;
+}
+
+body{
+background:url('../img/fundob.jpg') center/cover fixed;
+padding:24px 16px;
+}
+
+/* véu escuro sobre o mapa, para o card ter contraste */
+body::before{
+content:"";
+position:fixed;
+inset:0;
+background:radial-gradient(ellipse at center, rgba(20,10,0,0.35) 0%, rgba(20,10,0,0.75) 100%);
+z-index:-1;
+pointer-events:none;
+}
+
+.logo{
+width:100%;
+max-width:320px;
+margin:0 auto 18px;
+filter:drop-shadow(0 4px 18px rgba(0,0,0,0.6));
+}
+
+.container{
+width:min(420px, 100%);
+background:linear-gradient(180deg, rgba(36,23,10,0.92), rgba(22,14,5,0.94));
+border:1px solid var(--ouro-fraco);
+border-radius:14px;
+box-shadow:0 18px 50px rgba(0,0,0,0.55), inset 0 1px 0 rgba(212,175,55,0.15);
+color:var(--pergaminho);
+padding:32px 32px 28px;
+backdrop-filter:blur(6px);
+}
+
+.character-container{
+width:min(680px, 100%);
+min-height:0;
+padding-bottom:36px;
+}
+
+.container h2{
+font-family:'Cinzel',serif;
+color:var(--ouro);
+text-align:center;
+letter-spacing:2px;
+font-size:22px;
+margin-bottom:18px;
+}
+
+.input-box{
+height:50px;
+margin:18px 0;
+}
+
+.input-box input{
+background:rgba(0,0,0,0.35);
+border:1px solid var(--ouro-fraco);
+border-radius:8px;
+color:var(--pergaminho);
+font-size:17px;
+padding:12px 44px 12px 16px;
+transition:border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-box input::placeholder{
+color:#9d8a64;
+}
+
+.input-box input:focus{
+border-color:var(--ouro);
+box-shadow:0 0 0 3px rgba(212,175,55,0.15);
+}
+
+.input-box i{
+color:var(--ouro);
+font-size:20px;
+}
+
+.remember{
+margin:-6px 0 14px;
+color:var(--texto-suave);
+font-size:15px;
+}
+
+.remember label input{
+accent-color:var(--ouro);
+}
+
+/* Botão principal dourado (era branco arredondado) */
+.login{
+height:48px;
+background:linear-gradient(180deg, #e2c04a, #b8922b);
+color:#1e1306;
+border:1px solid #8a6b1c;
+border-radius:8px;
+font-family:'Cinzel',serif;
+font-size:15px;
+font-weight:700;
+letter-spacing:2px;
+text-transform:uppercase;
+box-shadow:0 4px 14px rgba(0,0,0,0.35);
+transition:filter 0.2s, transform 0.1s;
+}
+
+.login:hover{
+background:linear-gradient(180deg, #ecd062, #c49c30);
+color:#1e1306;
+filter:brightness(1.05);
+}
+
+.login:active{
+transform:translateY(1px);
+}
+
+/* Botão secundário (contorno) */
+.login.secundario{
+background:transparent;
+color:var(--ouro);
+border:1px solid var(--ouro-fraco);
+box-shadow:none;
+}
+
+.login.secundario:hover{
+background:rgba(212,175,55,0.1);
+color:var(--ouro);
+}
+
+.register-link{
+color:var(--texto-suave);
+font-size:15px;
+}
+
+.register-link a{
+color:var(--ouro);
+font-weight:600;
+}
+
+.register-link a:hover{
+text-decoration:underline;
+}
+
+.voltar-inicio{
+display:block;
+text-align:center;
+margin-top:14px;
+font-size:14px;
+color:#9d8a64;
+text-decoration:none;
+}
+
+.voltar-inicio:hover{
+color:var(--ouro);
+}
+
+.form-dica{
+color:var(--texto-suave);
+}
+
+/* Criação de personagem */
+.progress-bar::before{
+background:rgba(212,175,55,0.2);
+}
+
+.circle{
+background:rgba(0,0,0,0.45);
+border:1px solid var(--ouro-fraco);
+color:#9d8a64;
+font-family:'Cinzel',serif;
+}
+
+.progress-step.active .circle{
+background:linear-gradient(180deg, #e2c04a, #b8922b);
+border-color:#8a6b1c;
+color:#1e1306;
+}
+
+.progress-step p{
+font-family:'Cinzel',serif;
+color:var(--texto-suave);
+font-size:13px;
+}
+
+.character-card{
+background:rgba(0,0,0,0.35);
+border:1px solid var(--ouro-fraco);
+}
+
+.character-card:hover{
+border-color:var(--ouro);
+transform:translateY(-4px);
+}
+
+.character-card.selected{
+border:2px solid var(--ouro);
+box-shadow:0 0 18px rgba(212,175,55,0.35);
+}
+
+.character-sheet{
+background:rgba(0,0,0,0.3);
+border:1px solid var(--ouro-fraco);
+}
+
+.gender-buttons .login{
+min-width:150px;
+}
+
+@media (max-width:520px){
+.container{ padding:24px 20px 22px; }
+.character-sheet{ flex-direction:column; gap:20px; }
+.characters{ gap:10px; }
+.character-card img{ width:64px; }
+.gender-buttons{ flex-direction:column; gap:10px; }
 }
