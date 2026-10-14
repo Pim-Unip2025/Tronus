@@ -218,3 +218,16 @@ async function comCarregando(botao, acao, textoCarregando = "Aguarde...") {
     botao.textContent = original;
   }
 }
+
+/**
+ * Tira o efeito de "carregando" (classe .carregando, em css/comum.css) de
+ * tudo que estiver dentro de `raiz`. Chamar quando os dados chegarem.
+ */
+function pronto(raiz = document) {
+  raiz.querySelectorAll(".carregando").forEach((el) => el.classList.remove("carregando"));
+}
+
+/** Cards fantasmas enquanto uma lista carrega. */
+function esqueletos(quantidade, classe) {
+  return Array.from({ length: quantidade }, () => `<div class="${classe} esqueleto carregando" aria-hidden="true"></div>`).join("");
+}
