@@ -157,7 +157,6 @@
     }
   </style>
 </head>
-<script src="js/sidebar.js"></script>
 <body>
 
   <div class="topbar">
@@ -221,26 +220,18 @@
   </div>
 
   <script src="js/theme.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-  <script src="js/database.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
 
   <script>
-    initDatabase().then(() => {
-      const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado"))
-             || JSON.parse(localStorage.getItem("usuarioLogado"));
-      if (!usuario) { window.location.href = "login.html"; return; }
+    Sessao.exigir("aluno");
 
-      const personagem = buscarPersonagem(usuario.id);
-      if (!personagem) { window.location.href = "character.html"; return; }
-
-      const resumo = buscarResumoGeral(personagem.id);
+    Promise.all([api.meuResumo(), api.minhasEstatisticas()]).then(([resumo, stats]) => {
       document.getElementById("rTotalRespostas").innerText = resumo.total_respostas || 0;
       document.getElementById("rTotalAcertos").innerText   = resumo.total_acertos  || 0;
       document.getElementById("rTaxaGeral").innerText      = (resumo.taxa_geral || 0) + "%";
       document.getElementById("rEstrelas").innerText       = resumo.total_estrelas || 0;
       document.getElementById("rFasesCompletas").innerText = resumo.fases_completas || 0;
-
-      const stats = buscarEstatisticas(personagem.id);
 
       // Agrupa por reino para o gráfico
       const reinoMap = {};
@@ -288,8 +279,8 @@
         }
 
         tr.innerHTML = `
-          <td class="reino-badge">${row.reino !== lastReino ? row.reino : ""}</td>
-          <td class="fase-nome">${row.fase}</td>
+          <td class="reino-badge">${row.reino !== lastReino ? escapar(row.reino) : ""}</td>
+          <td class="fase-nome">${escapar(row.fase)}</td>
           <td>${row.tentativas || 0}</td>
           <td>${row.acertos || 0}</td>
           <td>${pct}%</td>
@@ -305,6 +296,11 @@
           Nenhuma questão respondida ainda. Acesse um reino e complete um quiz!
         </td></tr>`;
       }
+    }).catch((erro) => {
+      // 404 = o aluno ainda não criou o personagem.
+      if (erro.status === 404) return window.location.replace("character.html");
+      document.getElementById("tabelaBody").innerHTML =
+        `<tr><td colspan="7" class="dash-vazio">${escapar(erro.message)}</td></tr>`;
     });
   </script>
 </body>

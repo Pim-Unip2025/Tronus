@@ -4,10 +4,8 @@
 
 function criarSidebar() {
 
-  const usuario = JSON.parse(
-    sessionStorage.getItem("usuarioLogado") ||
-    localStorage.getItem("usuarioLogado") || "{}"
-  );
+  // Sessao vem do js/api.js, carregado antes deste arquivo.
+  const usuario = (typeof Sessao !== "undefined" && Sessao.usuario) || {};
   const papel = usuario.papel || 'aluno';
 
   const painelLink = papel === 'professor'
@@ -44,11 +42,6 @@ function criarSidebar() {
         </a>
 
         ${painelLink}
-
-        <a class="sidebar-item" onclick="fecharSidebar(); alert('Em breve!')">
-          <i class='bx bx-cog'></i>
-          Configurações
-        </a>
 
         <button id="temaBtn" onclick="alternarTema()">
           <i class='bx bx-sun'></i> Modo Claro
@@ -92,13 +85,7 @@ function fecharSidebar() {
 
 function logout() {
   if (!confirm("Tem certeza que deseja sair?")) return;
-  sessionStorage.removeItem("usuarioLogado");
-  localStorage.removeItem("usuarioLogado");
-  sessionStorage.removeItem("reinoSelecionado");
-  localStorage.removeItem("reinoSelecionado");
-  sessionStorage.removeItem("personagemId");
-  localStorage.removeItem("personagemId");
-  window.location.href = "index.html";
+  Sessao.sair();
 }
 
 criarSidebar();

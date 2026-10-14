@@ -502,3 +502,56 @@ body::before {
   .libras-grid { grid-template-columns: 1fr 1fr; }
   .libras-fab { bottom: 16px; right: 16px; }
 }
+
+/* Alternativa marcada (a correção só aparece no fim da fase) */
+.quiz-alt-btn.alt-escolhida {
+  border-color: #d4af37;
+  background: rgba(212, 175, 55, 0.18);
+  box-shadow: 0 0 0 1px #d4af37 inset;
+}
+
+.btn-proximo:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+button.fase-circulo {
+  font: inherit;
+  color: inherit;
+  padding: 0;
+}
+
+.trilha-erro {
+  color: #ffd2ca;
+  text-align: center;
+}
+
+/* Correção exibida no resultado */
+.quiz-correcao {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  text-align: left;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.quiz-correcao li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.quiz-correcao .corr-ok {
+  background: rgba(62, 155, 79, 0.15);
+  border: 1px solid rgba(62, 155, 79, 0.5);
+}
+
+.quiz-correcao .corr-erro {
+  background: rgba(192, 80, 63, 0.15);
+  border: 1px solid rgba(192, 80, 63, 0.5);
+}
