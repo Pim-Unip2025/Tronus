@@ -555,3 +555,124 @@ button.fase-circulo {
   background: rgba(192, 80, 63, 0.15);
   border: 1px solid rgba(192, 80, 63, 0.5);
 }
+
+/* ============================================================
+   TRILHA — cabeçalho do Reino e fases com informação ao lado
+============================================================ */
+.trilha-wrap { padding: 36px 20px 80px; }
+
+.trilha-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  width: min(520px, 100%);
+  margin-bottom: 40px;
+  padding: 18px 22px;
+  background: linear-gradient(180deg, rgba(36,23,10,0.92), rgba(22,14,5,0.94));
+  border: 1px solid rgba(212,175,55,0.35);
+  border-radius: 14px;
+  box-shadow: 0 12px 34px rgba(0,0,0,0.45);
+}
+.trilha-arte { width: 74px; height: 110px; object-fit: cover; border-radius: 8px; border: 1px solid rgba(212,175,55,0.5); }
+.trilha-info { flex: 1; min-width: 0; }
+.trilha-tag { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 3px; color: #d4af37; text-transform: uppercase; }
+.trilha-nome { font-family: 'Cinzel', serif; font-size: 26px; color: #f0e6c8; margin: 2px 0 12px; letter-spacing: 1px; }
+.trilha-barra { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.trilha-barra div { height: 100%; background: linear-gradient(90deg, #a8862a, #f5d020); border-radius: 4px; }
+.trilha-meta { display: block; margin-top: 8px; font-size: 14px; color: #c9b48a; }
+
+/* Cada fase: círculo à esquerda, informação à direita, linha ligando */
+.fase-item {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  column-gap: 22px;
+  align-items: center;
+  width: min(520px, 100%);
+}
+.fase-item:not(:last-child)::after {
+  grid-column: 1;
+  justify-self: center;
+  height: 44px;
+  margin: 6px 0;
+}
+.fase-info {
+  background: rgba(20,12,4,0.78);
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.fase-info:hover { border-color: rgba(212,175,55,0.6); }
+.fase-item-bloqueada .fase-info { cursor: default; opacity: 0.75; }
+.fase-item-bloqueada .fase-info:hover { border-color: rgba(212,175,55,0.25); }
+
+.fase-label {
+  font-family: 'Cinzel', serif;
+  font-size: 17px;
+  font-style: normal;
+  color: #f0e6c8;
+  margin: 0;
+}
+.fase-estrelas { margin: 6px 0 4px; }
+.fase-estrelas i { font-size: 18px; font-style: normal; }
+.fase-situacao { font-size: 14px; color: #c9b48a; }
+
+/* Fase bloqueada visível (antes sumia no fundo) */
+.fase-circulo.bloqueada {
+  opacity: 1;
+  filter: none;
+  border-color: rgba(212,175,55,0.3);
+  background: radial-gradient(circle at 30% 30%, rgba(80,70,50,0.6), rgba(15,9,3,0.95));
+}
+.fase-lock { font-size: 28px; filter: grayscale(0.4); }
+
+@media (max-width: 520px) {
+  .trilha-cabecalho { gap: 14px; padding: 14px; }
+  .trilha-arte { width: 54px; height: 80px; }
+  .trilha-nome { font-size: 20px; }
+  .fase-item { grid-template-columns: 70px 1fr; column-gap: 14px; }
+  .fase-circulo { width: 70px; height: 70px; }
+}
+
+/* ============================================================
+   QUIZ EM PERGAMINHO (era um modal branco destoando do jogo)
+============================================================ */
+.modal-quiz {
+  background: linear-gradient(180deg, #f7eed6 0%, #ecdcb4 100%);
+  border: 2px solid #a8862a;
+  color: #2a1a08;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.6), inset 0 0 40px rgba(168,134,42,0.18);
+}
+.modal-quiz .btn-fechar-quiz { color: #8a6b1c; }
+.modal-quiz .btn-fechar-quiz:hover { color: #2a1a08; }
+.quiz-fase-nome { color: #5a3d0c; }
+.quiz-prog-texto { color: #7a5a20; }
+.quiz-progress-bar-bg { background: rgba(120,90,30,0.18); }
+.quiz-question {
+  font-size: 18px;
+  color: #2a1a08;
+  background: rgba(255,255,255,0.45);
+  border-left: 3px solid #a8862a;
+}
+.modal-quiz .quiz-alt-btn {
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(120,90,30,0.3);
+  color: #2a1a08;
+  font-size: 16px;
+}
+.modal-quiz .quiz-alt-btn:hover:not(:disabled) {
+  background: rgba(255,255,255,0.8);
+  border-color: #a8862a;
+}
+.modal-quiz .alt-letra { color: #8a6b1c; }
+.modal-quiz .quiz-alt-btn.alt-escolhida {
+  background: rgba(212,175,55,0.3);
+  border-color: #a8862a;
+  box-shadow: 0 0 0 1px #a8862a inset;
+}
+.score-text { color: #4a3412; }
+.score-text strong { color: #2a1a08; }
+.quiz-correcao .corr-ok { color: #1f4d26; }
+.quiz-correcao .corr-erro { color: #6b2318; }
+.quiz-feedback.feedback-errado { color: #8a2a1a; }

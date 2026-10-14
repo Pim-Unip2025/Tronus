@@ -67,7 +67,7 @@
     /* CARDS DE STATS */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px,1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 14px; margin-bottom: 12px;
     }
     .stat-card {
@@ -190,6 +190,10 @@
         <span class="stat-val carregando" id="sRespostas">00</span>
         <div class="stat-label">Respostas registradas</div>
       </div>
+      <div class="stat-card">
+        <span class="stat-val carregando" id="sTaxa">00</span>
+        <div class="stat-label">Acerto geral</div>
+      </div>
     </div>
 
     <!-- LISTA DE USUÁRIOS -->
@@ -206,26 +210,6 @@
     <!-- TOAST -->
     <div class="toast-adm" id="toastAdm"></div>
 
-    <!-- MÓDULOS EM DESENVOLVIMENTO -->
-    <h3 class="section-titulo">Módulos Previstos (próximas versões)</h3>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-      <div class="em-desenvolvimento">
-        <i class='bx bx-buildings'></i>
-        Gestão de Turmas
-      </div>
-      <div class="em-desenvolvimento">
-        <i class='bx bx-link'></i>
-        Vincular Professores a Turmas
-      </div>
-      <div class="em-desenvolvimento">
-        <i class='bx bx-star'></i>
-        Configurar Regras de XP
-      </div>
-      <div class="em-desenvolvimento">
-        <i class='bx bx-bar-chart-square'></i>
-        Relatórios Gerais Exportáveis
-      </div>
-    </div>
 
   </div>
 
@@ -253,6 +237,7 @@
         document.getElementById("sPersonagens").textContent = s.personagens;
         document.getElementById("sQuestoes").textContent = s.questoes;
         document.getElementById("sRespostas").textContent = s.respostas;
+        document.getElementById("sTaxa").textContent = `${s.taxa_acerto}%`;
         pronto(document.querySelector(".stats-grid"));
       } catch (erro) {
         mostrarToastAdm(erro.message);

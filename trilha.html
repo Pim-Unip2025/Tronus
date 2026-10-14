@@ -145,10 +145,27 @@
       const wrap = document.getElementById("trilhaWrap");
       wrap.innerHTML = "";
 
+      // Cabeçalho do Reino: arte, nome e progresso
+      const ICONES = { "Python": "img/python.png", "C++": "img/c++.png", "Engenharia de Software": "img/soft.png", "Banco de Dados": "img/bd.png", "Redes": "img/redes.png" };
+      const total = reino.fases.reduce((s, f) => s + f.estrelas, 0);
+      const max = reino.fases.length * 3;
+      const cab = document.createElement("div");
+      cab.className = "trilha-cabecalho";
+      cab.innerHTML = `
+        ${ICONES[reino.nome] ? `<img class="trilha-arte" src="${escapar(ICONES[reino.nome])}" alt="">` : ""}
+        <div class="trilha-info">
+          <span class="trilha-tag">Reino</span>
+          <h1 class="trilha-nome">${escapar(reino.nome)}</h1>
+          <div class="trilha-barra"><div style="width:${max ? (total / max) * 100 : 0}%"></div></div>
+          <span class="trilha-meta">${total} de ${max} estrelas · ${total === max ? "Reino dominado! 👑" : "conquiste as 3 fases para dominar o Reino"}</span>
+        </div>`;
+      wrap.appendChild(cab);
+
       reino.fases.forEach((fase, index) => {
         const desbloqueada = index === 0 || reino.fases[index - 1].estrelas > 0;
         const item = document.createElement("div");
         item.classList.add("fase-item");
+        if (!desbloqueada) item.classList.add("fase-item-bloqueada");
 
         const circulo = document.createElement(desbloqueada ? "button" : "div");
         circulo.classList.add("fase-circulo");
@@ -162,21 +179,26 @@
           circulo.onclick = () => abrirQuiz(fase);
         } else {
           circulo.setAttribute("aria-label", `${fase.nome} bloqueada`);
-          circulo.innerHTML = `<i class='bx bxs-lock fase-lock-icon'></i>`;
+          circulo.innerHTML = `<span class="fase-lock" aria-hidden="true">🔒</span>`;
         }
 
-        const estrelas = document.createElement("div");
-        estrelas.classList.add("fase-estrelas");
-        estrelas.setAttribute("aria-label", `${fase.estrelas} de 3 estrelas`);
-        for (let i = 0; i < 3; i++) {
-          estrelas.insertAdjacentHTML("beforeend", `<i class='bx bxs-star ${i < fase.estrelas ? "ativa" : ""}'></i>`);
-        }
+        const situacao = !desbloqueada
+          ? "Conquiste ao menos 1 estrela na fase anterior"
+          : fase.estrelas === 3 ? "Fase conquistada"
+          : fase.estrelas > 0 ? "Jogue de novo para chegar a 3 estrelas"
+          : "Disponível — toque para jogar";
 
-        const label = document.createElement("div");
-        label.classList.add("fase-label");
-        label.textContent = fase.nome;
+        const info = document.createElement("div");
+        info.className = "fase-info";
+        info.innerHTML = `
+          <div class="fase-label">${escapar(fase.nome)}</div>
+          <div class="fase-estrelas" aria-label="${fase.estrelas} de 3 estrelas">
+            ${[0, 1, 2].map((i) => `<i class='${i < fase.estrelas ? "ativa" : ""}'>★</i>`).join("")}
+          </div>
+          <div class="fase-situacao">${situacao}</div>`;
+        if (desbloqueada) info.onclick = () => abrirQuiz(fase);
 
-        item.append(circulo, estrelas, label);
+        item.append(circulo, info);
         wrap.appendChild(item);
       });
     }
