@@ -151,16 +151,32 @@
     }
     .grafico-label { flex: 1; text-align: center; font-size: 10px; color: #a89060; font-style: italic; }
 
+    /* Barras horizontais: todos os Reinos na mesma escala de 0 a 100% */
+    .barras-reino { display: flex; flex-direction: column; gap: 14px; }
+    .barra-linha { display: grid; grid-template-columns: 170px 1fr 92px; align-items: center; gap: 14px; }
+    .barra-nome { font-family: 'Cinzel', serif; font-size: 14px; color: #f0e6c8; }
+    .barra-trilho { height: 14px; background: rgba(255,255,255,0.08); border-radius: 7px; overflow: hidden; }
+    .barra-cheia { height: 100%; background: linear-gradient(90deg, #a8862a, #f5d020); border-radius: 7px; }
+    .barra-valor { font-family: 'Cinzel', serif; font-size: 14px; color: #d4af37; text-align: right; }
+    .barra-valor.vazio { color: #8a7a5a; font-family: 'Crimson Text', serif; font-style: italic; font-size: 13px; }
+    .grafico-nota { margin-top: 16px; font-size: 13px; color: #a89060; font-style: italic; }
+    a.back-btn { text-decoration: none; display: inline-block; }
+    @media (max-width: 560px) {
+      .barra-linha { grid-template-columns: 1fr 80px; row-gap: 6px; }
+      .barra-nome { grid-column: 1 / -1; }
+    }
+
     @media (max-width:480px) {
       .topbar { padding: 12px 16px; }
       .resumo-grid { grid-template-columns: 1fr 1fr; }
     }
   </style>
+  <link rel="stylesheet" href="css/comum.css">
 </head>
 <body>
 
   <div class="topbar">
-    <button class="back-btn" onclick="history.back()">← Voltar</button>
+    <a class="back-btn" href="reinos.html">← Reinos</a>
     <span class="page-title">Análise de Desempenho</span>
   </div>
 
@@ -194,8 +210,8 @@
     <!-- GRÁFICO POR REINO -->
     <h3 class="section-titulo">Taxa de Acerto por Reino</h3>
     <div class="grafico-wrap">
-      <div class="grafico-cols" id="graficoCols"></div>
-      <div class="grafico-labels" id="graficoLabels"></div>
+      <div class="barras-reino" id="barrasReino"></div>
+      <p class="grafico-nota">Percentual de questões respondidas corretamente em cada Reino, somando todas as tentativas.</p>
     </div>
 
     <!-- TABELA DETALHADA -->
@@ -233,37 +249,29 @@
       document.getElementById("rEstrelas").innerText       = resumo.total_estrelas || 0;
       document.getElementById("rFasesCompletas").innerText = resumo.fases_completas || 0;
 
-      // Agrupa por reino para o gráfico
-      const reinoMap = {};
-      stats.forEach(row => {
-        if (!reinoMap[row.reino]) reinoMap[row.reino] = { acertos: 0, tentativas: 0 };
-        reinoMap[row.reino].acertos    += Number(row.acertos    || 0);
-        reinoMap[row.reino].tentativas += Number(row.tentativas || 0);
+      // Gráfico: um Reino por linha, todos na mesma escala (0 a 100%)
+      const porReino = {};
+      stats.forEach((row) => {
+        porReino[row.reino] ??= { acertos: 0, tentativas: 0 };
+        porReino[row.reino].acertos += Number(row.acertos || 0);
+        porReino[row.reino].tentativas += Number(row.tentativas || 0);
       });
-
-      const reinoNomes = Object.keys(reinoMap);
-      const graficoCols   = document.getElementById("graficoCols");
-      const graficoLabels = document.getElementById("graficoLabels");
-
-      reinoNomes.forEach(nome => {
-        const d   = reinoMap[nome];
-        const pct = d.tentativas > 0 ? Math.round((d.acertos / d.tentativas) * 100) : 0;
-        const h   = Math.max(4, (pct / 100) * 120);
-
-        const col = document.createElement("div");
-        col.classList.add("grafico-col");
-        col.innerHTML = `
-          <span class="grafico-pct">${pct}%</span>
-          <div class="grafico-barra-wrap">
-            <div class="grafico-barra" style="height:${h}px"></div>
-          </div>
-        `;
-        graficoCols.appendChild(col);
-
-        const lbl = document.createElement("div");
-        lbl.classList.add("grafico-label");
-        lbl.innerText = nome.length > 6 ? nome.substring(0,6) + "." : nome;
-        graficoLabels.appendChild(lbl);
+      api.reinos().catch(() => []).then((reinos) => {
+        const nomes = reinos.length ? reinos.map((r) => r.nome) : Object.keys(porReino);
+        document.getElementById("barrasReino").innerHTML = nomes
+          .map((nome) => {
+            const d = porReino[nome];
+            const pct = d && d.tentativas > 0 ? Math.round((d.acertos / d.tentativas) * 100) : null;
+            return `
+              <div class="barra-linha">
+                <span class="barra-nome">${escapar(nome)}</span>
+                <div class="barra-trilho" role="img" aria-label="${escapar(nome)}: ${pct === null ? "sem respostas" : pct + "% de acerto"}">
+                  <div class="barra-cheia" style="width:${pct ?? 0}%"></div>
+                </div>
+                <span class="barra-valor ${pct === null ? "vazio" : ""}">${pct === null ? "sem respostas" : pct + "%"}</span>
+              </div>`;
+          })
+          .join("");
       });
 
       // Tabela detalhada
