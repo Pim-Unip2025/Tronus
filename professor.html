@@ -9,6 +9,10 @@
   <link rel="stylesheet" href="css/sidebar.css">
   <title>Painel do Professor — TRONUS</title>
   <style>
+    button.aluno-header { width:100%; font:inherit; color:inherit; background:none; border:none; text-align:left; cursor:pointer; }
+    button.aluno-header:disabled { cursor:default; }
+    .questao-alts { list-style:none; margin:6px 0 0; padding:0; font-size:13px; color:#a89060; }
+    .questao-alts .correta { color:#86efac; font-weight:600; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       min-height: 100vh;
@@ -275,7 +279,6 @@
     }
   </style>
 </head>
-<script src="js/sidebar.js"></script>
 <body>
 
   <div class="topbar">
@@ -356,7 +359,8 @@
         <i class='bx bx-search search-ico'></i>
         <input class="search-input" id="searchInput"
                placeholder="Buscar aluno pelo nome de usuário..."
-               oninput="buscarAluno(this.value)">
+               aria-label="Buscar aluno"
+               oninput="agendarBusca(this.value)">
       </div>
 
       <div id="resultadoAlunos">
@@ -371,122 +375,125 @@
   <div class="toast" id="toast"></div>
 
   <script src="js/theme.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-  <script src="js/database.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
   <script>
+    Sessao.exigir("professor");
 
-    let professorUsuario = null;
-    let faseAtualId      = null;
-    let reinoId          = null;
-    let reinoNome        = null;
+    let faseAtualId = null;
+    let reinoNome = null;
 
     // ────────────────────────────────────────────
-    // INIT
+    // INIT — o Reino vem da API (o admin pode ter trocado desde o login)
     // ────────────────────────────────────────────
-    initDatabase().then(() => {
-      const u = JSON.parse(sessionStorage.getItem("usuarioLogado"))
-             || JSON.parse(localStorage.getItem("usuarioLogado"));
-
-      if (!u || u.papel !== 'professor') {
-        window.location.href = "login.html";
-        return;
+    async function iniciar() {
+      let eu;
+      try {
+        eu = await api.eu();
+        Sessao.atualizarUsuario(eu);
+      } catch (erro) {
+        return mostrarToast(erro.message);
       }
+      document.getElementById("profBadge").textContent = eu.nome;
 
-      professorUsuario = u;
-      document.getElementById("profBadge").innerText = u.nome;
-
-      reinoId = u.professor_reino_id;
-
-      if (!reinoId) {
+      if (!eu.professor_reino_id) {
         document.getElementById("listaQuestoes").innerHTML =
           `<div class="estado-vazio">Nenhum reino associado a este professor. Contate o administrador.</div>`;
         document.getElementById("selectFase").disabled = true;
         return;
       }
 
-      // Busca nome do reino para filtrar desempenho dos alunos
-      const rRes = db.exec(`SELECT nome FROM reinos WHERE id = ?`, [reinoId]);
-      reinoNome  = rRes[0]?.values[0][0] || null;
-
-      // Atualiza título da aba de questões com o nome do reino
-      if (reinoNome) {
-        document.querySelector('#tab-questoes .section-titulo').innerText =
-          `Gerenciar Questões — Reino ${reinoNome}`;
-        document.querySelector('#tab-alunos .section-titulo').innerText =
-          `Desempenho dos Alunos — Reino ${reinoNome}`;
+      try {
+        const [reinos, fases] = await Promise.all([api.reinos(), api.fases(eu.professor_reino_id)]);
+        reinoNome = reinos.find((r) => r.id === eu.professor_reino_id)?.nome ?? null;
+        if (reinoNome) {
+          document.querySelector("#tab-questoes .section-titulo").textContent = `Gerenciar Questões — Reino ${reinoNome}`;
+          document.querySelector("#tab-alunos .section-titulo").textContent = `Desempenho dos Alunos — Reino ${reinoNome}`;
+        }
+        const sel = document.getElementById("selectFase");
+        fases.forEach((f) => sel.add(new Option(f.nome, f.id)));
+      } catch (erro) {
+        mostrarToast(erro.message);
       }
-
-      // Popula select de fases
-      const fases = buscarFasesPorReino(reinoId);
-      const sel   = document.getElementById("selectFase");
-      fases.forEach(f => {
-        const opt = document.createElement("option");
-        opt.value = f.id;
-        opt.text  = f.nome;
-        sel.appendChild(opt);
-      });
-    });
+    }
 
     // ────────────────────────────────────────────
     // TABS
     // ────────────────────────────────────────────
     function mostrarTab(tab) {
-      document.getElementById("tab-questoes").style.display = tab === 'questoes' ? 'block' : 'none';
-      document.getElementById("tab-alunos").style.display   = tab === 'alunos'   ? 'block' : 'none';
-      document.getElementById("tabBtnQuestoes").classList.toggle("ativo", tab === 'questoes');
-      document.getElementById("tabBtnAlunos").classList.toggle("ativo",   tab === 'alunos');
+      document.getElementById("tab-questoes").style.display = tab === "questoes" ? "block" : "none";
+      document.getElementById("tab-alunos").style.display = tab === "alunos" ? "block" : "none";
+      document.getElementById("tabBtnQuestoes").classList.toggle("ativo", tab === "questoes");
+      document.getElementById("tabBtnAlunos").classList.toggle("ativo", tab === "alunos");
     }
 
     // ────────────────────────────────────────────
     // QUESTÕES
     // ────────────────────────────────────────────
     function carregarQuestoes() {
-      const sel   = document.getElementById("selectFase");
+      const sel = document.getElementById("selectFase");
       faseAtualId = sel.value ? Number(sel.value) : null;
       const lista = document.getElementById("listaQuestoes");
       const btnNova = document.getElementById("btnNovaQuestao");
-
-      // Esconde form ao trocar de fase
-      document.getElementById("formQuestao").style.display = 'none';
+      document.getElementById("formQuestao").style.display = "none";
 
       if (!faseAtualId) {
         lista.innerHTML = `<div class="estado-vazio">Selecione uma fase para ver as questões.</div>`;
-        btnNova.style.display = 'none';
+        btnNova.style.display = "none";
         return;
       }
-
-      btnNova.style.display = 'flex';
+      btnNova.style.display = "flex";
       renderQuestoes();
     }
 
-    function renderQuestoes() {
-      const lista   = document.getElementById("listaQuestoes");
-      const questoes = listarQuestoesDaFase(faseAtualId);
+    async function renderQuestoes() {
+      const lista = document.getElementById("listaQuestoes");
+      lista.innerHTML = `<div class="estado-vazio">Carregando...</div>`;
+      let questoes;
+      try {
+        questoes = await api.questoesGestao(faseAtualId);
+      } catch (erro) {
+        lista.innerHTML = `<div class="estado-vazio">${escapar(erro.message)}</div>`;
+        return;
+      }
 
       if (!questoes.length) {
         lista.innerHTML = `<div class="estado-vazio">Nenhuma questão nesta fase ainda.</div>`;
         return;
       }
 
-      lista.innerHTML = questoes.map((q, i) => `
+      lista.innerHTML = questoes
+        .map(
+          (q, i) => `
         <div class="questao-item">
           <span class="questao-num">${i + 1}.</span>
           <div style="flex:1">
-            <div class="questao-texto">${q.enunciado}</div>
-            <div class="questao-meta">${q.nivel_dificuldade} · ${q.total_alts} alternativas</div>
+            <div class="questao-texto" style="white-space:pre-line">${escapar(q.enunciado)}</div>
+            <div class="questao-meta">${escapar(q.nivel_dificuldade)} · ${q.alternativas.length} alternativas</div>
+            <ul class="questao-alts">
+              ${q.alternativas
+                .map((a) => `<li class="${a.correta ? "correta" : ""}">${a.correta ? "✓" : ""} ${escapar(a.letra)}) ${escapar(a.texto)}</li>`)
+                .join("")}
+            </ul>
           </div>
-          <button class="btn-excluir" onclick="deletarQuestao(${q.id})">
+          <button class="btn-excluir" type="button" onclick="deletarQuestao(${q.id}, this)">
             <i class='bx bx-trash'></i> Excluir
           </button>
         </div>
-      `).join('');
+      `,
+        )
+        .join("");
     }
 
-    function deletarQuestao(id) {
+    async function deletarQuestao(id, btn) {
       if (!confirm("Excluir esta questão? Esta ação também remove as respostas dos alunos relacionadas.")) return;
-      excluirQuestao(id);
-      renderQuestoes();
-      mostrarToast("Questão excluída.");
+      try {
+        const r = await comCarregando(btn, () => api.excluirQuestao(id), "Excluindo...");
+        mostrarToast(`Questão excluída (${r.respostas_apagadas} respostas de alunos apagadas).`);
+        renderQuestoes();
+      } catch (erro) {
+        mostrarToast(erro.message);
+      }
     }
 
     // ────────────────────────────────────────────
@@ -494,48 +501,57 @@
     // ────────────────────────────────────────────
     function toggleForm() {
       const form = document.getElementById("formQuestao");
-      const aberto = form.style.display !== 'none';
-      form.style.display = aberto ? 'none' : 'block';
+      const aberto = form.style.display !== "none";
+      form.style.display = aberto ? "none" : "block";
       if (!aberto) renderAltsForm();
     }
 
     function renderAltsForm() {
-      const letras = ['A','B','C','D','E'];
-      document.getElementById("altsGrid").innerHTML = letras.map(l => `
+      document.getElementById("altsGrid").innerHTML = ["A", "B", "C", "D", "E"]
+        .map(
+          (l) => `
         <div class="alt-row">
           <span class="alt-letra">${l}</span>
-          <input type="radio" name="altCorreta" value="${l}" class="alt-radio" title="Marcar como correta">
-          <input type="text" class="alt-input" id="alt${l}" placeholder="Texto da alternativa ${l}">
+          <input type="radio" name="altCorreta" value="${l}" class="alt-radio" title="Marcar como correta" aria-label="Alternativa ${l} é a correta">
+          <input type="text" class="alt-input" id="alt${l}" maxlength="500" placeholder="Texto da alternativa ${l}" aria-label="Texto da alternativa ${l}">
         </div>
-      `).join('');
+      `,
+        )
+        .join("");
     }
 
-    function salvarQuestao() {
-      if (!faseAtualId) { mostrarToast("Selecione uma fase primeiro."); return; }
+    async function salvarQuestao() {
+      if (!faseAtualId) return mostrarToast("Selecione uma fase primeiro.");
 
       const enunciado = document.getElementById("fEnunciado").value.trim();
-      const nivel     = document.getElementById("fNivel").value;
-
-      if (!enunciado) { mostrarToast("Preencha o enunciado."); return; }
+      const nivel = document.getElementById("fNivel").value;
+      if (!enunciado) return mostrarToast("Preencha o enunciado.");
 
       const correta = document.querySelector('input[name="altCorreta"]:checked')?.value;
-      if (!correta) { mostrarToast("Marque a alternativa correta."); return; }
+      if (!correta) return mostrarToast("Marque a alternativa correta.");
 
-      const letras = ['A','B','C','D','E'];
-      const alts   = [];
-      for (const l of letras) {
-        const texto = document.getElementById(`alt${l}`).value.trim();
-        if (!texto) continue; // alternativas em branco são ignoradas
-        alts.push({ letra: l, texto, correta: l === correta });
+      // Alternativas em branco são ignoradas e as letras são refeitas em
+      // sequência (A, B, C...), como a API espera.
+      const preenchidas = ["A", "B", "C", "D", "E"]
+        .map((l) => ({ l, texto: document.getElementById(`alt${l}`).value.trim() }))
+        .filter((a) => a.texto);
+      if (preenchidas.length < 2) return mostrarToast("Preencha ao menos 2 alternativas.");
+      if (!preenchidas.some((a) => a.l === correta)) return mostrarToast("A alternativa marcada como correta deve ser preenchida.");
+
+      const alternativas = preenchidas.map((a, i) => ({ letra: "ABCDE"[i], texto: a.texto, correta: a.l === correta }));
+
+      try {
+        await comCarregando(
+          document.querySelector(".btn-salvar"),
+          () => api.criarQuestao(faseAtualId, { enunciado, nivel_dificuldade: nivel, alternativas }),
+          "Salvando...",
+        );
+      } catch (erro) {
+        return mostrarToast(erro.message);
       }
-      if (alts.length < 2) { mostrarToast("Preencha ao menos 2 alternativas."); return; }
-      if (!alts.find(a => a.correta)) { mostrarToast("A alternativa marcada como correta deve ser preenchida."); return; }
 
-      criarQuestao(faseAtualId, enunciado, nivel, alts);
-
-      // Reset form
-      document.getElementById("fEnunciado").value = '';
-      document.getElementById("formQuestao").style.display = 'none';
+      document.getElementById("fEnunciado").value = "";
+      document.getElementById("formQuestao").style.display = "none";
       renderQuestoes();
       mostrarToast("Questão criada com sucesso!");
     }
@@ -543,89 +559,105 @@
     // ────────────────────────────────────────────
     // ALUNOS
     // ────────────────────────────────────────────
-    function buscarAluno(nome) {
+    let buscaTimer = null;
+    function agendarBusca(nome) {
+      clearTimeout(buscaTimer);
+      buscaTimer = setTimeout(() => buscarAluno(nome), 300);
+    }
+
+    async function buscarAluno(nome) {
       const area = document.getElementById("resultadoAlunos");
       if (!nome || nome.trim().length < 2) {
         area.innerHTML = `<div class="estado-vazio">Digite ao menos 2 caracteres para buscar.</div>`;
         return;
       }
 
-      const alunos = buscarAlunosPorNome(nome.trim());
+      let alunos;
+      try {
+        alunos = await api.buscarAlunos(nome.trim());
+      } catch (erro) {
+        area.innerHTML = `<div class="estado-vazio">${escapar(erro.message)}</div>`;
+        return;
+      }
 
       if (!alunos.length) {
         area.innerHTML = `<div class="estado-vazio">Nenhum aluno encontrado com esse nome.</div>`;
         return;
       }
 
-      area.innerHTML = alunos.map(a => {
-        const temPersonagem = !!a.pid;
-        return `
+      area.innerHTML = alunos
+        .map((a) => {
+          const temPersonagem = !!a.personagem_id;
+          return `
           <div class="aluno-card">
-            <div class="aluno-header" onclick="toggleAluno(this, ${a.pid || 0})">
+            <button class="aluno-header" type="button" data-usuario="${a.usuario_id}" ${temPersonagem ? "" : "disabled"}>
               <div class="aluno-avatar-placeholder">🧙</div>
               <div class="aluno-info">
-                <div class="aluno-nome">${a.usuario_nome}</div>
-                <div class="aluno-sub">${temPersonagem ? `${a.personagem_nome} · ${a.titulo_atual}` : 'Sem personagem criado'}</div>
+                <div class="aluno-nome">${escapar(a.usuario_nome)}</div>
+                <div class="aluno-sub">${temPersonagem ? `${escapar(a.personagem_nome)} · ${escapar(a.titulo_atual)}` : "Sem personagem criado"}</div>
               </div>
               <span class="aluno-estrelas">⭐ ${a.total_estrelas || 0}</span>
               <i class='bx bx-chevron-down' style="color:#6b5a30;margin-left:8px"></i>
-            </div>
-            <div class="aluno-detalhe" id="detalhe-${a.pid || 0}">
-              ${temPersonagem ? '<div style="color:#6b5a30;font-style:italic;font-size:13px">Carregando...</div>' : '<div style="color:#6b5a30;font-style:italic;padding:8px 0">Aluno ainda não criou um personagem.</div>'}
+            </button>
+            <div class="aluno-detalhe" id="detalhe-${a.usuario_id}">
+              ${temPersonagem ? "" : '<div style="color:#6b5a30;font-style:italic;padding:8px 0">Aluno ainda não criou um personagem.</div>'}
             </div>
           </div>
         `;
-      }).join('');
+        })
+        .join("");
+
+      area.querySelectorAll(".aluno-header:not([disabled])").forEach((h) =>
+        h.addEventListener("click", () => toggleAluno(Number(h.dataset.usuario))),
+      );
     }
 
-    function toggleAluno(header, pid) {
-      const detalhe = document.getElementById(`detalhe-${pid}`);
-      if (!detalhe || !pid) return;
+    async function toggleAluno(usuarioId) {
+      const detalhe = document.getElementById(`detalhe-${usuarioId}`);
+      if (!detalhe) return;
 
-      const aberto = detalhe.classList.contains('aberto');
-      if (aberto) {
-        detalhe.classList.remove('aberto');
+      if (detalhe.classList.contains("aberto")) return detalhe.classList.remove("aberto");
+      if (detalhe.dataset.carregado) return detalhe.classList.add("aberto");
+
+      detalhe.innerHTML = '<div style="color:#6b5a30;font-style:italic;font-size:13px">Carregando...</div>';
+      detalhe.classList.add("aberto");
+
+      let stats;
+      try {
+        stats = await api.desempenhoAluno(usuarioId);
+      } catch (erro) {
+        detalhe.innerHTML = `<div class="estado-vazio">${escapar(erro.message)}</div>`;
         return;
       }
 
-      // Carrega stats apenas uma vez (cache via data-attribute)
-      if (detalhe.dataset.carregado) {
-        detalhe.classList.add('aberto');
-        return;
-      }
+      // Mostra só o Reino do professor
+      if (reinoNome) stats = stats.filter((s) => s.reino === reinoNome);
 
-      // Filtra apenas o reino do professor
-      const statsRaw = buscarDesempenhoAluno(pid);
-      const stats = reinoNome ? statsRaw.filter(s => s.reino === reinoNome) : statsRaw;
-      if (!stats.length) {
-        detalhe.innerHTML = `<div style="color:#6b5a30;font-style:italic;padding:8px 0">Nenhuma atividade registrada ainda.</div>`;
-      } else {
-        detalhe.innerHTML = `
+      detalhe.innerHTML = !stats.length
+        ? `<div style="color:#6b5a30;font-style:italic;padding:8px 0">Nenhuma atividade registrada ainda.</div>`
+        : `
           <table class="tabela-aluno">
             <thead>
-              <tr>
-                <th>Reino</th><th>Fase</th><th>Tentativas</th>
-                <th>Acertos</th><th>Taxa</th><th>Barra</th>
-              </tr>
+              <tr><th>Reino</th><th>Fase</th><th>Tentativas</th><th>Acertos</th><th>Taxa</th><th>Barra</th></tr>
             </thead>
             <tbody>
-              ${stats.map(s => `
+              ${stats
+                .map(
+                  (s) => `
                 <tr>
-                  <td>${s.reino}</td>
-                  <td>${s.fase}</td>
+                  <td>${escapar(s.reino)}</td>
+                  <td>${escapar(s.fase)}</td>
                   <td>${s.tentativas || 0}</td>
                   <td>${s.acertos || 0}</td>
                   <td>${s.taxa_acerto || 0}%</td>
-                  <td><div class="bar-bg"><div class="bar-fill" style="width:${s.taxa_acerto || 0}%"></div></div></td>
-                </tr>
-              `).join('')}
+                  <td><div class="bar-bg"><div class="bar-fill" style="width:${Number(s.taxa_acerto) || 0}%"></div></div></td>
+                </tr>`,
+                )
+                .join("")}
             </tbody>
           </table>
         `;
-      }
-
-      detalhe.dataset.carregado = '1';
-      detalhe.classList.add('aberto');
+      detalhe.dataset.carregado = "1";
     }
 
     // ────────────────────────────────────────────
@@ -633,11 +665,12 @@
     // ────────────────────────────────────────────
     function mostrarToast(msg) {
       const t = document.getElementById("toast");
-      t.innerText = msg;
+      t.textContent = msg;
       t.classList.add("show");
       setTimeout(() => t.classList.remove("show"), 2800);
     }
 
+    iniciar();
   </script>
 </body>
 </html>

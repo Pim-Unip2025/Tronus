@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/sidebar.css">
   <title>Painel Admin — TRONUS</title>
   <style>
+    .tabela-vazia { text-align:center; color:#6b5a30; font-style:italic; padding:20px; }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       min-height: 100vh;
@@ -152,7 +153,6 @@
     }
   </style>
 </head>
-<script src="js/sidebar.js"></script>
 <body>
 
   <div class="topbar">
@@ -226,132 +226,110 @@
   </div>
 
   <script src="js/theme.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-  <script src="js/database.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
   <script>
+    const admin = Sessao.exigir("admin");
+    document.getElementById("admBadge").textContent = admin.nome;
 
-    initDatabase().then(() => {
-      const u = JSON.parse(sessionStorage.getItem("usuarioLogado"))
-             || JSON.parse(localStorage.getItem("usuarioLogado"));
-
-      if (!u || u.papel !== 'admin') {
-        window.location.href = "login.html";
-        return;
-      }
-
-      document.getElementById("admBadge").innerText = u.nome;
-
-      // ── Estatísticas gerais ──────────────────
-      function stat(sql) {
-        const r = db.exec(sql);
-        return r.length ? (r[0].values[0][0] || 0) : 0;
-      }
-
-      document.getElementById("sUsuarios").innerText   = stat(`SELECT COUNT(*) FROM usuarios`);
-      document.getElementById("sAlunos").innerText     = stat(`SELECT COUNT(*) FROM usuarios WHERE papel = 'aluno'`);
-      document.getElementById("sPersonagens").innerText= stat(`SELECT COUNT(*) FROM personagens`);
-      document.getElementById("sQuestoes").innerText   = stat(`SELECT COUNT(*) FROM questoes`);
-      document.getElementById("sRespostas").innerText  = stat(`SELECT COUNT(*) FROM respostas_usuario`);
-
-      // ── Lista de reinos (para dropdown do professor) ──
-      const reinosRes = db.exec(`SELECT id, nome FROM reinos ORDER BY id`);
-      const reinos = reinosRes.length ? reinosRes[0].values : [];
-
-      // ── Lista de usuários ────────────────────
-      const result = db.exec(`
-        SELECT id, nome, email, papel, professor_reino_id
-        FROM usuarios
-        ORDER BY papel, nome
-      `);
-
-      const tbody = document.getElementById("tabelaUsuarios");
-
-      if (!result.length || !result[0].values.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:#6b5a30;font-style:italic;padding:20px">Nenhum usuário.</td></tr>`;
-        return;
-      }
-
-      result[0].values.forEach(row => {
-        const [id, nome, email, papel, reinoId] = row;
-        const isAdmin     = papel === 'admin';
-        const isProfessor = papel === 'professor';
-
-        // Coluna de reino: dropdown para professores, "—" para o resto
-        let reinoHtml = '<span style="color:#3a2e10">—</span>';
-        if (isProfessor) {
-          const options = reinos.map(([rId, rNome]) =>
-            `<option value="${rId}" ${rId === reinoId ? 'selected' : ''}>${rNome}</option>`
-          ).join('');
-          reinoHtml = `
-            <select class="select-reino" onchange="vincularProfessorReino(${id}, this.value)">
-              <option value="">Nenhum</option>
-              ${options}
-            </select>
-          `;
-        }
-
-        // Coluna de ação
-        let acaoHtml;
-        if (isAdmin || isProfessor) {
-          acaoHtml = `<span style="color:#3a2e10;font-size:11px;font-style:italic">protegido</span>`;
-        } else {
-          acaoHtml = `<button class="btn-del-user" onclick="deletarUsuario(${id}, ${JSON.stringify(nome)}, '${papel}', this)">
-                       <i class='bx bx-trash'></i> Excluir
-                     </button>`;
-        }
-
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td style="color:#6b5a30">${id}</td>
-          <td>${nome}</td>
-          <td style="color:#a89060">${email}</td>
-          <td><span class="papel-badge papel-${papel}">${papel}</span></td>
-          <td>${reinoHtml}</td>
-          <td>${acaoHtml}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    });
-
-    function vincularProfessorReino(userId, reinoId) {
-      const valor = reinoId ? Number(reinoId) : null;
-      db.run(`UPDATE usuarios SET professor_reino_id = ? WHERE id = ?`, [valor, userId]);
-      saveDatabase();
-
-      // Busca nome do reino para o toast
-      let msg = "Reino removido do professor.";
-      if (valor) {
-        const r = db.exec(`SELECT nome FROM reinos WHERE id = ?`, [valor]);
-        const nome = r.length ? r[0].values[0][0] : "";
-        msg = `Professor vinculado ao Reino ${nome}.`;
-      }
-      mostrarToastAdm(msg);
-    }
+    let reinos = [];
 
     function mostrarToastAdm(msg) {
       const t = document.getElementById("toastAdm");
-      t.innerText = msg;
+      t.textContent = msg;
       t.classList.add("show");
       setTimeout(() => t.classList.remove("show"), 2800);
     }
 
-    function deletarUsuario(id, nome, papel, btn) {
-      if (!confirm(`Excluir o usuário "${nome}"? Esta ação é irreversível.`)) return;
-      db.run(`DELETE FROM respostas_usuario WHERE personagem_id IN (SELECT id FROM personagens WHERE usuario_id = ?)`, [id]);
-      db.run(`DELETE FROM progresso_fases    WHERE personagem_id IN (SELECT id FROM personagens WHERE usuario_id = ?)`, [id]);
-      db.run(`DELETE FROM personagens        WHERE usuario_id = ?`, [id]);
-      db.run(`DELETE FROM usuarios           WHERE id = ?`, [id]);
-      saveDatabase();
-      btn.closest("tr").remove();
-      // Atualiza contadores
-      const sU = document.getElementById("sUsuarios");
-      sU.innerText = Math.max(0, parseInt(sU.innerText) - 1);
-      if (papel === 'aluno') {
-        const sAl = document.getElementById("sAlunos");
-        sAl.innerText = Math.max(0, parseInt(sAl.innerText) - 1);
+    async function carregarEstatisticas() {
+      try {
+        const s = await api.estatisticasAdmin();
+        document.getElementById("sUsuarios").textContent = s.usuarios;
+        document.getElementById("sAlunos").textContent = s.alunos;
+        document.getElementById("sPersonagens").textContent = s.personagens;
+        document.getElementById("sQuestoes").textContent = s.questoes;
+        document.getElementById("sRespostas").textContent = s.respostas;
+      } catch (erro) {
+        mostrarToastAdm(erro.message);
       }
     }
 
+    async function carregarUsuarios() {
+      const tbody = document.getElementById("tabelaUsuarios");
+      let usuarios;
+      try {
+        [usuarios, reinos] = await Promise.all([api.usuarios(), api.reinos()]);
+      } catch (erro) {
+        tbody.innerHTML = `<tr><td colspan="6" class="tabela-vazia">${escapar(erro.message)}</td></tr>`;
+        return;
+      }
+
+      if (!usuarios.length) {
+        tbody.innerHTML = `<tr><td colspan="6" class="tabela-vazia">Nenhum usuário.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = "";
+      usuarios.forEach((u) => {
+        const ehProfessor = u.papel === "professor";
+
+        // Professor sempre tem um Reino (regra do banco), então não há opção "Nenhum".
+        const reinoHtml = ehProfessor
+          ? `<select class="select-reino" aria-label="Reino de ${escapar(u.nome)}">
+               ${reinos
+                 .map((r) => `<option value="${r.id}" ${r.id === u.professor_reino_id ? "selected" : ""}>${escapar(r.nome)}</option>`)
+                 .join("")}
+             </select>`
+          : '<span style="color:#3a2e10">—</span>';
+
+        // Só aluno pode ser excluído; professor e admin são protegidos pela API.
+        const acaoHtml =
+          u.papel === "aluno"
+            ? `<button class="btn-del-user" type="button"><i class='bx bx-trash'></i> Excluir</button>`
+            : `<span style="color:#3a2e10;font-size:11px;font-style:italic">protegido</span>`;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="color:#6b5a30">${u.id}</td>
+          <td>${escapar(u.nome)}</td>
+          <td style="color:#a89060">${escapar(u.email)}</td>
+          <td><span class="papel-badge papel-${escapar(u.papel)}">${escapar(u.papel)}</span></td>
+          <td>${reinoHtml}</td>
+          <td>${acaoHtml}</td>
+        `;
+
+        tr.querySelector(".select-reino")?.addEventListener("change", (e) => vincularProfessorReino(u, Number(e.target.value), e.target));
+        tr.querySelector(".btn-del-user")?.addEventListener("click", (e) => deletarUsuario(u, e.currentTarget));
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function vincularProfessorReino(usuario, reinoId, select) {
+      const anterior = usuario.professor_reino_id;
+      try {
+        await api.vincularReino(usuario.id, reinoId);
+        usuario.professor_reino_id = reinoId;
+        mostrarToastAdm(`${usuario.nome} agora cuida do Reino ${reinos.find((r) => r.id === reinoId)?.nome ?? ""}.`);
+      } catch (erro) {
+        select.value = String(anterior);
+        mostrarToastAdm(erro.message);
+      }
+    }
+
+    async function deletarUsuario(usuario, btn) {
+      if (!confirm(`Excluir o aluno "${usuario.nome}"?\n\nPersonagem, progresso e respostas dele também serão apagados. Esta ação não pode ser desfeita.`)) return;
+      try {
+        const r = await comCarregando(btn, () => api.excluirUsuario(usuario.id), "Excluindo...");
+        btn.closest("tr").remove();
+        mostrarToastAdm(`${usuario.nome} excluído (${r.apagados.respostas_usuario} respostas apagadas).`);
+        carregarEstatisticas();
+      } catch (erro) {
+        mostrarToastAdm(erro.message);
+      }
+    }
+
+    carregarEstatisticas();
+    carregarUsuarios();
   </script>
 </body>
 </html>
