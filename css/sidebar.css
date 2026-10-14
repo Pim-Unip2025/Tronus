@@ -54,9 +54,10 @@
   left: -280px;
   width: 260px;
   height: 100vh;
-  background: rgba(61, 39, 5, 0.397);
-  border: 2px solid rgba(255,255,255,.2);
-  border-right: 2px solid rgba(212,175,55,0.3);
+  /* Fundo sólido: com transparência o topo da página aparecia por trás */
+  background: linear-gradient(180deg, #24170a 0%, #160e05 100%);
+  border-right: 2px solid rgba(212,175,55,0.35);
+  box-shadow: 8px 0 32px rgba(0,0,0,0.6);
   z-index: 400;
   display: flex;
   flex-direction: column;
@@ -67,6 +68,30 @@
 .sidebar.ativo {
   left: 0;
 }
+
+/* Quem está logado, no topo do menu */
+.sidebar-usuario {
+  padding: 0 24px 16px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(212,175,55,0.12);
+}
+.sidebar-usuario-nome {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  color: #f0e6c8;
+}
+.sidebar-usuario-papel {
+  font-size: 12px;
+  color: #a89060;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.sidebar-item.ativo {
+  background: rgba(212,175,55,0.12);
+  border-color: rgba(212,175,55,0.3);
+  color: #d4af37;
+}
+/* Botão de tema: estilo em theme.css */
 
 /* CABEÇALHO DO MENU */
 .sidebar-header {
@@ -156,6 +181,7 @@
 /* RODAPÉ DO MENU */
 .sidebar-footer {
   padding: 16px 24px 0;
+  margin-top: 8px;
   border-top: 1px solid rgba(212,175,55,0.2);
   font-size: 12px;
   color: #a89060;

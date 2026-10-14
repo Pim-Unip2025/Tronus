@@ -8,40 +8,50 @@ function criarSidebar() {
   const usuario = (typeof Sessao !== "undefined" && Sessao.usuario) || {};
   const papel = usuario.papel || 'aluno';
 
-  const painelLink = papel === 'professor'
-    ? `<a class="sidebar-item" onclick="fecharSidebar(); window.location.href='professor.html'">
-         <i class='bx bx-chalkboard'></i>
-         Painel do Professor
-       </a>`
-    : papel === 'admin'
-    ? `<a class="sidebar-item" onclick="fecharSidebar(); window.location.href='admin.html'">
-         <i class='bx bx-shield-alt-2'></i>
-         Painel Admin
-       </a>`
-    : '';
+  const PAPEIS = { aluno: "Aluno", professor: "Professor", admin: "Administrador" };
+  const pagina = location.pathname.split("/").pop().replace(".html", "") || "index";
+
+  // Itens do menu por perfil
+  const itens = papel === "aluno"
+    ? [
+        ["reinos", "bx-map-alt", "Reinos"],
+        ["dashboard", "bx-bar-chart-alt-2", "Meu desempenho"],
+      ]
+    : papel === "professor"
+    ? [["professor", "bx-chalkboard", "Painel do Professor"]]
+    : [["admin", "bx-shield-alt-2", "Painel Admin"]];
+
+  const links = itens
+    .map(([destino, icone, texto]) => `
+        <a class="sidebar-item ${pagina === destino || (destino === "reinos" && pagina === "trilha") ? "ativo" : ""}" href="${destino}.html">
+          <i class='bx ${icone}'></i>
+          ${texto}
+        </a>`)
+    .join("");
+
+  const nome = String(usuario.nome || "").replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
   const html = `
-    <button class="menu-toggle" onclick="abrirSidebar()" title="Menu">
+    <button class="menu-toggle" onclick="abrirSidebar()" title="Menu" aria-label="Abrir menu">
       <i class='bx bx-menu'></i>
     </button>
 
     <div class="sidebar-overlay" id="sidebarOverlay" onclick="fecharSidebar()"></div>
 
-    <div class="sidebar" id="sidebar">
+    <nav class="sidebar" id="sidebar" aria-label="Menu principal">
 
       <div class="sidebar-header">
         <span class="sidebar-logo">⚔ TRONUS</span>
-        <button class="sidebar-close" onclick="fecharSidebar()">✕</button>
+        <button class="sidebar-close" onclick="fecharSidebar()" aria-label="Fechar menu">✕</button>
       </div>
 
-      <nav class="sidebar-nav">
+      <div class="sidebar-usuario">
+        <div class="sidebar-usuario-nome">${nome}</div>
+        <div class="sidebar-usuario-papel">${PAPEIS[papel] || ""}</div>
+      </div>
 
-        <a class="sidebar-item" onclick="fecharSidebar(); window.location.href='reinos.html'">
-          <i class='bx bx-map-alt'></i>
-          Reinos
-        </a>
-
-        ${painelLink}
+      <div class="sidebar-nav">
+        ${links}
 
         <button id="temaBtn" onclick="alternarTema()">
           <i class='bx bx-sun'></i> Modo Claro
@@ -49,28 +59,27 @@ function criarSidebar() {
 
         <div style="flex:1"></div>
 
-        <a class="sidebar-item danger" onclick="logout()">
+        <a class="sidebar-item danger" onclick="logout(); return false;" href="#" role="button">
           <i class='bx bx-log-out'></i>
           Sair
         </a>
-
-      </nav>
-
-      <div class="sidebar-footer">
-        TRONUS © 2025 — UNIP
       </div>
 
-    </div>
+      <div class="sidebar-footer">
+        TRONUS © ${new Date().getFullYear()} — UNIP
+      </div>
+
+    </nav>
   `;
 
   // Aguarda o body estar disponível
-  if (document.body) {
+  const inserir = () => {
     document.body.insertAdjacentHTML("afterbegin", html);
-  } else {
-    document.addEventListener("DOMContentLoaded", () => {
-      document.body.insertAdjacentHTML("afterbegin", html);
-    });
-  }
+    // Atualiza o texto do botão de tema, que só existe depois do menu
+    if (typeof iniciarTema === "function") iniciarTema();
+  };
+  if (document.body) inserir();
+  else document.addEventListener("DOMContentLoaded", inserir);
 }
 
 function abrirSidebar() {

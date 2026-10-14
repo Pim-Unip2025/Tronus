@@ -1,0 +1,101 @@
+/* ============================================================
+   COMUM.CSS — ajustes compartilhados pelas telas do jogo e painéis
+   (reinos, trilha, dashboard, professor, admin). Carregado por último.
+============================================================ */
+
+/* Tabelas largas rolam dentro do próprio quadro, sem empurrar a página */
+.tabela-usuarios,
+.tabela-desempenho,
+.tabela-aluno {
+  width: 100%;
+}
+
+/* Textos pequenos demais ficavam ilegíveis sobre o fundo escuro */
+.stat-label,
+.resumo-label {
+  font-size: 12px !important;
+  color: #c9b48a !important;
+  font-style: normal !important;
+}
+
+.estado-vazio {
+  color: #b8a57c !important;
+}
+
+@media (max-width: 700px) {
+  .tabela-usuarios,
+  .tabela-desempenho,
+  .tabela-aluno {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    white-space: nowrap;
+  }
+
+  /* Topo: menos espaço lateral; o menu (☰) ocupa a esquerda */
+  .topbar {
+    padding: 10px 14px 10px 70px !important;
+    gap: 10px !important;
+    flex-wrap: nowrap;
+  }
+
+  .topbar .page-title,
+  .topbar .topbar-title {
+    font-size: 15px !important;
+    letter-spacing: 1px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .back-btn,
+  .dashboard-btn {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    white-space: nowrap;
+  }
+
+  .menu-toggle {
+    top: 10px !important;
+    left: 12px !important;
+  }
+}
+
+/* Topo da tela de Reinos no celular */
+@media (max-width: 640px) {
+  .player-info { gap: 10px !important; min-width: 0; }
+  .player-avatar { width: 44px !important; height: 44px !important; }
+  .player-name { font-size: 15px !important; }
+  .player-title { font-size: 11px !important; }
+  .player-stats { flex-shrink: 0; }
+  .stars-count { font-size: 13px !important; white-space: nowrap; }
+  .progress-label { font-size: 11px !important; white-space: nowrap; }
+  .progress-bar-bg { width: 110px !important; }
+  .page-title h1 { font-size: 28px !important; }
+}
+
+/* Carregando: quadro com brilho enquanto a API responde */
+.carregando {
+  position: relative;
+  color: transparent !important;
+  background: rgba(255,255,255,0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.carregando::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(212,175,55,0.15), transparent);
+  animation: brilho 1.2s infinite;
+}
+@keyframes brilho {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(100%); }
+}
+
+/* Esqueletos de carregamento ocupam o lugar do conteúdo */
+.esqueleto { border: none !important; cursor: default !important; }
+.reino-card.esqueleto { height: 230px; }
+.fase-circulo.esqueleto { opacity: 0.6; }
