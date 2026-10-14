@@ -12,7 +12,6 @@
   <title>Trilha - TRONUS</title>
 </head>
 
-<script src="js/sidebar.js"></script>
 
 <body>
 
@@ -95,232 +94,181 @@
   </button>
 
   <script src="js/theme.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-  <script src="js/database.js"></script>
-
+  <script src="js/api.js"></script>
+  <script src="js/sidebar.js"></script>
   <script>
-    let personagemId = null;
-    let reinoGlobal  = null;
+    Sessao.exigir("aluno");
 
-    const quiz = { faseAtual: null, questoes: [], index: 0, acertos: 0, respondida: false };
+    const reinoId = Number(new URLSearchParams(location.search).get("reino"));
+    let reinoAtual = null; // { id, nome, fases: [{ id, nome, ordem, estrelas }] }
+
+    // Estado do quiz. As respostas só vão para a API no fim da fase: é o
+    // servidor que corrige (o aluno nem recebe qual alternativa é a certa).
+    const quiz = { fase: null, questoes: [], index: 0, escolhas: {} };
 
     // ── Inicialização ────────────────────────────────────────
-    initDatabase().then(() => {
-      const reino = JSON.parse(sessionStorage.getItem("reinoSelecionado"))
-             || JSON.parse(localStorage.getItem("reinoSelecionado"));
-      personagemId = sessionStorage.getItem("personagemId")
-             || localStorage.getItem("personagemId");
+    async function carregarTrilha() {
+      if (!reinoId) return window.location.replace("reinos.html");
+      try {
+        const [reinos, fases, progresso] = await Promise.all([api.reinos(), api.fases(reinoId), api.meuProgresso()]);
+        const reino = reinos.find((r) => r.id === reinoId);
+        if (!reino) return window.location.replace("reinos.html");
 
-      if (!reino || !personagemId) { window.location.href = "reinos.html"; return; }
+        reinoAtual = {
+          id: reino.id,
+          nome: reino.nome,
+          fases: fases.map((f) => ({
+            ...f,
+            estrelas: progresso.find((p) => p.fase_id === f.id)?.estrelas ?? 0,
+          })),
+        };
 
-      // Re-busca progresso do banco para ter estrelas atualizadas após quiz
-      const progresso = buscarProgresso(personagemId);
-      reino.fases.forEach(fase => {
-        const p = progresso.find(r => r.fase_id === fase.id);
-        if (p) fase.estrelas = p.estrelas;
-      });
-
-      reinoGlobal = reino;
-
-      document.getElementById("reinoNome").innerText = reino.nome;
-      const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
-      document.getElementById("reinoProgresso").innerText =
-        totalEstrelas + " / " + (reino.fases.length * 3) + " ⭐";
-
-      renderTrilha(reino);
-    });
+        document.getElementById("reinoNome").textContent = reino.nome;
+        const total = reinoAtual.fases.reduce((s, f) => s + f.estrelas, 0);
+        document.getElementById("reinoProgresso").textContent = `${total} / ${reinoAtual.fases.length * 3} ⭐`;
+        renderTrilha(reinoAtual);
+      } catch (erro) {
+        if (erro.status === 404) return window.location.replace("character.html");
+        document.getElementById("trilhaWrap").innerHTML = `<p class="trilha-erro">${escapar(erro.message)}</p>`;
+      }
+    }
 
     // ── Renderiza trilha ─────────────────────────────────────
+    // A fase seguinte abre quando a anterior tem ao menos 1 estrela.
     function renderTrilha(reino) {
       const wrap = document.getElementById("trilhaWrap");
       wrap.innerHTML = "";
 
       reino.fases.forEach((fase, index) => {
         const desbloqueada = index === 0 || reino.fases[index - 1].estrelas > 0;
-        const completa     = fase.estrelas === 3;
-
         const item = document.createElement("div");
         item.classList.add("fase-item");
 
-        const circulo = document.createElement("div");
+        const circulo = document.createElement(desbloqueada ? "button" : "div");
         circulo.classList.add("fase-circulo");
         if (!desbloqueada) circulo.classList.add("bloqueada");
-        if (completa)      circulo.classList.add("completa");
+        if (fase.estrelas === 3) circulo.classList.add("completa");
 
         if (desbloqueada) {
+          circulo.type = "button";
+          circulo.setAttribute("aria-label", `Jogar ${fase.nome}`);
           circulo.innerHTML = `<span class="fase-numero">${index + 1}</span>`;
-          circulo.onclick   = () => abrirQuiz(fase);
+          circulo.onclick = () => abrirQuiz(fase);
         } else {
+          circulo.setAttribute("aria-label", `${fase.nome} bloqueada`);
           circulo.innerHTML = `<i class='bx bxs-lock fase-lock-icon'></i>`;
         }
 
-        let estrelasHtml = '<div class="fase-estrelas">';
+        const estrelas = document.createElement("div");
+        estrelas.classList.add("fase-estrelas");
+        estrelas.setAttribute("aria-label", `${fase.estrelas} de 3 estrelas`);
         for (let i = 0; i < 3; i++) {
-          estrelasHtml += `<i class='bx bxs-star ${i < fase.estrelas ? "ativa" : ""}'></i>`;
+          estrelas.insertAdjacentHTML("beforeend", `<i class='bx bxs-star ${i < fase.estrelas ? "ativa" : ""}'></i>`);
         }
-        estrelasHtml += "</div>";
-
-        item.appendChild(circulo);
-
-        const starsEl = document.createElement("div");
-        starsEl.innerHTML = estrelasHtml;
-        item.appendChild(starsEl.firstElementChild);
 
         const label = document.createElement("div");
         label.classList.add("fase-label");
-        label.innerText = fase.nome;
-        item.appendChild(label);
+        label.textContent = fase.nome;
 
+        item.append(circulo, estrelas, label);
         wrap.appendChild(item);
       });
     }
 
-    // ── Renderiza atividades ─────────────────────────────────
-    function renderAtividades(reino) {
-      const grid = document.getElementById("atividadesGrid");
-      grid.innerHTML = "";
-      const hoje = new Date().toLocaleDateString("pt-BR");
-
-      reino.fases.forEach((fase, index) => {
-        const questoes     = buscarQuestoesPorFase(fase.id);
-        const desbloqueada = index === 0 || reino.fases[index - 1].estrelas > 0;
-        if (!questoes || !questoes.length) return;
-
-        const nivelEmoji = { "Fácil": "🟢", "Médio": "🟡", "Difícil": "🔴" };
-        const nivel = questoes[0]?.nivel || "Médio";
-
-        const card = document.createElement("div");
-        card.classList.add("atividade-card", desbloqueada ? "desbloqueada" : "bloqueada-card");
-        card.innerHTML = `
-          <div class="atividade-badge">${nivelEmoji[nivel] || "🟡"} ${nivel}</div>
-          <div class="atividade-nome">Quiz — ${reino.nome} · Fase ${index + 1}</div>
-          <div class="atividade-desc">Responda ${questoes.length} questões de múltipla escolha e ganhe até 3 estrelas.</div>
-          <div class="atividade-footer">
-            <span class="atividade-date"><i class='bx bx-calendar'></i> ${hoje}</span>
-            <span class="atividade-count"><i class='bx bxs-help-circle'></i> ${questoes.length} questões</span>
-          </div>
-        `;
-        if (desbloqueada) card.onclick = () => abrirQuiz(fase);
-        grid.appendChild(card);
-      });
-
-      if (!grid.children.length) {
-        grid.innerHTML = `<p class="atividades-vazio">Nenhuma atividade disponível para este reino ainda.</p>`;
-      }
-    }
-
     // ── Toast Em Breve ───────────────────────────────────────
-    function mostrarEmBreve() {
+    function mostrarEmBreve(texto = "✦ Questões em desenvolvimento — em breve!") {
       const t = document.getElementById("toastEmBreve");
+      t.textContent = texto;
       t.style.display = "block";
       setTimeout(() => { t.style.display = "none"; }, 3000);
     }
 
     // ── Abre quiz ────────────────────────────────────────────
-    function abrirQuiz(fase) {
-      const questoes = buscarQuestoesPorFase(fase.id);
-      if (!questoes || !questoes.length) {
-        mostrarEmBreve();
-        return;
+    async function abrirQuiz(fase) {
+      let questoes;
+      try {
+        questoes = await api.questoes(fase.id);
+      } catch (erro) {
+        return mostrarEmBreve(erro.message);
       }
-      quiz.faseAtual  = fase;
-      quiz.questoes   = questoes;
-      quiz.index      = 0;
-      quiz.acertos    = 0;
-      quiz.respondida = false;
+      if (!questoes.length) return mostrarEmBreve();
 
-      document.getElementById("quizFaseNome").innerText = fase.nome;
+      Object.assign(quiz, { fase, questoes, index: 0, escolhas: {} });
+      document.getElementById("quizFaseNome").textContent = fase.nome;
       document.getElementById("quizScore").style.display = "none";
       document.getElementById("modalQuizOverlay").classList.add("ativo");
       renderQuestao();
     }
 
     function renderQuestao() {
-      const q     = quiz.questoes[quiz.index];
+      const q = quiz.questoes[quiz.index];
       const total = quiz.questoes.length;
 
-      document.getElementById("quizProgressText").innerText = `Questão ${quiz.index + 1} de ${total}`;
-      document.getElementById("quizProgressFill").style.width = ((quiz.index / total) * 100) + "%";
-      document.getElementById("quizQuestion").innerText = q.enunciado;
+      document.getElementById("quizProgressText").textContent = `Questão ${quiz.index + 1} de ${total}`;
+      document.getElementById("quizProgressFill").style.width = (quiz.index / total) * 100 + "%";
+      document.getElementById("quizQuestion").textContent = q.enunciado;
       document.getElementById("quizFeedback").textContent = "";
-      document.getElementById("quizFeedback").className   = "quiz-feedback";
-      document.getElementById("btnProximo").style.display = "none";
-      document.getElementById("quizScore").style.display      = "none";
-      document.getElementById("quizQuestion").style.display   = "block";
+      document.getElementById("quizFeedback").className = "quiz-feedback";
+      document.getElementById("quizScore").style.display = "none";
+      document.getElementById("quizQuestion").style.display = "block";
       document.getElementById("quizAlternativas").style.display = "flex";
 
       const altContainer = document.getElementById("quizAlternativas");
       altContainer.innerHTML = "";
-      q.alternativas.forEach(alt => {
+      q.alternativas.forEach((alt) => {
         const btn = document.createElement("button");
+        btn.type = "button";
         btn.classList.add("quiz-alt-btn");
-        btn.innerHTML = `<span class="alt-letra">${alt.letra}</span><span class="alt-texto">${alt.texto}</span>`;
-        btn.onclick = () => responder(alt, btn, q);
+        if (quiz.escolhas[q.id] === alt.id) btn.classList.add("alt-escolhida");
+        btn.setAttribute("aria-pressed", String(quiz.escolhas[q.id] === alt.id));
+        btn.innerHTML = `<span class="alt-letra">${escapar(alt.letra)}</span><span class="alt-texto">${escapar(alt.texto)}</span>`;
+        btn.onclick = () => escolher(q, alt);
         altContainer.appendChild(btn);
       });
-      quiz.respondida = false;
-    }
-
-    function responder(alt, btnClicado, q) {
-      if (quiz.respondida) return;
-      quiz.respondida = true;
-
-      registrarResposta(personagemId, q.id, quiz.faseAtual.id, alt.correta ? 1 : 0);
-      if (alt.correta) quiz.acertos++;
-
-      document.querySelectorAll(".quiz-alt-btn").forEach(b => {
-        b.disabled = true;
-        const letra   = b.querySelector(".alt-letra").innerText;
-        const thisAlt = q.alternativas.find(a => a.letra === letra);
-        if (thisAlt?.correta)              b.classList.add("alt-correta");
-        else if (b === btnClicado && !alt.correta) b.classList.add("alt-errada");
-      });
-
-      const feedback = document.getElementById("quizFeedback");
-      if (alt.correta) {
-        feedback.textContent = "✓ Correto! Muito bem!";
-        feedback.className   = "quiz-feedback feedback-correto";
-      } else {
-        const correta = q.alternativas.find(a => a.correta);
-        feedback.textContent = `✗ Incorreto. Resposta: (${correta?.letra}) ${correta?.texto}`;
-        feedback.className   = "quiz-feedback feedback-errado";
-      }
 
       const btnProx = document.getElementById("btnProximo");
+      const ultima = quiz.index === total - 1;
       btnProx.style.display = "block";
-      if (quiz.index < quiz.questoes.length - 1) {
-        btnProx.innerText = "Próxima →";
-        btnProx.onclick   = proximaQuestao;
-      } else {
-        btnProx.innerText = "Ver Resultado";
-        btnProx.onclick   = mostrarResultado;
-      }
+      btnProx.disabled = quiz.escolhas[q.id] === undefined;
+      btnProx.textContent = ultima ? "Enviar respostas" : "Próxima →";
+      btnProx.onclick = ultima ? enviarRespostas : proximaQuestao;
     }
 
-    function proximaQuestao() { quiz.index++; renderQuestao(); }
+    function escolher(q, alt) {
+      quiz.escolhas[q.id] = alt.id;
+      renderQuestao();
+    }
 
-    function mostrarResultado() {
-      const acertos = quiz.acertos;
-      const total   = quiz.questoes.length;
+    function proximaQuestao() {
+      quiz.index++;
+      renderQuestao();
+    }
 
-      let estrelas = 0;
-      if (acertos >= 4)      estrelas = 3;
-      else if (acertos === 3) estrelas = 2;
-      else if (acertos >= 1) estrelas = 1;
+    // ── Envia e mostra o resultado corrigido pela API ────────
+    async function enviarRespostas() {
+      const btn = document.getElementById("btnProximo");
+      const respostas = quiz.questoes.map((q) => ({ questaoId: q.id, alternativaId: quiz.escolhas[q.id] }));
+      let r;
+      try {
+        r = await comCarregando(btn, () => api.responderFase(quiz.fase.id, respostas), "Corrigindo...");
+      } catch (erro) {
+        const fb = document.getElementById("quizFeedback");
+        fb.textContent = erro.message;
+        fb.className = "quiz-feedback feedback-errado";
+        return;
+      }
+      mostrarResultado(r);
+    }
 
-      const anteriores = quiz.faseAtual.estrelas || 0;
-      const melhor     = Math.max(estrelas, anteriores);
-      if (melhor > 0) atualizarProgresso(personagemId, quiz.faseAtual.id, melhor);
-
-      document.getElementById("quizQuestion").style.display    = "none";
+    function mostrarResultado(r) {
+      document.getElementById("quizQuestion").style.display = "none";
       document.getElementById("quizAlternativas").style.display = "none";
       document.getElementById("quizFeedback").textContent = "";
-      document.getElementById("btnProximo").style.display  = "none";
+      document.getElementById("btnProximo").style.display = "none";
+      document.getElementById("quizProgressFill").style.width = "100%";
 
       let estrelasHtml = "";
-      for (let i = 0; i < 3; i++) {
-        estrelasHtml += `<i class='bx bxs-star ${i < estrelas ? "ativa" : ""}'></i>`;
-      }
+      for (let i = 0; i < 3; i++) estrelasHtml += `<i class='bx bxs-star ${i < r.estrelas ? "ativa" : ""}'></i>`;
       document.getElementById("scoreStars").innerHTML = estrelasHtml;
 
       const msgs = [
@@ -329,15 +277,36 @@
         "Quase lá! Mais um esforço! 🌟",
         "Excelente! Fase conquistada! 🏆",
       ];
+
+      const textoAlt = (questaoId, altId) => {
+        const alt = quiz.questoes.find((q) => q.id === questaoId)?.alternativas.find((a) => a.id === altId);
+        return alt ? `(${escapar(alt.letra)}) ${escapar(alt.texto)}` : "—";
+      };
+      const correcao = r.correcao
+        .map((c, i) => {
+          const q = quiz.questoes.find((x) => x.id === c.questao_id);
+          return `<li class="${c.acertou ? "corr-ok" : "corr-erro"}">
+              <strong>${c.acertou ? "✓" : "✗"} ${i + 1}. ${escapar(q?.enunciado)}</strong>
+              ${c.acertou ? "" : `<span>Sua resposta: ${textoAlt(c.questao_id, c.alternativa_escolhida_id)}</span>`}
+              <span>Correta: ${textoAlt(c.questao_id, c.alternativa_correta_id)}</span>
+            </li>`;
+        })
+        .join("");
+
+      const melhor = r.melhor_estrelas > r.estrelas ? `<br><small>Sua melhor marca nesta fase continua ${r.melhor_estrelas} ⭐</small>` : "";
       document.getElementById("scoreText").innerHTML =
-        `<strong>${acertos}/${total}</strong> questões corretas<br>${msgs[estrelas]}`;
+        `<strong>${r.acertos}/${r.total}</strong> questões corretas<br>${msgs[r.estrelas]}${melhor}
+         <br><small>${escapar(r.personagem.titulo_atual)} · ${r.personagem.total_estrelas} estrelas no total</small>
+         <ul class="quiz-correcao">${correcao}</ul>`;
       document.getElementById("quizScore").style.display = "block";
     }
 
     function fecharQuiz() {
       document.getElementById("modalQuizOverlay").classList.remove("ativo");
-      location.reload();
+      carregarTrilha(); // atualiza estrelas e libera a próxima fase
     }
+
+    carregarTrilha();
 
     // ── LIBRAS ───────────────────────────────────────────────
     const glossarioLibras = [

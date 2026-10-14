@@ -135,6 +135,7 @@ margin-top:20px;
 .register-link a{
 color:#fff;
 text-decoration:none;
+color:#000;
 font-weight:600;
 }
 
@@ -332,4 +333,56 @@ gap:15px;
 
 font-size:18px;
 
+}
+/* MENSAGENS DE FORMULÁRIO (substituem os alert()) */
+
+.form-msg{
+display:none;
+margin:0 0 16px;
+padding:10px 14px;
+border-radius:8px;
+font-size:14px;
+line-height:1.4;
+white-space:pre-line;
+text-align:left;
+}
+
+.form-msg--erro{
+display:block;
+background:rgba(192,80,63,0.18);
+border:1px solid #c0503f;
+color:#ffd2ca;
+}
+
+.form-msg--ok{
+display:block;
+background:rgba(62,155,79,0.18);
+border:1px solid #3e9b4f;
+color:#d4f5da;
+}
+
+.form-dica{
+color:#e8dcc0;
+font-size:13px;
+margin:0 0 14px;
+text-align:center;
+}
+
+.codigo-simulado{
+color:gold;
+font-size:20px;
+letter-spacing:4px;
+}
+
+.botao-link{
+display:flex;
+align-items:center;
+justify-content:center;
+text-decoration:none;
+color:#000;
+}
+
+button.login:disabled{
+opacity:0.6;
+cursor:wait;
 }

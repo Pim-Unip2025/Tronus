@@ -68,10 +68,12 @@ Feminino
 <h2>Nome do personagem</h2>
 
 <div class="input-box">
-<input id="username" placeholder="Nome do personagem">
+<input id="username" placeholder="Nome do personagem" maxlength="60" aria-label="Nome do personagem">
 </div>
 
-<button class="login" onclick="nextStep(3)">
+<p id="nomeMsg" class="form-msg" role="alert"></p>
+
+<button class="login" onclick="confirmarNome()">
 Continuar
 </button>
 
@@ -96,16 +98,22 @@ Continuar
 <div class="character-sheet">
 
 <div class="sheet-avatar">
-<img id="previewImage">
+<img id="previewImage" alt="Avatar escolhido">
 </div>
 
 <div class="sheet-info">
 
 <p id="playerName"></p>
 <p id="playerEmail"></p>
+<p class="form-dica">O nome e a aparência não podem ser trocados depois.</p>
+<p id="criarMsg" class="form-msg" role="alert"></p>
 
-<button class="login" onclick="window.location.href='reinos.html'">
-Prosseguir
+<button class="login" id="btnCriar" onclick="criarPersonagem()">
+Iniciar jornada
+</button>
+
+<button class="login" style="margin-top:8px" onclick="nextStep(3)">
+Trocar aparência
 </button>
 
 </div>
@@ -119,9 +127,8 @@ Prosseguir
 </main>
 
 <script src="js/script.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-<script src="js/database.js"></script>
-<script src="js/character_db.js"></script>
+<script src="js/api.js"></script>
+<script src="js/personagem.js"></script>
 
 </body>
 </html>

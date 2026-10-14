@@ -1,19 +1,17 @@
 # ROTEIRO DE TESTES — TRONUS
-**Versão:** 1.0 · **Data:** 23/05/2026  
-**Projeto:** PIM III — ADS · UNIP  
-**Ambiente:** Navegador local (`127.0.0.1:5500`) com Live Server
+**Versão:** 2.0 · **Data:** 14/10/2026  
+**Projeto:** PIM IV — ADS · UNIP  
+**Ambiente:** site publicado (`https://tronus-one.vercel.app`) ou local (`127.0.0.1:5500`), usando a API `https://king-blue-nine.vercel.app`
 
 ---
 
 ## Pré-requisitos
 
-1. Abrir o projeto com **Live Server** (VS Code) ou servidor local equivalente
-2. Ter o DevTools aberto (F12 → Console) para verificar erros
-3. Antes de cada bloco de testes, limpar o banco:
-   ```
-   localStorage.clear();  // cole no console do navegador
-   ```
-4. Contas pré-criadas (disponíveis após qualquer inicialização do banco):
+1. Abrir o site publicado, ou rodar localmente com **Live Server** (VS Code)
+2. Conferir que a API está no ar: `https://king-blue-nine.vercel.app/health` deve mostrar `"banco": "ok"`
+3. Ter o DevTools aberto (F12 → Console) para verificar erros
+4. Os dados ficam no banco compartilhado (Supabase): use um aluno novo por bloco de testes, com nome, e-mail e celular ainda não usados
+5. Contas pré-criadas (seeds do banco):
 
 | Perfil     | E-mail                    | Senha          |
 |------------|---------------------------|----------------|
@@ -25,14 +23,14 @@
 
 ## CT-01 — Landing Page
 
-**Página:** `landing.html`
+**Página:** `index.html`
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Abrir `landing.html` | Página carrega sem erros no console | |
+| 1 | Abrir `index.html` | Página carrega sem erros no console | |
 | 2 | Rolar a página | Seções Hero, Como Funciona, Reinos, Equipe e Rodapé visíveis | |
-| 3 | Clicar em **Entrar** na navbar | Redireciona para `index.html` | |
-| 4 | Clicar em **Criar Conta** (hero ou navbar) | Redireciona para `register.html` | |
+| 3 | Clicar em **Já tenho conta** | Redireciona para `login.html` | |
+| 4 | Clicar em **Cadastre-se agora** | Redireciona para `register.html` | |
 | 5 | Redimensionar para mobile (<480px) | Layout responsivo, sem sobreposições | |
 
 ---
@@ -45,17 +43,18 @@
 |---|------|--------------------|-----|
 | 1 | Submeter formulário vazio | Mensagem de erro — campos obrigatórios | |
 | 2 | Inserir e-mail inválido (`abc`) | Mensagem de e-mail inválido | |
-| 3 | Inserir senhas diferentes | Mensagem "senhas não coincidem" | |
+| 3 | Inserir senhas diferentes | Mensagem "As senhas não conferem" | |
+| 3b | Inserir senha fraca (`teste123`) | Mensagem pedindo 8+ caracteres com maiúscula, minúscula, número e símbolo | |
 | 4 | Preencher todos os campos corretamente e submeter | Conta criada, redireciona para `character.html` | |
 | 5 | Tentar registrar com o mesmo e-mail novamente | Mensagem de e-mail já cadastrado | |
 
-> **Dados sugeridos:** Nome: `Aluno Teste` · E-mail: `aluno@teste.com` · Celular: `11999999999` · Senha: `Teste@123`
+> **Dados sugeridos:** Nome de usuário (sem espaços): `aluno_teste` · E-mail: `aluno@teste.com` · Celular: `11999999999` · Senha: `Teste@123`
 
 ---
 
 ## CT-03 — Login
 
-**Página:** `index.html`
+**Página:** `login.html`
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
@@ -65,7 +64,8 @@
 | 4 | Login com aluno que já tem personagem | Redireciona para `reinos.html` | |
 | 5 | Login com `prof.python@tronus.com` / `Python@prof1` | Redireciona para `professor.html` | |
 | 6 | Login com `admin@tronus.com` / `Tronus@adm1` | Redireciona para `admin.html` | |
-| 7 | Marcar **Lembrar-me** e fechar/abrir aba | Usuário permanece logado | |
+| 7 | Marcar **Manter conectado** e fechar/abrir aba | Usuário permanece logado | |
+| 8 | Desmarcar **Manter conectado**, logar e fechar a aba | Ao reabrir, pede login de novo | |
 
 ---
 
@@ -109,7 +109,7 @@
 | 2 | Verificar estrelas iniciais | Todas as estrelas apagadas (0/9 ⭐ no topbar) | |
 | 3 | Clicar na Fase 2 (bloqueada) | Nenhuma ação / cursor `not-allowed` | |
 | 4 | Clicar na Fase 1 | Modal de quiz abre com a Fase 1 | |
-| 5 | Fechar o quiz (✕) | Modal fecha; página recarrega | |
+| 5 | Fechar o quiz (✕) | Modal fecha; trilha é atualizada | |
 
 ---
 
@@ -120,14 +120,15 @@
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
 | 1 | Abrir quiz da Fase 1 | Modal branco com cabeçalho "Fase 1", barra de progresso, questão 1 de 5 | |
-| 2 | Clicar em uma alternativa **errada** | Botão fica vermelho; alternativa correta fica verde; feedback "✗ Incorreto" aparece | |
-| 3 | Clicar em uma alternativa **correta** | Botão fica verde; feedback "✓ Correto!" aparece | |
-| 4 | Tentar clicar em outra alternativa após responder | Bloqueado — sem efeito | |
+| 2 | Tentar avançar sem escolher alternativa | Botão **Próxima →** desabilitado | |
+| 3 | Clicar em uma alternativa | Alternativa fica marcada em dourado (sem indicar se está certa) | |
+| 4 | Trocar a alternativa marcada | A nova escolha substitui a anterior | |
 | 5 | Clicar **Próxima →** | Avança para a questão 2; barra de progresso avança | |
-| 6 | Responder todas as 5 questões | Botão muda para "Ver Resultado" na última | |
-| 7 | Clicar **Ver Resultado** | Tela de resultado com estrelas e mensagem motivacional | |
+| 6 | Chegar na última questão | Botão muda para "Enviar respostas" | |
+| 7 | Clicar **Enviar respostas** | A API corrige; aparece o resultado com estrelas, mensagem e a correção de cada questão (sua resposta × correta) | |
 | 8 | Verificar estrelas ganhas conforme acertos | 0 acertos = 0★ · 1–2 = 1★ · 3 = 2★ · 4–5 = 3★ | |
-| 9 | Clicar **Concluir** | Modal fecha; página recarrega | |
+| 9 | Clicar **Concluir** | Modal fecha; trilha atualizada | |
+| 10 | No DevTools (aba Network), abrir a resposta de `/fases/1/questoes` | As alternativas **não** têm o campo `correta` (o aluno não consegue colar) | |
 
 ---
 
@@ -170,7 +171,7 @@
 | 4 | Clicar em **Trocar Tema** | Tema alterna entre escuro e claro | |
 | 5 | Verificar modo claro | Topbar, textos e cards legíveis (fundo claro, texto escuro) | |
 | 6 | Clicar em **Sair** | Caixa de confirmação: "Tem certeza que deseja sair?" | |
-| 7 | Confirmar saída | Sessão encerrada; redireciona para `index.html` | |
+| 7 | Confirmar saída | Sessão encerrada; redireciona para `login.html` | |
 | 8 | Cancelar saída | Permanece na página atual | |
 
 ---
@@ -194,11 +195,11 @@
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Inserir celular **não cadastrado** | Mensagem: "Celular não encontrado" | |
-| 2 | Inserir celular do aluno cadastrado (ex.: `11999999999`) | Avanço para Passo 2; código exibido | |
-| 3 | Inserir código incorreto | Mensagem de código inválido | |
-| 4 | Inserir código correto | Campo para nova senha aparece | |
-| 5 | Definir nova senha e confirmar | Senha atualizada; redireciona para `index.html` | |
+| 1 | Inserir celular **não cadastrado** | Mensagem: "Nenhuma conta com esse celular" | |
+| 2 | Inserir celular do professor ou admin | Mensagem de que só alunos usam este fluxo | |
+| 3 | Inserir celular do aluno cadastrado | Avança para a etapa 2; em modo de teste (`SIMULAR_SMS=true`) o código aparece na tela | |
+| 4 | Inserir código incorreto + nova senha | Mensagem de código inválido ou expirado | |
+| 5 | Inserir código correto + nova senha forte | Mensagem "Senha redefinida" e botão para o login | |
 | 6 | Login com a nova senha | Login efetuado com sucesso | |
 
 ---
@@ -212,8 +213,8 @@
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Tentar acessar `professor.html` sem login | Redireciona para `index.html` | |
-| 2 | Tentar acessar `professor.html` logado como aluno | Redireciona para `index.html` | |
+| 1 | Tentar acessar `professor.html` sem login | Redireciona para `login.html` | |
+| 2 | Tentar acessar `professor.html` logado como aluno | Redireciona para a área do aluno (`reinos.html`) | |
 | 3 | Acessar logado como professor | Painel carrega; badge exibe nome do professor | |
 | 4 | Verificar título das abas | "Gerenciar Questões — Reino Python" e "Desempenho dos Alunos — Reino Python" | |
 
@@ -221,7 +222,7 @@
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Selecionar **Fase 1** no dropdown | Lista as 5 questões seedadas; botão "+ Nova Questão" aparece | |
+| 1 | Selecionar **Fase 1** no dropdown | Lista as 5 questões seedadas, com a alternativa correta marcada (✓); botão "+ Nova Questão" aparece | |
 | 2 | Clicar **+ Nova Questão** | Formulário expande | |
 | 3 | Submeter formulário **sem enunciado** | Toast: "Preencha o enunciado" | |
 | 4 | Preencher enunciado, **sem marcar alternativa correta** | Toast: "Marque a alternativa correta" | |
@@ -252,8 +253,9 @@
 
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
-| 1 | Tentar acessar `admin.html` sem login | Redireciona para `index.html` | |
-| 2 | Tentar acessar `admin.html` logado como aluno | Redireciona para `index.html` | |
+| 1 | Tentar acessar `admin.html` sem login | Redireciona para `login.html` | |
+| 2 | Tentar acessar `admin.html` logado como aluno | Redireciona para a área do aluno (`reinos.html`) | |
+| 4 | Logado como aluno, editar `tronus.usuario` no localStorage para `"papel":"admin"` e abrir `admin.html` | A página abre, mas todas as chamadas falham com "Seu perfil não tem acesso" (a API valida o token) | |
 | 3 | Acessar logado como admin | Painel carrega; badge exibe "admin" | |
 
 ### CT-14B — Estatísticas e Usuários
@@ -261,7 +263,8 @@
 | # | Ação | Resultado esperado | ✔/✘ |
 |---|------|--------------------|-----|
 | 1 | Verificar cards de estatísticas | Usuários, Alunos, Personagens, Questões, Respostas com números corretos | |
-| 2 | Verificar tabela de usuários | Lista com colunas: #, Nome, E-mail, Papel, Ação | |
+| 2 | Verificar tabela de usuários | Lista com colunas: #, Nome, E-mail, Papel, Reino, Ação | |
+| 2b | Trocar o Reino de um professor no seletor | Toast confirmando; ao logar como esse professor, o painel mostra o novo Reino | |
 | 3 | Verificar linha do admin | Coluna Ação exibe "protegido" (sem botão excluir) | |
 | 4 | Verificar linha do professor | Coluna Ação exibe "protegido" | |
 | 5 | Clicar **Excluir** em um aluno | Diálogo de confirmação exibido | |
@@ -279,6 +282,7 @@ Após todas as correções aplicadas, verificar que os bugs anteriores não reap
 | 1 | Clicar na Fase 1 da trilha | Quiz abre (não falha silenciosamente) | |
 | 2 | Concluir quiz e recarregar a trilha | Estrelas exibidas; próxima fase desbloqueada | |
 | 3 | Abrir `professor.html` | Nenhum erro no console | |
+| 3b | Cadastrar um aluno com nome `<b>teste</b>` e abrir `admin.html` | O nome aparece como texto, sem negrito (HTML escapado) | |
 | 4 | Abrir `admin.html` | Nenhum erro no console | |
 | 5 | Abrir `trilha.html` | Nenhum erro `q.nivel_dificuldade` no console | |
 | 6 | Sidebar em `admin.html` | Botão Voltar visível e não sobreposto | |
@@ -293,28 +297,28 @@ Após todas as correções aplicadas, verificar que os bugs anteriores não reap
 | Bloco | Casos | Mínimo para aprovação |
 |-------|-------|-----------------------|
 | CT-01 Landing | 5 | 5/5 |
-| CT-02 Registro | 5 | 4/5 |
-| CT-03 Login | 7 | 6/7 |
+| CT-02 Registro | 6 | 5/6 |
+| CT-03 Login | 8 | 7/8 |
 | CT-04 Personagem | 6 | 5/6 |
 | CT-05 Reinos | 5 | 5/5 |
 | CT-06 Trilha | 5 | 5/5 |
-| CT-07 Quiz | 9 | 8/9 |
+| CT-07 Quiz | 10 | 9/10 |
 | CT-08 Progresso | 5 | 5/5 |
 | CT-09 Dashboard | 3 | 2/3 |
 | CT-10 Sidebar/Tema | 8 | 7/8 |
 | CT-11 LIBRAS | 4 | 4/4 |
 | CT-12 Recuperação | 6 | 4/6 |
 | CT-13 Professor | 14 | 12/14 |
-| CT-14 Admin | 8 | 7/8 |
-| CT-15 Regressão | 9 | 9/9 |
-| **TOTAL** | **99** | **88/99 (≥89%)** |
+| CT-14 Admin | 10 | 9/10 |
+| CT-15 Regressão | 10 | 10/10 |
+| **TOTAL** | **105** | **94/105 (≥89%)** |
 
 ---
 
 ## Observações
 
-- **Reset do banco:** `localStorage.clear(); location.reload()` no console do navegador
-- **Banco persiste** entre recarregamentos — use reset entre blocos independentes
-- Senhas são armazenadas em texto simples (escopo acadêmico — sem hash por limitação do ambiente client-side)
-- Os reinos C++, Engenharia de Software, Banco de Dados e Redes **não possuem questões seedadas** — comportamento esperado: "Este reino ainda não tem questões cadastradas"
-- `forgot_password.html` usa código de recuperação **simulado** (exibido em tela por ser ambiente local sem SMS)
+- **Banco compartilhado:** todos os dados ficam no Supabase. Para limpar dados de teste, o admin exclui os alunos de teste pelo painel
+- **Sair:** menu lateral → Sair (apaga o token do navegador)
+- Senhas são guardadas só como hash bcrypt, gerado pela API
+- Os reinos C++, Engenharia de Software, Banco de Dados e Redes **não possuem questões seedadas** — comportamento esperado: card "Em Breve"
+- `forgot_password.html` usa código **simulado** enquanto não há SMS real: com `SIMULAR_SMS=true` na API, o código aparece na tela

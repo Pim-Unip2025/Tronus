@@ -2,7 +2,7 @@
 -- TRONUS — 02_seeds.sql
 -- Carga inicial: Reinos, Fases e o banco de questões do Reino Python.
 --
--- ARQUIVO GERADO por db/_gerar_seeds.js a partir de js/database.js.
+-- ARQUIVO GERADO por db/_gerar_seeds.js a partir de db/questoes_python.js.
 -- Não editar à mão: altere a fonte e gere de novo.
 --
 -- Idempotente: rodar duas vezes não duplica nada.

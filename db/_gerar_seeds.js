@@ -1,5 +1,5 @@
 // Gera db/02_seeds.sql e db/02b_seed_usuarios.sql a partir do banco de
-// questões que hoje vive dentro de js/database.js.
+// questões em db/questoes_python.js.
 // Rodar: node db/_gerar_seeds.js
 
 const fs = require('fs');
@@ -7,17 +7,7 @@ const path = require('path');
 const bcrypt = require('bcryptjs');
 
 const RAIZ = path.resolve(__dirname, '..');
-const src = fs.readFileSync(path.join(RAIZ, 'js/database.js'), 'utf8');
-
-// --- extrai o array `banco` de seedQuestoes() -------------------------------
-const i = src.indexOf('const banco = [');
-const ini = src.indexOf('[', i);
-let prof = 0, fim = ini;
-for (; fim < src.length; fim++) {
-  if (src[fim] === '[') prof++;
-  else if (src[fim] === ']') { prof--; if (prof === 0) { fim++; break; } }
-}
-const banco = eval(src.slice(ini, fim));
+const banco = require('./questoes_python.js');
 
 const q = (s) => "'" + String(s).replace(/'/g, "''") + "'";
 
@@ -35,7 +25,7 @@ out.push('-- ===================================================================
 out.push('-- TRONUS — 02_seeds.sql');
 out.push('-- Carga inicial: Reinos, Fases e o banco de questões do Reino Python.');
 out.push('--');
-out.push('-- ARQUIVO GERADO por db/_gerar_seeds.js a partir de js/database.js.');
+out.push('-- ARQUIVO GERADO por db/_gerar_seeds.js a partir de db/questoes_python.js.');
 out.push('-- Não editar à mão: altere a fonte e gere de novo.');
 out.push('--');
 out.push('-- Idempotente: rodar duas vezes não duplica nada.');
