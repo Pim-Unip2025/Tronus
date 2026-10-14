@@ -50,132 +50,98 @@
 
   <script src="js/script.js"></script>
   <script src="js/theme.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.2/sql-wasm.js"></script>
-  <script src="js/database.js"></script>
-
+  <script src="js/api.js"></script>
 
   <script>
+    Sessao.exigir("aluno");
 
-    // Ícones de cada reino (adicione os arquivos em img/ conforme for gerando)
+    // Ícone de cada reino (fallback em emoji se não houver imagem)
     const reinoIcones = {
-      "Python":                "img/python.png",
-      "C++":                   "img/c++.png",
+      "Python":                 "img/python.png",
+      "C++":                    "img/c++.png",
       "Engenharia de Software": "img/soft.png",
-      "Banco de Dados":        "img/bd.png",
-      "Redes":                 "img/redes.png",
+      "Banco de Dados":         "img/bd.png",
+      "Redes":                  "img/redes.png",
     };
-
-    // Emojis de fallback caso não tenha imagem
     const reinoEmojis = {
-      "Python":                "🐍",
-      "C++":                   "⚙️",
-      "Engenharia de Software": "📐",
-      "Banco de Dados":        "🗄️",
-      "Redes":                 "🌐",
+      "Python": "🐍", "C++": "⚙️", "Engenharia de Software": "📐", "Banco de Dados": "🗄️", "Redes": "🌐",
     };
 
-    initDatabase().then(() => {
+    // Limiar do próximo título. A fonte da verdade é o banco; aqui é só a barra.
+    const PROXIMO = { Plebeu: ["Cavaleiro", 15], Cavaleiro: ["Duque", 30], Duque: ["Rei", 45], Rei: null };
 
-      const usuario = JSON.parse(sessionStorage.getItem("usuarioLogado")) 
-             || JSON.parse(localStorage.getItem("usuarioLogado"));
-
-      if (!usuario) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      const personagem = buscarPersonagem(usuario.id);
-
-      if (!personagem) {
-        window.location.href = "character.html";
-        return;
-      }
-
-      // Preenche o topo
-      document.getElementById("avatarImg").src      = personagem.avatar;
-      document.getElementById("playerName").innerText  = personagem.nome;
-      document.getElementById("playerTitle").innerText = personagem.titulo_atual;
-      document.getElementById("totalEstrelas").innerText = personagem.total_estrelas;
-
-      // Barra de progresso (meta: 45 estrelas = Rei, o máximo do jogo)
-      const pct = Math.min((personagem.total_estrelas / 45) * 100, 100);
-      document.getElementById("progressFill").style.width = pct + "%";
-      document.getElementById("progressLabel").innerText =
-        personagem.total_estrelas + " / 45 para Rei";
-
-      // Busca progresso
-      const progresso = buscarProgresso(personagem.id);
-
-      // Agrupa por reino
-      const reinos = {};
-      progresso.forEach(row => {
-        if (!reinos[row.reino_id]) {
-          reinos[row.reino_id] = {
-            id: row.reino_id,
-            nome: row.reino_nome,
-            fases: []
-          };
-        }
-        reinos[row.reino_id].fases.push({
-          id: row.fase_id,
-          nome: row.fase_nome,
-          estrelas: row.estrelas
-        });
-      });
-
+    async function carregar() {
       const grid = document.getElementById("reinosGrid");
-      const reinosList = Object.values(reinos);
+      let personagem;
+      try {
+        personagem = await api.meuPersonagem();
+      } catch (erro) {
+        if (erro.status === 404) return window.location.replace("character.html");
+        grid.innerHTML = `<p class="reinos-erro">${escapar(erro.message)}</p>`;
+        return;
+      }
 
-      reinosList.forEach((reino, index) => {
+      // Topo
+      document.getElementById("avatarImg").src = personagem.avatar;
+      document.getElementById("playerName").textContent = personagem.nome;
+      document.getElementById("playerTitle").textContent = personagem.titulo_atual;
+      document.getElementById("totalEstrelas").textContent = personagem.total_estrelas;
 
-        const totalEstrelas = reino.fases.reduce((s, f) => s + f.estrelas, 0);
-        const maxEstrelas   = reino.fases.length * 3;
+      const prox = PROXIMO[personagem.titulo_atual];
+      const meta = prox ? prox[1] : 45;
+      document.getElementById("progressFill").style.width = Math.min((personagem.total_estrelas / meta) * 100, 100) + "%";
+      document.getElementById("progressLabel").textContent = prox
+        ? `${personagem.total_estrelas} / ${meta} para ${prox[0]}`
+        : "Todos os Reinos dominados!";
 
-        // Verifica se o reino tem questões cadastradas
-        const temQuestoes = reino.fases.some(f => {
-          const q = buscarQuestoesPorFase(f.id);
-          return q && q.length > 0;
+      try {
+        const [reinos, progresso] = await Promise.all([api.reinos(), api.meuProgresso()]);
+
+        // "Em breve" = a primeira fase do Reino ainda não tem perguntas.
+        const temQuestoes = await Promise.all(
+          reinos.map(async (r) => {
+            const primeira = progresso.find((p) => p.reino_id === r.id && p.ordem === 1);
+            if (!primeira) return false;
+            try {
+              return (await api.questoes(primeira.fase_id)).length > 0;
+            } catch {
+              return true; // na dúvida, deixa entrar; a trilha trata
+            }
+          }),
+        );
+
+        grid.innerHTML = "";
+        reinos.forEach((reino, i) => {
+          const fases = progresso.filter((p) => p.reino_id === reino.id);
+          const estrelas = fases.reduce((s, f) => s + f.estrelas, 0);
+          const max = fases.length * 3;
+          const disponivel = temQuestoes[i];
+
+          const card = document.createElement(disponivel ? "button" : "div");
+          card.classList.add("reino-card");
+          if (!disponivel) card.classList.add("em-breve");
+
+          const icone = reinoIcones[reino.nome];
+          card.innerHTML = `
+            ${icone
+              ? `<img class="reino-icone" src="${escapar(icone)}" alt="">`
+              : `<div class="reino-icone-placeholder">${reinoEmojis[reino.nome] || "⚔️"}</div>`}
+            <div class="reino-nome">${escapar(reino.nome)}</div>
+            <div class="reino-progresso">${disponivel ? `${estrelas} / ${max} ⭐` : "Questões em desenvolvimento"}</div>
+            ${disponivel ? "" : `<div class="reino-badge-breve">✦ Em Breve</div>`}
+          `;
+          if (disponivel) {
+            card.type = "button";
+            card.onclick = () => (window.location.href = `trilha.html?reino=${reino.id}`);
+          }
+          grid.appendChild(card);
         });
+      } catch (erro) {
+        grid.innerHTML = `<p class="reinos-erro">${escapar(erro.message)}</p>`;
+      }
+    }
 
-        const card = document.createElement("div");
-        card.classList.add("reino-card");
-        if (!temQuestoes) card.classList.add("em-breve");
-
-        // Ícone ou emoji
-        const icone = reinoIcones[reino.nome];
-        let iconeHtml = "";
-        if (icone) {
-          iconeHtml = `<img class="reino-icone" src="${icone}" alt="${reino.nome}">`;
-        } else {
-          iconeHtml = `<div class="reino-icone-placeholder">${reinoEmojis[reino.nome] || "⚔️"}</div>`;
-        }
-
-        const badgeHtml = !temQuestoes
-          ? `<div class="reino-badge-breve">✦ Em Breve</div>`
-          : "";
-
-        card.innerHTML = `
-          ${iconeHtml}
-          <div class="reino-nome">${reino.nome}</div>
-          <div class="reino-progresso">${temQuestoes ? `${totalEstrelas} / ${maxEstrelas} ⭐` : "Questões em desenvolvimento"}</div>
-          ${badgeHtml}
-        `;
-
-        if (temQuestoes) {
-          card.onclick = () => {
-            sessionStorage.setItem("reinoSelecionado", JSON.stringify(reino));
-            sessionStorage.setItem("personagemId", personagem.id);
-            localStorage.setItem("reinoSelecionado", JSON.stringify(reino));
-            localStorage.setItem("personagemId", personagem.id);
-            window.location.href = "trilha.html";
-          };
-        }
-
-        grid.appendChild(card);
-      });
-
-    });
-
+    carregar();
   </script>
   <script src="js/sidebar.js"></script>
 

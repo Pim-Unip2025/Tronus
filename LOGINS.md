@@ -44,7 +44,7 @@ Exemplo sugerido para testes:
 |--------|--------------------|
 | Nome   | `aluno_teste`      |
 | E-mail | `aluno@teste.com`  |
-| Senha  | `Aluno123`         |
+| Senha  | `Aluno@123`        |
 | Papel  | `aluno` (padrão)   |
 
 **Acesso:** após login cria personagem e acessa os Reinos normalmente
@@ -53,8 +53,6 @@ Exemplo sugerido para testes:
 
 ## ⚠️ Observações
 
-- As senhas são armazenadas em texto simples no banco SQLite local (sql.js / localStorage).
-  Em produção real seria necessário aplicar hashing (ex.: bcrypt).
-- O banco de dados fica no `localStorage` do navegador sob a chave `tronusDB`.
-- Para forçar a recriação dos usuários especiais, limpe o `localStorage` do navegador
-  (`localStorage.clear()`) e recarregue qualquer página do sistema.
+- Estes usuários vêm dos seeds do banco (`db/02b_seed_usuarios.sql`), que já estão no Supabase.
+- As senhas ficam guardadas só como hash bcrypt; a API nunca devolve a senha.
+- Professor e admin não usam o "esqueci a senha": pedem a redefinição ao administrador.

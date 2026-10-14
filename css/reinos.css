@@ -292,3 +292,15 @@ body::before {
   overflow: hidden;
   pointer-events: none;
 }
+
+/* card de reino como <button> (acessível pelo teclado) */
+button.reino-card {
+  font: inherit;
+  color: inherit;
+}
+
+.reinos-erro {
+  color: #ffd2ca;
+  text-align: center;
+  width: 100%;
+}
