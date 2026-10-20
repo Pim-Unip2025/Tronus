@@ -6,7 +6,18 @@
 
 **Sistema gamificado de apoio acadêmico — PIM IV · ADS · UNIP**
 
+<<<<<<< HEAD
 [Site](https://tronus-one.vercel.app) · [API](https://king-blue-nine.vercel.app/docs) · [App mobile](https://github.com/Pim-Unip2025/mobile)
+=======
+[![GitHub](https://img.shields.io/badge/GitHub-Tronus-181717?style=for-the-badge&logo=github)](https://github.com/Pim-Unip2025/Tronus)
+![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=c-sharp&logoColor=white)
+![.NET 10](https://img.shields.io/badge/.NET_10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)
+>>>>>>> 7afe996 (feat: implementa cliente desktop nativo C# .NET 10, todas as telas, modelos, documentacao completa e diagramas UML)
 
 </div>
 
@@ -14,7 +25,19 @@
 
 ## Sobre
 
+<<<<<<< HEAD
 O **Tronus** ajuda calouros com dificuldade no semestre transformando a jornada acadêmica numa aventura: cada matéria é um **Reino** a ser conquistado.
+=======
+### 📖 Sobre o Projeto
+
+**Tronus** é um sistema gamificado de apoio acadêmico desenvolvido para ajudar alunos calouros que estão com dificuldades no semestre. A ideia é transformar a jornada acadêmica em uma aventura épica, onde cada matéria é um **Reino** a ser conquistado.
+
+A plataforma possui duas interfaces clientes integradas à mesma API central:
+1. 🌐 **Aplicação Web:** Interface responsiva construída em HTML5, CSS3 e JavaScript.
+2. 🖥️ **Aplicação Desktop ([`TronusDesktop`](TronusDesktop/README.md)):** Cliente nativo Windows construído em C# e **.NET 10 (Windows Forms)** no modelo *Thin Client*, com atmosfera medieval personalizada.
+
+### 🎮 Como Funciona
+>>>>>>> 7afe996 (feat: implementa cliente desktop nativo C# .NET 10, todas as telas, modelos, documentacao completa e diagramas UML)
 
 | Elemento | Descrição |
 |---|---|
@@ -25,12 +48,80 @@ O **Tronus** ajuda calouros com dificuldade no semestre transformando a jornada 
 
 Perfis: **aluno** joga; **professor** cuida das perguntas do seu Reino e acompanha os alunos; **admin** gerencia usuários e vê os números da plataforma.
 
+<<<<<<< HEAD
 ## Como as peças se conectam
 
 ```
 Site (este repo)  ─┐
 App mobile        ─┼──>  API (repo king, NestJS na Vercel)  ──>  PostgreSQL (Supabase)
 App desktop       ─┘
+=======
+- 🔐 Cadastro e login com nome de usuário ou e-mail (autenticação JWT)
+- 📱 Recuperação de senha com validações de segurança
+- 🧙 Criação de personagem com escolha de gênero e avatar medieval
+- 🗺️ Sistema de Reinos (matérias) com fases sequenciais e estrelas
+- 🏆 Progressão automática de títulos no banco de dados conforme conquistas
+- 📊 Dashboard de análise de desempenho e taxa de acertos
+- ☁️ Banco de dados relacional centralizado **PostgreSQL (Supabase)** e API REST (NestJS)
+
+### 🚀 Como Rodar o Projeto
+
+#### 1. Versão Desktop (C# / .NET 10)
+Consulte a documentação completa em [`TronusDesktop/README.md`](TronusDesktop/README.md).
+```bash
+# Executar a aplicação desktop
+dotnet run --project TronusDesktop/TronusDesktop.csproj
+```
+
+#### 2. Versão Web (Navegador)
+1. Abra a pasta no **VSCode**
+2. Instale a extensão **Live Server**
+3. Clique com o botão direito no `index.html` → **Open with Live Server**
+4. Pronto! O projeto abrirá no navegador 🎉
+
+### 🛠️ Tecnologias Utilizadas
+
+- **C# / .NET 10 (Windows Forms)** — Aplicação Desktop nativa
+- **HTML5 / CSS3 / JavaScript** — Aplicação Web responsiva
+- **PostgreSQL / Supabase** — Banco de dados relacional com RLS e triggers ([`db/README.md`](db/README.md))
+- **NestJS / REST API** — Backend centralizado
+- **Boxicons & Google Fonts** — Ícones e tipografia (Poppins)
+
+---
+
+## 🇺🇸 English
+
+### 📖 About the Project
+
+**Tronus** is a gamified academic support system developed to help freshman students who are struggling during the semester. The idea is to transform the academic journey into an epic adventure, where each subject is a **Kingdom** to be conquered.
+
+### 🎮 How It Works
+
+| Element | Description |
+|---|---|
+| 👑 **Plebeian** | Freshman's initial title |
+| ⚔️ **Kingdoms** | Represent the semester's subjects |
+| 🏰 **Phases** | Each kingdom has 3 phases to complete |
+| ⭐ **Stars** | Each phase is worth up to 3 stars |
+| 🎖️ **Knight** | Achieved at 15 stars |
+| 🦅 **Duke** | Achieved at 30 stars |
+| 👑 **King** | Achieved at 50 stars — all kingdoms conquered |
+
+### ✨ Features
+
+- 🔐 Register and login with username or email
+- 📱 Password recovery via phone number
+- 🧙 Character creation with gender and avatar selection
+- 🗺️ Kingdom system (subjects) with phases and stars
+- 🏆 Title progression based on achievements
+- 💾 Local SQLite database via `sql.js`
+
+### 🚀 How to Run
+
+1. Clone the repository:
+```bash
+git clone https://github.com/Pim-Unip2025/Tronus.git
+>>>>>>> 7afe996 (feat: implementa cliente desktop nativo C# .NET 10, todas as telas, modelos, documentacao completa e diagramas UML)
 ```
 
 - **Este repositório** tem o site (HTML/CSS/JS puro, sem build) e os scripts do banco (`db/`).
