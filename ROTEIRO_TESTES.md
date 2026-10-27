@@ -327,31 +327,18 @@ Após todas as correções aplicadas, verificar que os bugs anteriores não reap
 | CT-11 LIBRAS | 4 | 4/4 |
 | CT-12 Recuperação | 6 | 4/6 |
 | CT-13 Professor | 14 | 12/14 |
-<<<<<<< HEAD
-| CT-14 Admin | 10 | 9/10 |
-| CT-15 Regressão | 10 | 10/10 |
-| **TOTAL** | **105** | **94/105 (≥89%)** |
-=======
 | CT-14 Admin | 8 | 7/8 |
 | CT-15 Regressão | 9 | 9/9 |
 | CT-DESKTOP (C#) | 7 | 6/7 |
 | **TOTAL** | **106** | **94/106 (≥88%)** |
->>>>>>> 7afe996 (feat: implementa cliente desktop nativo C# .NET 10, todas as telas, modelos, documentacao completa e diagramas UML)
 
 ---
 
 ## Observações
 
-<<<<<<< HEAD
-- **Banco compartilhado:** todos os dados ficam no Supabase. Para limpar dados de teste, o admin exclui os alunos de teste pelo painel
-- **Sair:** menu lateral → Sair (apaga o token do navegador)
-- Senhas são guardadas só como hash bcrypt, gerado pela API
-- Os reinos C++, Engenharia de Software, Banco de Dados e Redes **não possuem questões seedadas** — comportamento esperado: card "Em Breve"
-- `forgot_password.html` usa código **simulado** enquanto não há SMS real: com `SIMULAR_SMS=true` na API, o código aparece na tela
-=======
-- **Reset do banco Web:** `localStorage.clear(); location.reload()` no console do navegador
-- **Banco Desktop / API:** Integração centralizada com banco PostgreSQL no Supabase via API NestJS na Vercel
-- **Credenciais de teste API:** `admin` / `Tronus@adm1` e `prof_python` / `Python@prof1`
-- Os reinos C++, Engenharia de Software, Banco de Dados e Redes **não possuem questões seedadas** — comportamento esperado: "Este reino ainda não tem questões cadastradas"
-- `forgot_password.html` usa código de recuperação **simulado** (exibido em tela por ser ambiente local sem SMS)
->>>>>>> 7afe996 (feat: implementa cliente desktop nativo C# .NET 10, todas as telas, modelos, documentacao completa e diagramas UML)
+- **Banco compartilhado:** Todos os dados ficam centralizados no PostgreSQL (Supabase) consumidos via API NestJS na Vercel. Para limpar dados de teste, o admin pode gerenciar os alunos pelo painel.
+- **Credenciais de teste API:** `admin` / `Tronus@adm1` e `prof_python` / `Python@prof1`.
+- **Sair:** Menu lateral → Sair (encerra a sessão e apaga o token).
+- **Senhas:** Guardadas exclusivamente como hash bcrypt gerado pela API.
+- **Questões dos Reinos:** Os reinos C++, Engenharia de Software, Banco de Dados e Redes não possuem questões seedadas — comportamento esperado: card "Em Breve" / "Este reino ainda não tem questões cadastradas".
+- **Recuperação de Senha:** `forgot_password.html` usa código de recuperação simulado exibido em tela enquanto em ambiente local/sem gateway SMS.

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TronusDesktop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e4f7d97ccf14ff6f97578677cf77e03cc11381a8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+97593cce759028140412d242c766b4f6f04207f2")]
 [assembly: System.Reflection.AssemblyProductAttribute("TronusDesktop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TronusDesktop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
